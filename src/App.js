@@ -1,26 +1,21 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import 'antd/dist/antd.css';
+import './App.scss';
+import LoadingGif from './assets/gif/loading.gif';
+const Board = React.lazy(() => import("./views/Board/Board"));
+const Loading = () => {
+	return (
+		 <div style={{width:"100%",height:"100%",verticalAlign:"middle",textAlign:"center"}}>
+			 <img src={LoadingGif} alt={"Cargando..."}/>
+		 </div>
+	);
+};
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	return (
+		 <React.Suspense fallback={Loading()}>
+			<Board/>
+		 </React.Suspense>
+	);
 }
 
 export default App;

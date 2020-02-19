@@ -1,0 +1,18 @@
+$background: #2C313C;
+$board: #F4F4F4;
+.mainCtn {
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  background-color: $background;
+}
+.title {
+  color: whitesmoke;
+}
+.board {
+  background-color: $board;
+  border-radius: 10px;
+  height: 500px;
+  border-style: solid;
+  border-color: grey;
+}

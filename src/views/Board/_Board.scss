@@ -1,0 +1,44 @@
+$background: #2C313C;
+$board: #F4F4F4;
+.mainCtn {
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  background-color: $background;
+}
+.boardTitle {
+  color: whitesmoke;
+}
+.board {
+  background-color: $board;
+  border-radius: 10px;
+  height: 500px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: grey;
+}
+.graphCtn {
+  //margin: 10px;
+}
+.linkLabelInput {
+  border-width: 0 0 1px 0;
+  border-color: red green gray red;
+  border-style: solid;
+  height: 45px;
+  width: 100%;
+  color: #003152;
+  font-weight: 400;
+  font-size: 20px;
+  text-align: center;
+  padding-bottom: 5px;
+}
+.linkLabelInput:focus {
+  outline: none;
+}
+::-webkit-input-placeholder {
+  color: #003152;
+  font-weight: 200;
+  font-size: 20px;
+  vertical-align: top;
+  text-align: center;
+}
