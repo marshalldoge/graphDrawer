@@ -15,17 +15,14 @@ class Board extends Component {
 		inputType: "node",
 		nodeRadius: 200,
 		data: {
-			nodes: [{ id: "0" }, { id: "1" }, { id: "2" }],
-			links: [
-				{ source: "0", target: "1",label: "3" },
-				{ source: "1", target: "0",label: "10" },
-				{ source: "1", target: "2", label: "0" }
-				],
+			nodes: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
+			links: [],
 		},
 		lastActionType: null,
 		linkSource: null,
 		linkTarget: null,
 		isAddLinkLabelModalOpen: false,
+		//isAddNodeLabelModalOpen
 		clickedLink: null,
 		addLabelInputValue: "",
 		directed: true
@@ -36,6 +33,7 @@ class Board extends Component {
 		linkHighlightBehavior: true,
 		automaticRearrangeAfterDropNode: true,
 		directed: this.state.directed,
+		staticGraph: false,
 		d3: {
 			alphaTarget: 0.05,
 			gravity: -200,
@@ -45,7 +43,7 @@ class Board extends Component {
 		node: {
 			color: "#C05D4F",
 			size: 900,
-			fontSize: 15,
+			fontSize: 20,
 			fontColor: "#3C4655",
 			highlightStrokeColor: "#2E4052",
 			highlightFontSize: 20,
@@ -66,38 +64,77 @@ class Board extends Component {
 	};
 
 	/**
+	 * Play stopped animations.
+	 */
+	restartGraphSimulation = () => this.refs.graph.restartSimulation();
+
+	/**
 	 * If you have moved nodes you will have them restore theirs positions
 	 * when you call resetNodesPositions.
 	 */
 	resetNodesPositions = () => this.refs.graph.resetNodesPositions();
-
 	// graph event callbacks
 	onClickGraph = () => {
 		let me = this;
+		/*
 		me.setState ((prevState) =>{
 			console.log("Crating new node");
 			prevState.data.nodes.push(
 				 {id: prevState.data.nodes.length.toString()}
 			);
-			console.log("New state: ",prevState);
 			prevState.lastActionType = "node";
 			return prevState;
 		});
+		//me.resetNodesPositions();
+		me.restartGraphSimulation();
+
+		 */
 	};
 
 	onClickNode = (nodeId) => {
 		let me = this;
 		if(this.state.inputType === "node"){
+			me.setState((prevState) => {
 
+				return prevState;
+			})
 		}else {
 			console.log("Creating link");
 			if(this.state.linkSource === null) {
 				console.log("From: ",nodeId);
 				this.setState({linkSource:nodeId});
+				me.setState ((prevState) =>{
+					console.log("Crating new node");
+					/*
+					for(let i = 0; i < prevState.data.nodes.length; i++) {
+						if(prevState.data.nodes[i].id === nodeId) {
+							prevState.data.nodes[i]= {
+								id: nodeId,
+								color: "#446984"
+							};
+							break;
+						}
+					}
+					 */
+					prevState.lastActionType = "edge";
+					return prevState;
+				});
 			} else {
 				console.log("To: ",nodeId);
 				me.setState ((prevState) =>{
 					console.log("Crating new node");
+					/*
+					for(let i = 0; i < prevState.data.nodes.length; i++) {
+						if(prevState.data.nodes[i].id === prevState.linkSource) {
+							prevState.data.nodes[i]= {
+								id: prevState.linkSource,
+								color: "#C05D4F"
+							};
+							break;
+						}
+					}
+					
+					 */
 					prevState.data.links.push(
 						 {
 							 source:prevState.linkSource,
@@ -113,7 +150,7 @@ class Board extends Component {
 					prevState.linkSource = null;
 					prevState.isAddLinkLabelModalOpen = true;
 					return prevState;
-				});
+				},me.restartGraphSimulation);
 			}
 		}
 	};
@@ -164,6 +201,7 @@ class Board extends Component {
 	setTypeInput = (e,type) => {
 		console.log("InputType: ",type);
 		this.setState({inputType: type});
+		this.restartGraphSimulation();
 	};
 
 	undoAction = (e) => {
@@ -193,18 +231,26 @@ class Board extends Component {
 	};
 
 	createNode = (e) => {
-		/*
-		var rect = e.target.getBoundingClientRect();
-		let x = e.clientX - rect.left - (this.state.nodeRadius/2);
-		let y = e.clientY - rect.top - (this.state.nodeRadius/2);
-
-		 */
-		this.setState ((prevState) =>{
-			prevState.data.nodes.push(
-				 {id: "Nuevo"}
-			);
-			return prevState;
-		});
+		if(this.state.inputType === "node") {
+			var rect = e.target.getBoundingClientRect();
+			let x = e.clientX - rect.left;
+			let y = e.clientY - rect.top;
+			let me = this;
+			me.setState((prevState) => {
+				console.log("Crating new node");
+				prevState.data.nodes.push(
+					 {
+						 id: prevState.data.nodes.length.toString(),
+						 x: x,
+						 y: y
+					 }
+				);
+				prevState.lastActionType = "node";
+				return prevState;
+			});
+			//me.resetNodesPositions();
+			me.restartGraphSimulation();
+		}
 	};
 
 	ProcessedMatrix = () => {
@@ -303,6 +349,43 @@ class Board extends Component {
 		);
 	};
 
+	AddNodeLabelModal = () => {
+		let me = this;
+		const customStyles = {
+			content : {
+				top                   : '50%',
+				left                  : '50%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)'
+			}
+		};
+		return (
+			 <Modal
+				  isOpen={this.state.isAddLinkLabelModalOpen}
+				  onRequestClose={this.closeAddLinkLabelModal}
+				  style={customStyles}
+				  contentLabel="Add Edge"
+				  ariaHideApp={false}
+			 >
+				 <Row>
+					 <Col span={24}>
+						 <input
+							  className={"linkLabelInput"}
+							  type="text"
+							  value={this.state.addLabelInputValue}
+							  onChange={this.handleChange}
+							  placeholder={"Node Name..."}
+							  onKeyUp={this.addLinkLabel}
+							  autoFocus
+						 />
+					 </Col>
+				 </Row>
+			 </Modal>
+		);
+	};
+
 
 	render() {
 		return (
@@ -336,8 +419,9 @@ class Board extends Component {
 				 <Row type="flex" justify="space-around" align="middle">
 					 <Col span={23}>
 						 <div className={"board"}>
-							 <div className={"graphCtn"}>
+							 <div className={"graphCtn"} onClick={this.createNode}>
 								 <Graph
+									  ref="graph"
 									  id="graph-id" // id is mandatory, if no id is defined rd3g will throw an error
 									  data={this.state.data}
 									  config={this.myConfig}

@@ -84,7 +84,7 @@ class Matrix extends Component {
 			let nodes = [];
 			for(let j = 0;j<this.props.nodes.length;j++) {
 				let hashValue = i * this.props.nodes.length + j;
-				let cellValue = this.props.edges[hashValue]? this.props.edges[hashValue] : "NO";
+				let cellValue = this.props.edges[hashValue]? this.props.edges[hashValue] : "-";
 				nodes.push(
 					 <Col key={hashValue}>
 						 {this.Cell(cellValue)}
