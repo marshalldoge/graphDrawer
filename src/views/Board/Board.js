@@ -106,6 +106,10 @@ class Board extends Component {
 				this.setState({linkSource:nodeId});
 				me.setState ((prevState) =>{
 					console.log("Crating new node");
+					prevState.data.nodes[nodeId] = {
+						id: nodeId,
+						color: "#446984"
+					};
 					/*
 					for(let i = 0; i < prevState.data.nodes.length; i++) {
 						if(prevState.data.nodes[i].id === nodeId) {
@@ -124,6 +128,10 @@ class Board extends Component {
 				console.log("To: ",nodeId);
 				me.setState ((prevState) =>{
 					console.log("Crating new node");
+					prevState.data.nodes[prevState.linkSource]= {
+						id: prevState.linkSource,
+						color: "#C05D4F"
+					};
 					/*
 					for(let i = 0; i < prevState.data.nodes.length; i++) {
 						if(prevState.data.nodes[i].id === prevState.linkSource) {
@@ -151,6 +159,7 @@ class Board extends Component {
 					prevState.actionHistory.push("link");
 					prevState.linkSource = null;
 					prevState.isAddLinkLabelModalOpen = true;
+					me.restartGraphSimulation();
 					return prevState;
 				},me.restartGraphSimulation);
 			}
