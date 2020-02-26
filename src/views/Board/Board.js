@@ -159,9 +159,9 @@ class Board extends Component {
 					prevState.actionHistory.push("link");
 					prevState.linkSource = null;
 					prevState.isAddLinkLabelModalOpen = true;
-					me.restartGraphSimulation();
 					return prevState;
 				},me.restartGraphSimulation);
+				me.restartGraphSimulation();
 			}
 		}
 	};
@@ -340,6 +340,26 @@ class Board extends Component {
 			}
 		}
 	};
+	addLinkLabelEnterButton = () => {
+		let me = this;
+		console.log("Clicked enter!");
+		console.log("This is the linked clicked: ",this.state.clickedLink);
+		for (let i = 0; i < this.state.data.links.length; i++) {
+			if (
+				 this.state.data.links[i].target === this.state.clickedLink.target &&
+				 this.state.data.links[i].source === this.state.clickedLink.source
+			) {
+				me.setState((prevState) => {
+					prevState.data.links[i].label = prevState.addLabelInputValue;
+					prevState.isAddLinkLabelModalOpen = false;
+					prevState.addLabelInputValue = "";
+					prevState.clickedLink = null;
+					return prevState;
+				});
+				break;
+			}
+		}
+	};
 
 	AddLinkLabelModal = () => {
 		let me = this;
@@ -362,7 +382,7 @@ class Board extends Component {
 				  ariaHideApp={false}
 			 >
 				 <Row>
-					 <Col span={24}>
+					 <Col span={18}>
 						 <input
 							  className={"linkLabelInput"}
 							  type="text"
@@ -372,6 +392,11 @@ class Board extends Component {
 							  onKeyUp={this.addLinkLabel}
 							  autoFocus
 						 />
+					 </Col>
+					 <Col span={6}>
+						 <div className={"enterButton"} onClick={this.addLinkLabelEnterButton}>
+							 <p>Enter</p>
+						 </div>
 					 </Col>
 				 </Row>
 			 </Modal>
@@ -399,7 +424,7 @@ class Board extends Component {
 				  ariaHideApp={false}
 			 >
 				 <Row>
-					 <Col span={24}>
+					 <Col span={20}>
 						 <input
 							  className={"linkLabelInput"}
 							  type="text"
@@ -409,6 +434,11 @@ class Board extends Component {
 							  onKeyUp={this.addLinkLabel}
 							  autoFocus
 						 />
+					 </Col>
+					 <Col span={4}>
+						 <div className={"enterButton"}>
+							 <p>Enter</p>
+						 </div>
 					 </Col>
 				 </Row>
 			 </Modal>
