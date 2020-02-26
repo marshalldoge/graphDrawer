@@ -19,6 +19,7 @@ class Board extends Component {
 			links: [],
 		},
 		lastActionType: null,
+		actionHistory: [],
 		linkSource: null,
 		linkTarget: null,
 		isAddLinkLabelModalOpen: false,
@@ -36,7 +37,7 @@ class Board extends Component {
 		staticGraph: false,
 		d3: {
 			alphaTarget: 0.05,
-			gravity: -200,
+			gravity: -500,
 			linkLength: 200,
 			linkStrength: 2
 		},
@@ -133,7 +134,7 @@ class Board extends Component {
 							break;
 						}
 					}
-					
+
 					 */
 					prevState.data.links.push(
 						 {
@@ -147,6 +148,7 @@ class Board extends Component {
 						target:nodeId
 					};
 					prevState.lastActionType = "link";
+					prevState.actionHistory.push("link");
 					prevState.linkSource = null;
 					prevState.isAddLinkLabelModalOpen = true;
 					return prevState;
@@ -206,6 +208,22 @@ class Board extends Component {
 
 	undoAction = (e) => {
 		let me = this;
+		if(this.state.actionHistory.length > 0){
+			if (this.state.actionHistory[this.state.actionHistory.length-1] === "node") {
+				me.setState((prevState) => {
+					prevState.data.nodes.pop();
+					prevState.actionHistory.pop();
+					return prevState;
+				});
+			} else {
+				me.setState((prevState) => {
+					prevState.data.links.pop();
+					prevState.actionHistory.pop();
+					return prevState;
+				});
+			}
+		}
+		/*
 		if(this.state.lastActionType) {
 			if (this.state.lastActionType === "node") {
 				me.setState((prevState) => {
@@ -219,6 +237,8 @@ class Board extends Component {
 				});
 			}
 		}
+
+		 */
 	};
 
 	eraseAll = () => {
@@ -246,9 +266,9 @@ class Board extends Component {
 					 }
 				);
 				prevState.lastActionType = "node";
+				prevState.actionHistory.push("node");
 				return prevState;
 			});
-			//me.resetNodesPositions();
 			me.restartGraphSimulation();
 		}
 	};
