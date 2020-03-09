@@ -4,6 +4,16 @@ $matrix-radius: 7px;
   background-color: #F4F4F4;
   border-bottom-right-radius: $matrix-radius;
 }
+.matrixMobileCtn {
+  width: 400px;
+  overflow: hidden;
+  height: 500px;
+}
+.matrixMobileInnerCtn {
+  width: 500px;
+  overflow-x: scroll;
+  height: 500px;
+}
 .topTitleCtn {
   background-color: #F4F4F4;
   border-top-right-radius: $matrix-radius;

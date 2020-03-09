@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Row, Col, Button, Typography} from 'antd';
+import {Row, Col, Button, Typography, message} from 'antd';
 import { Graph } from "react-d3-graph";
 import 'antd/dist/antd.css';
 import Modal from 'react-modal';
@@ -26,7 +26,12 @@ class Board extends Component {
 		//isAddNodeLabelModalOpen
 		clickedLink: null,
 		addLabelInputValue: "",
-		directed: true
+		directed: true,
+		isMobile: window.innerWidth<480,
+		graphMap: {
+			"0": {}
+		},
+		erasedNodes: false
 	};
 
 	myConfig = {
@@ -64,6 +69,16 @@ class Board extends Component {
 		width: window.innerWidth*0.95
 	};
 
+	//Get actual index in array of some node Id
+	getNodeIndex = nodeId => {
+		let length = this.state.data.nodes.length;
+		for( let  i = 0; i < length; i++) {
+			if(this.state.data.nodes[i].id === nodeId) {
+				return i;
+			}
+		}
+	};
+
 	/**
 	 * Play stopped animations.
 	 */
@@ -94,22 +109,28 @@ class Board extends Component {
 
 	onClickNode = (nodeId) => {
 		let me = this;
-		if(this.state.inputType === "node"){
+		switch(this.state.inputType) {
+			case "node":
 			me.setState((prevState) => {
 
 				return prevState;
-			})
-		}else {
+			});
+			break;
+			case "edge":
 			console.log("Creating link");
 			if(this.state.linkSource === null) {
-				console.log("From: ",nodeId);
 				this.setState({linkSource:nodeId});
 				me.setState ((prevState) =>{
-					console.log("Crating new node");
-					prevState.data.nodes[nodeId] = {
-						id: nodeId,
-						color: "#446984"
-					};
+					console.log("Crating new edge from ",nodeId);
+					let length = prevState.data.nodes.length;
+					for(let i = 0; i < length; i++) {
+						if(prevState.data.nodes[i].id === nodeId) {
+							prevState.data.nodes[i] = {
+								id: nodeId,
+								color: "#446984"
+							};
+						}
+					}
 					/*
 					for(let i = 0; i < prevState.data.nodes.length; i++) {
 						if(prevState.data.nodes[i].id === nodeId) {
@@ -121,17 +142,52 @@ class Board extends Component {
 						}
 					}
 					 */
+
 					prevState.lastActionType = "edge";
 					return prevState;
 				});
 			} else {
-				console.log("To: ",nodeId);
-				me.setState ((prevState) =>{
-					console.log("Crating new node");
-					prevState.data.nodes[prevState.linkSource]= {
-						id: prevState.linkSource,
-						color: "#C05D4F"
-					};
+				console.log("To: ", nodeId);
+				me.setState((prevState) => {
+					// Making the conection fro graphMap
+					console.log("BEFORE graphMap: ", prevState.graphMap," with ",prevState.graphMap[parseInt(prevState.linkSource)]);
+					console.log("From ",prevState.linkSource," to ",nodeId);
+					if (prevState.graphMap[parseInt(prevState.linkSource)][nodeId] === undefined) {
+
+
+						prevState.graphMap[prevState.linkSource] = {
+							...prevState.graphMap[prevState.linkSource],
+							[nodeId]: true
+
+						};
+
+						console.log("AFTER graphMap: ", prevState.graphMap);
+
+						//Creating the node for view
+						prevState.data.nodes[prevState.linkSource] = {
+							id: prevState.linkSource,
+							color: "#C05D4F"
+						};
+
+						prevState.data.links.push(
+							 {
+								 source: prevState.linkSource,
+								 target: nodeId,
+								 label: ""
+							 }
+						);
+						prevState.clickedLink = {
+							source: prevState.linkSource,
+							target: nodeId
+						};
+						prevState.lastActionType = "link";
+						prevState.actionHistory.push("link");
+						prevState.linkSource = null;
+						prevState.isAddLinkLabelModalOpen = true;
+					} else {
+						message.error('The nodes are already connected!');
+					}
+
 					/*
 					for(let i = 0; i < prevState.data.nodes.length; i++) {
 						if(prevState.data.nodes[i].id === prevState.linkSource) {
@@ -144,25 +200,30 @@ class Board extends Component {
 					}
 
 					 */
-					prevState.data.links.push(
-						 {
-							 source:prevState.linkSource,
-							 target:nodeId,
-							 label: ""
-						 }
-					);
-					prevState.clickedLink = {
-						source:prevState.linkSource,
-						target:nodeId
-					};
-					prevState.lastActionType = "link";
-					prevState.actionHistory.push("link");
-					prevState.linkSource = null;
-					prevState.isAddLinkLabelModalOpen = true;
 					return prevState;
-				},me.restartGraphSimulation);
+				}, me.restartGraphSimulation);
 				me.restartGraphSimulation();
 			}
+			break;
+			case "erase":
+				console.log("Erasing node");
+				me.setState((prevState) => {
+					console.log("This is the nodes array: ",prevState.data.nodes);
+					for(let i = 0; i < prevState.data.nodes.length; i++) {
+						console.log("NodeId ",nodeId," ",typeof nodeId, " vs ",prevState.data.nodes[i].id, " ", typeof prevState.data.nodes[i].id);
+						if(prevState.data.nodes[i].id === nodeId) {
+							prevState.data.nodes.splice(i,1);
+							break;
+						}
+					}
+					console.log("This is the links array: ",prevState.data.links);
+					prevState.data.links = prevState.data.links.filter(l => l.source !== nodeId && l.target !== nodeId);
+					console.log("new data: ",prevState.data);
+					prevState.lastActionType = "erase";
+					prevState.erasedNodes = true;
+					return prevState;
+				});
+				break;
 		}
 	};
 
@@ -220,14 +281,18 @@ class Board extends Component {
 		if(this.state.actionHistory.length > 0){
 			if (this.state.actionHistory[this.state.actionHistory.length-1] === "node") {
 				me.setState((prevState) => {
+					console.log("Undoing node: ",prevState.data.node);
 					prevState.data.nodes.pop();
 					prevState.actionHistory.pop();
+					console.log("To new  node array: ",prevState.data.node);
 					return prevState;
 				});
 			} else {
 				me.setState((prevState) => {
+					console.log("Undoing link: ",prevState.data.node);
 					prevState.data.links.pop();
 					prevState.actionHistory.pop();
+					console.log("To new  node link: ",prevState.data.node);
 					return prevState;
 				});
 			}
@@ -255,6 +320,17 @@ class Board extends Component {
 		me.setState((prevState) => {
 			prevState.data.links = [];
 			prevState.data.nodes = [{ id: "0" }];
+			prevState.graphMap = {
+				"0": {}
+			};
+			return prevState;
+		});
+	};
+
+	eraseNode = () => {
+		let me = this;
+		me.setState((prevState) => {
+			prevState.inputType = "erase";
 			return prevState;
 		});
 	};
@@ -267,15 +343,18 @@ class Board extends Component {
 			let me = this;
 			me.setState((prevState) => {
 				console.log("Crating new node");
+				let nodeId =  prevState.data.nodes.length.toString();
 				prevState.data.nodes.push(
 					 {
-						 id: prevState.data.nodes.length.toString(),
+						 id: nodeId,
 						 x: x,
 						 y: y
 					 }
 				);
 				prevState.lastActionType = "node";
 				prevState.actionHistory.push("node");
+				prevState.graphMap[nodeId] = {};
+				console.log("Creating node, new array: ",prevState.data.nodes);
 				return prevState;
 			});
 			me.restartGraphSimulation();
@@ -288,17 +367,17 @@ class Board extends Component {
 		let length = this.state.data.links.length;
 		for(let i = 0; i < length; i++) {
 			let hashValue =
-				 parseInt(this.state.data.links[i].source,10)*nodesLength+
-				 parseInt(this.state.data.links[i].target,10);
+				 this.getNodeIndex(this.state.data.links[i].source)*nodesLength+
+				 this.getNodeIndex(this.state.data.links[i].target);
 			hash[hashValue] = this.state.data.links[i].label;
 		}
 		for(let i = 0; i < length; i++) {
 			let inverseHashValue =
-				 parseInt(this.state.data.links[i].target,10)*nodesLength+
-				 parseInt(this.state.data.links[i].source,10);
+				 this.getNodeIndex(this.state.data.links[i].target)*nodesLength+
+				 this.getNodeIndex(this.state.data.links[i].source);
 			if(hash[inverseHashValue]===undefined && !this.state.directed)hash[inverseHashValue] = this.state.data.links[i].label;
 		}
-
+		console.log("Graph map: ",this.state.graphMap);
 		console.log("Hash: ",hash);
 
 		return (
@@ -455,19 +534,26 @@ class Board extends Component {
 				 <Row type="flex" justify="space-around" align="middle">
 					 <Button type="normal" icon="dribbble" size={'large'}
 					         onClick={e => this.setTypeInput(e,"node")}
+					         disabled={this.state.inputType === "node"}
 					 >
 						 Draw/Move Nodes
 					 </Button>
 					 <Button type="normal" icon="arrows-alt" size={'large'}
 					    onClick={e => this.setTypeInput(e,"edge")}
+					         disabled={this.state.inputType === "edge"}
 					 >
 						 Draw Links
 					 </Button>
 					 <Button type="danger" icon="reload" size={'large'}
 					         onClick={this.undoAction}
-					         disabled={!this.state.lastActionType}
+					         disabled={!this.state.lastActionType || this.state.erasedNodes}
 					 >
 						 Undo
+					 </Button>
+					 <Button type="danger" icon="highlight" size={'large'}
+					         onClick={this.eraseNode}
+					 >
+						 Erase
 					 </Button>
 					 <Button type="danger" icon="delete" size={'large'}
 					         onClick={this.eraseAll}
@@ -500,8 +586,8 @@ class Board extends Component {
 
 						 <h1 className={"boardTitle"}>Adjacency Matrix</h1>
 				 </Row>
-				 <Row type="flex" justify="space-around" align="middle">
-					 <Col span={15}>
+				 <Row type="flex" justify={this.state.isMobile? "start" :"space-around"} align="middle">
+					 <Col justify={this.state.isMobile? "start" :"space-around"} span={15}>
 						 {this.ProcessedMatrix()}
 					 </Col>
 				 </Row>

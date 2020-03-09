@@ -7,6 +7,10 @@ import './_Matrix.scss';
 
 class Matrix extends Component {
 
+	state = {
+		isMobile: window.innerWidth<480
+	};
+
 	Title = value => {
 		return (
 			<div className={"title"}>
@@ -107,17 +111,36 @@ class Matrix extends Component {
 
 	render() {
 		//console.log("Node being created: with posotion: ",this.props.x,"-",this.props.y);
-		return (
-			 <Row type="flex" justify="center" align="middle">
-				 <Col>
-					 {this.LeftTitle()}
-				 </Col>
-				 <Col>
-					 {this.TopTitle()}
-					 {this.Container()}
-				 </Col>
-			 </Row>
-		);
+		if(this.state.isMobile) {
+			console.log("Is mobile matrix!");
+			return (
+				 <div className={"matrixMobileCtn"}>
+					 <div className={"matrixMobileInnerCtn"}>
+						 <Row type="flex" justify="center" align="middle">
+							 <Col>
+								 {this.LeftTitle()}
+							 </Col>
+							 <Col>
+								 {this.TopTitle()}
+								 {this.Container()}
+							 </Col>
+						 </Row>
+					 </div>
+				 </div>
+			);
+		}else{
+			return (
+				 <Row type="flex" justify="center" align="middle">
+					 <Col>
+						 {this.LeftTitle()}
+					 </Col>
+					 <Col>
+						 {this.TopTitle()}
+						 {this.Container()}
+					 </Col>
+				 </Row>
+			);
+		}
 	}
 }
 
