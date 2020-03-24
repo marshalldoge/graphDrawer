@@ -7,6 +7,7 @@ import './_Board.scss';
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
+const SelfLoopLabels = React.lazy(() => import("../../components/SelfLoopLabels/SelfLoopLabels"));
 
 class Board extends Component {
 
@@ -18,6 +19,9 @@ class Board extends Component {
 			nodes: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
 			links: [],
 		},
+		nodesPosition: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
+		lastNodeIndex: 0,
+		selfLoopLabels: [],
 		lastActionType: null,
 		actionHistory: [],
 		linkSource: null,
@@ -31,7 +35,7 @@ class Board extends Component {
 		graphMap: {
 			"0": {}
 		},
-		erasedNodes: false
+		erasedNodes: false,
 	};
 
 	myConfig = {
@@ -39,7 +43,8 @@ class Board extends Component {
 		linkHighlightBehavior: true,
 		automaticRearrangeAfterDropNode: true,
 		directed: this.state.directed,
-		staticGraph: false,
+		staticGraph: true,
+		maxZoom: 8.0,
 		d3: {
 			alphaTarget: 0.05,
 			gravity: -500,
@@ -74,6 +79,14 @@ class Board extends Component {
 		let length = this.state.data.nodes.length;
 		for( let  i = 0; i < length; i++) {
 			if(this.state.data.nodes[i].id === nodeId) {
+				return i;
+			}
+		}
+	};
+	getNodePositionIndex = nodeId => {
+		let length = this.state.data.nodes.length;
+		for( let  i = 0; i < length; i++) {
+			if(this.state.nodesPosition[i].id === nodeId) {
 				return i;
 			}
 		}
@@ -151,6 +164,7 @@ class Board extends Component {
 				me.setState((prevState) => {
 					// Making the conection fro graphMap
 					console.log("BEFORE graphMap: ", prevState.graphMap," with ",prevState.graphMap[parseInt(prevState.linkSource)]);
+					console.log("Data: ",prevState.data);
 					console.log("From ",prevState.linkSource," to ",nodeId);
 					if (prevState.graphMap[parseInt(prevState.linkSource)][nodeId] === undefined) {
 
@@ -219,6 +233,16 @@ class Board extends Component {
 					console.log("This is the links array: ",prevState.data.links);
 					prevState.data.links = prevState.data.links.filter(l => l.source !== nodeId && l.target !== nodeId);
 					console.log("new data: ",prevState.data);
+
+					for (let i = 0; i < prevState.selfLoopLabels.length; i++) {
+						console.log("SelfLoopLabels NodeId ", nodeId, " ", typeof nodeId, " vs ", prevState.selfLoopLabels[i].id, " ", typeof prevState.selfLoopLabels[i].id);
+						if (prevState.selfLoopLabels[i].id === nodeId) {
+							prevState.selfLoopLabels.splice(i, 1);
+							break;
+						}
+					}
+
+
 					prevState.lastActionType = "erase";
 					prevState.erasedNodes = true;
 					return prevState;
@@ -266,7 +290,18 @@ class Board extends Component {
 	};
 
 	onNodePositionChange = function(nodeId, x, y) {
+		let me = this;
 		console.log(`Node ${nodeId} is moved to new position. New position is x= ${x} y= ${y}`);
+		/*this.setState((prevState) => {
+			let nodeId = prevState.data.nodes.length.toString();
+			prevState.nodesPosition[me.getNodeIndex(nodeId)] =
+				 {
+					 x: x,
+					 y: y
+				 };
+		});
+
+		 */
 		//window.alert(`Node ${nodeId} is moved to new position. New position is x= ${x} y= ${y}`);
 	};
 
@@ -343,8 +378,16 @@ class Board extends Component {
 			let me = this;
 			me.setState((prevState) => {
 				console.log("Crating new node");
-				let nodeId =  prevState.data.nodes.length.toString();
+				let nodeId =  (prevState.lastNodeIndex + 1).toString();
+				prevState.lastNodeIndex = prevState.lastNodeIndex + 1;
 				prevState.data.nodes.push(
+					 {
+						 id: nodeId,
+						 x: x,
+						 y: y
+					 }
+				);
+				prevState.nodesPosition.push(
 					 {
 						 id: nodeId,
 						 x: x,
@@ -408,10 +451,27 @@ class Board extends Component {
 					 this.state.data.links[i].source === this.state.clickedLink.source
 				) {
 					me.setState((prevState) => {
+
+						//Self loop case
+						if(prevState.clickedLink.target === prevState.clickedLink.source) {
+							console.log("Self loop to be added to ",prevState.nodesPosition[this.getNodePositionIndex(prevState.clickedLink.target)]);
+							console.log("In ",prevState.nodesPosition);
+							prevState.selfLoopLabels.push(
+								 {
+									 id: prevState.clickedLink.target,
+									 label: prevState.addLabelInputValue,
+									 x: prevState.nodesPosition[this.getNodePositionIndex(prevState.clickedLink.target)].x-60,
+									 y: prevState.nodesPosition[this.getNodePositionIndex(prevState.clickedLink.target)].y-8
+								 }
+							);
+						}
+
 						prevState.data.links[i].label = prevState.addLabelInputValue;
 						prevState.isAddLinkLabelModalOpen = false;
 						prevState.addLabelInputValue = "";
 						prevState.clickedLink = null;
+
+
 						return prevState;
 					});
 					break;
@@ -576,6 +636,9 @@ class Board extends Component {
 									  onClickLink={this.onClickLink}
 									  onRightClickLink={this.onRightClickLink}
 									  onNodePositionChange={this.onNodePositionChange}
+								 />
+								 <SelfLoopLabels
+									  data = {this.state.selfLoopLabels}
 								 />
 							 </div>
 						 </div>
