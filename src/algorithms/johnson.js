@@ -1,9 +1,9 @@
 export function johnson(matrizad) {
     let array = new Array();
     //You can change this colors
-    FocusNodeColor = "#FAAC58";
-    FocusEdgeColor = "#F4FA58";
-    SelectNodeColor = "#819FF7"; //Only for start
+    let FocusNodeColor = "#FAAC58";
+    let FocusEdgeColor = "#F4FA58";
+    let SelectNodeColor = "#819FF7"; //Only for start
     //Search Start Node and End Node
     //Choice the start node
     let start,end;
