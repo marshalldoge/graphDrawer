@@ -4,6 +4,7 @@ import { Graph } from "react-d3-graph";
 import 'antd/dist/antd.css';
 import Modal from 'react-modal';
 import './_Board.scss';
+import { johnson } from '../../algorithms/johnson';
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
@@ -16,7 +17,7 @@ class Board extends Component {
 		inputType: "node",
 		nodeRadius: 200,
 		data: {
-			nodes: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
+			nodes: [{ id: "0",x: window.innerWidth/4 - 40, y: window.innerHeight/2.5 - 40, left: 0, right: 0 }],
 			links: [],
 		},
 		nodesPosition: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
@@ -38,6 +39,70 @@ class Board extends Component {
 		erasedNodes: false,
 	};
 
+	// Function that receives a node and returns a JSX view.
+	viewGenerator = node => {
+		let nodeColor = node.color ? node.color : "#f6edcf";
+		const nodeCtn = {
+			borderRadius: "40px",
+			width: "60px",
+			height: "60px",
+			backgroundColor: nodeColor,
+			fontSize: "15px"
+		};
+		const bottomCtn = {
+			width: "60px",
+			height: "30px",
+			minHeight: "40px",
+			textAlign: "center",
+		};
+
+		const leftBlock = {
+			width: "50%",
+			/*float: left;*/
+			display: "inline-block",
+			borderTopStyle: "solid",
+			borderColor: "black transparent transparent transparent",
+			borderStyle: "solid solid solid solid",
+			borderWidth: "1px 0 0 0"
+		};
+
+		const rightBlock = {
+			width: "50%",
+			/*float: left;*/
+			display: "inline-block",
+			borderTopStyle: "solid",
+			borderColor: "black transparent transparent black",
+			borderStyle: "solid solid solid solid",
+			borderWidth: "1px 0 0 1px"
+		};
+
+		const nodeId = {
+			width: "100%",
+			height: "30px",
+			textAlign: "center",
+			paddingTop: "8px"
+		};
+
+		let leftValue = node.left !== undefined ? node.left : "NULL";
+		let rightValue = node.right !== undefined ? node.right : "NULL";
+		console.log("Drawing: ", node.id, " L: ", node.left, "R: ",node.right);
+		return (
+			 <div style={nodeCtn}>
+				 <div style={nodeId}>
+					 {node.id}
+				 </div>
+				 <div style={bottomCtn}>
+					 <div style={leftBlock}>
+						 {leftValue}
+					 </div>
+					 <div style={rightBlock}>
+						 {rightValue}
+					 </div>
+				 </div>
+			 </div>
+		);
+	};
+
 	myConfig = {
 		//nodeHighlightBehavior: true,
 		linkHighlightBehavior: true,
@@ -52,29 +117,31 @@ class Board extends Component {
 			linkStrength: 2
 		},
 		node: {
-			color: "#C05D4F",
 			size: 900,
 			fontSize: 20,
 			fontColor: "#3C4655",
 			highlightStrokeColor: "#2E4052",
 			highlightFontSize: 20,
 			highlightFontWeight: "bolder",
+			renderLabel: false,
 			cx: 200,
-			cy:200
+			cy:200,
+			viewGenerator: this.viewGenerator,
 		},
 		link: {
 			highlightColor: "lightblue",
 			renderLabel: true,
 			fontWeight: "normal",
 			fontSize: 13,
-			strokeWidth: 4,
-			highlightStrokeColor: "#3C4655"
+			strokeWidth: 6,
+			highlightStrokeColor: "#3C4655",
+			type: "CURVE_SMOOTH"
 		},
 		height: 500,
 		width: window.innerWidth*0.95
 	};
 
-	//Get actual index in array of some node Id
+	// Get actual index in array of some node Id
 	getNodeIndex = nodeId => {
 		let length = this.state.data.nodes.length;
 		for( let  i = 0; i < length; i++) {
@@ -140,7 +207,9 @@ class Board extends Component {
 						if(prevState.data.nodes[i].id === nodeId) {
 							prevState.data.nodes[i] = {
 								id: nodeId,
-								color: "#446984"
+								color: "#446984",
+								left: prevState.data.nodes[i].left,
+								right: prevState.data.nodes[i].right
 							};
 						}
 					}
@@ -180,19 +249,22 @@ class Board extends Component {
 						//Creating the node for view
 						prevState.data.nodes[prevState.linkSource] = {
 							id: prevState.linkSource,
-							color: "#C05D4F"
+							left: prevState.data.nodes[prevState.linkSource].left,
+							right: prevState.data.nodes[prevState.linkSource].right
 						};
 
 						prevState.data.links.push(
 							 {
 								 source: prevState.linkSource,
 								 target: nodeId,
-								 label: ""
+								 label: "",
+								 ro: ""
 							 }
 						);
 						prevState.clickedLink = {
 							source: prevState.linkSource,
-							target: nodeId
+							target: nodeId,
+							ro: ""
 						};
 						prevState.lastActionType = "link";
 						prevState.actionHistory.push("link");
@@ -350,14 +422,115 @@ class Board extends Component {
 		 */
 	};
 
+	runAlgorithm = () => {
+		let me = this;
+		let nodesLength = this.state.data.nodes.length;
+		let length = this.state.data.links.length;
+		let matrix = [];
+		for(let i = 0; i < nodesLength; i++){
+			let row = [];
+			for(let j = 0; j < nodesLength; j++){
+				row.push(0);
+			}
+			matrix.push(row);
+		}
+		console.log("empty matrix: ",matrix);
+		for(let i = 0; i < length; i++) {
+			matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
+		}
+		console.log("Filled matrix: ",matrix);
+		/*
+		let answer = johnson([[0,3,0,0,2,0],
+			[0,0,7,6,0,0],
+			[0,0,0,6,0,0],
+			[0,0,0,0,0,3],
+			[0,0,0,4,0,0],
+			[0,0,0,0,0,0]]);
+		 */
+		let commands = johnson(matrix);
+		console.log("Andwer from algorithm: ",commands);
+		for(let i = 0; i < commands.length; i++) {
+			if (commands[i].type === "node") {
+				me.setState((prevState) => {
+					let aux = {
+						...prevState.data.nodes[commands[i].id],
+						color: commands[i].color,
+						left: commands[i].left ? commands[i].left : prevState.data.nodes[commands[i].id].left,
+						right: commands[i].right ? commands[i].right : prevState.data.nodes[commands[i].id].right,
+						nodes: prevState.data.nodes
+					};
+
+					console.log("Node to draw PREV: ", aux);
+					prevState.data.nodes[commands[i].id] = aux;
+				});
+			} else {
+				me.setState((prevState) => {
+					for (let j = 0; j < prevState.data.links.length; j++) {
+						if (
+							 prevState.data.links[j].source === commands[i].source.toString() &&
+							 prevState.data.links[j].target === commands[i].target.toString()
+						) {
+							let newRo = commands[i].ro !== undefined ? commands[i].ro : (prevState.data.links[j].ro === "" ? 0 : prevState.data.links[j].ro);
+							let newLabel = commands[i].label !== undefined ?  commands[i].label : prevState.data.links[j].label.split("(")[0];
+							prevState.data.links[j] = {
+								...prevState.data.links[j],
+								label: newLabel + "(" + newRo + ")",
+								color: commands[i].color
+							}
+						}
+					}
+				});
+			}
+			for(let k = 0; k < 9999999; k++) {
+
+			}
+			this.setState(this.state);
+		}
+		//To disable erase or undo buttons
+		this.setState({erasedNodes: true});
+		/*
+		me.setState((prevState) => {
+			for(let i = 0; i < commands.length; i++) {
+				if(commands[i].type === "node") {
+					let aux = {
+						...prevState.data.nodes[commands[i].id],
+						color: commands[i].color,
+						left: commands[i].left ? commands[i].left : prevState.data.nodes[commands[i].id].left,
+						right: commands[i].right ? commands[i].right : prevState.data.nodes[commands[i].id].right,
+						nodes: prevState.data.nodes
+					};
+
+					console.log("Node to draw PREV: ",aux);
+					prevState.data.nodes[commands[i].id] = aux;
+				}else{
+					for(let i = 0; i < prevState.data.links.length; i++) {
+						if(
+							 prevState.data.links[i].source === commands[i].source.toString() &&
+							 prevState.data.links[i].target === commands[i].target.toString()
+						) {
+							prevState.data.links[i] = {
+								...prevState.data.links[i],
+								label: commands[i].label + "(" + commands[i].ro + ")",
+								color: commands[i].color
+							}
+						}
+					}
+				}
+			}
+			return prevState;
+		});
+		 */
+	};
+
 	eraseAll = () => {
 		let me = this;
 		me.setState((prevState) => {
 			prevState.data.links = [];
-			prevState.data.nodes = [{ id: "0" }];
+			prevState.data.nodes = [{ id: "0", left: 0, right: 0 }];
 			prevState.graphMap = {
 				"0": {}
 			};
+			prevState.selfLoopLabels = [];
 			return prevState;
 		});
 	};
@@ -384,7 +557,9 @@ class Board extends Component {
 					 {
 						 id: nodeId,
 						 x: x,
-						 y: y
+						 y: y,
+						 left: 0,
+						 right: 0
 					 }
 				);
 				prevState.nodesPosition.push(
@@ -412,13 +587,13 @@ class Board extends Component {
 			let hashValue =
 				 this.getNodeIndex(this.state.data.links[i].source)*nodesLength+
 				 this.getNodeIndex(this.state.data.links[i].target);
-			hash[hashValue] = this.state.data.links[i].label;
+			hash[hashValue] = this.state.data.links[i].label.split("(")[0];
 		}
 		for(let i = 0; i < length; i++) {
 			let inverseHashValue =
 				 this.getNodeIndex(this.state.data.links[i].target)*nodesLength+
 				 this.getNodeIndex(this.state.data.links[i].source);
-			if(hash[inverseHashValue]===undefined && !this.state.directed)hash[inverseHashValue] = this.state.data.links[i].label;
+			if(hash[inverseHashValue]===undefined && !this.state.directed)hash[inverseHashValue] = this.state.data.links[i].label.split("(")[0];
 		}
 		console.log("Graph map: ",this.state.graphMap);
 		console.log("Hash: ",hash);
@@ -619,6 +794,11 @@ class Board extends Component {
 					         onClick={this.eraseAll}
 					 >
 						 Clean
+					 </Button>
+					 <Button type="normal" icon="DeploymentUnitOutlined" size={'large'}
+					         onClick={this.runAlgorithm}
+					 >
+						 Johnson
 					 </Button>
 				 </Row>
 				 <Row type="flex" justify="space-around" align="middle">
