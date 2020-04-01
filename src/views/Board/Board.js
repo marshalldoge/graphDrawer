@@ -37,6 +37,7 @@ class Board extends Component {
 			"0": {}
 		},
 		erasedNodes: false,
+		animationState: 0
 	};
 
 	// Function that receives a node and returns a JSX view.
@@ -85,7 +86,7 @@ class Board extends Component {
 
 		let leftValue = node.left !== undefined ? node.left : "NULL";
 		let rightValue = node.right !== undefined ? node.right : "NULL";
-		console.log("Drawing: ", node.id, " L: ", node.left, "R: ",node.right);
+		//console.log("Drawing: ", node.id, " L: ", node.left, "R: ",node.right);
 		return (
 			 <div style={nodeCtn}>
 				 <div style={nodeId}>
@@ -422,6 +423,47 @@ class Board extends Component {
 		 */
 	};
 
+	runAnimation(commands) {
+		let me = this;
+		let animation = setInterval(function(){
+			me.setState((prevState) => {
+				console.log("Animating command",prevState.animationState);
+				if (commands[prevState.animationState].type === "node") {
+					let aux = {
+						...prevState.data.nodes[commands[prevState.animationState].id],
+						color: commands[prevState.animationState].color,
+						left: commands[prevState.animationState].left ? commands[prevState.animationState].left : prevState.data.nodes[commands[prevState.animationState].id].left,
+						right: commands[prevState.animationState].right ? commands[prevState.animationState].right : prevState.data.nodes[commands[prevState.animationState].id].right,
+						nodes: prevState.data.nodes
+					};
+
+					//console.log("Node to draw PREV: ", aux);
+					prevState.data.nodes[commands[prevState.animationState].id] = aux;
+				}else {
+					for (let j = 0; j < prevState.data.links.length; j++) {
+						if (
+							 prevState.data.links[j].source === commands[prevState.animationState].source.toString() &&
+							 prevState.data.links[j].target === commands[prevState.animationState].target.toString()
+						) {
+							let newRo = commands[prevState.animationState].ro !== undefined ? commands[prevState.animationState].ro : (prevState.data.links[j].ro === "" ? 0 : prevState.data.links[j].ro);
+							let newLabel = commands[prevState.animationState].label !== undefined ?  commands[prevState.animationState].label : prevState.data.links[j].label.split("(")[0];
+							prevState.data.links[j] = {
+								...prevState.data.links[j],
+								label: newLabel + "(" + newRo + ")",
+								color: commands[prevState.animationState].color
+							}
+						}
+					}
+				}
+				prevState.animationState = prevState.animationState + 1;
+				if(prevState.animationState === commands.length) clearInterval(animation);
+				return prevState;
+			} )
+
+		}, 1000);
+	};
+
+
 	runAlgorithm = () => {
 		let me = this;
 		let nodesLength = this.state.data.nodes.length;
@@ -449,6 +491,10 @@ class Board extends Component {
 		 */
 		let commands = johnson(matrix);
 		console.log("Andwer from algorithm: ",commands);
+		this.runAnimation(commands);
+
+
+		/*
 		for(let i = 0; i < commands.length; i++) {
 			if (commands[i].type === "node") {
 				me.setState((prevState) => {
@@ -486,6 +532,8 @@ class Board extends Component {
 			}
 			this.setState(this.state);
 		}
+
+		 */
 		//To disable erase or undo buttons
 		this.setState({erasedNodes: true});
 		/*
