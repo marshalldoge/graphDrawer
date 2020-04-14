@@ -79,24 +79,24 @@
                     if(ida[i]==-1){//No previous computation for node i
                         ida[i]=ida[node]+matrizad[node][i];
                         //ANIMATION
-                        object = {
+                       /* object = {
                             type: "node",
                             id: i,
                             left: ida[i]
                         };
-                        array.push(object);
+                        array.push(object);*/
                     }
                     else{//previous computation exist
                         let newIda = ida[node]+matrizad[node][i];
                         if(newIda>ida[i]){
                             ida[i]=newIda;
                             //ANIMATION
-                            object = {
+                            /*object = {
                                 type: "node",
                                 id: i,
                                 left: ida[i]
                             };
-                            array.push(object);
+                            array.push(object);*/
                         }
                     }
                 }
@@ -123,24 +123,24 @@
                     if(vuelta[i]==-1){//No previous computation for node i
                         vuelta[i]=vuelta[node]-matrizad[i][node];
                         //ANIMATION
-                        object = {
+                        /*object = {
                             type : "node",
                             id : i,
                             right : vuelta[i]
                         };
-                        array.push(object)
+                        array.push(object)*/
                     }
                     else{//Previous computation exist
                         let newVuelta = vuelta[node]-matrizad[i][node];
                         if(newVuelta<vuelta[i]){
                             vuelta[i]=newVuelta;
                             //ANIMATION
-                            object = {
+                            /*object = {
                                 type : "node",
                                 id : i,
                                 right : vuelta[i]
                             };
-                            array.push(object)
+                            array.push(object)*/
                         }
                     }
                 }
@@ -149,6 +149,13 @@
         for(let i=0;i<ida.length;i++){
             let newInfoNode = [ida[i],vuelta[i]];
             matrizjohn.push(newInfoNode);
+            object = {
+                type: "node",
+                id: i,
+                left: ida[i],
+                right: vuelta[i]
+            };
+            array.push(object);
         }
 
 
