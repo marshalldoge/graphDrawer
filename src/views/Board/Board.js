@@ -512,7 +512,7 @@ class Board extends Component {
 	};
 
 
-	runAlgorithm = () => {
+	callAlgorithm = () => {
 		let me = this;
 		if(this.state.algorithmPicked === "jhonson") {
 			let nodesLength = this.state.data.nodes.length;
@@ -577,6 +577,24 @@ class Board extends Component {
 			this.runAnimation(commands);
 			this.setState({erasedNodes: true});
 		}
+	};
+
+	runAlgorithm = () => {
+		this.clearDirtyGraph();
+		this.setState({
+			isMaxOrMinModalOpen: true,
+			animationState: 0
+		});
+	};
+
+	clearDirtyGraph = () => {
+		let me = this;
+		me.setState((prevState) => {
+			for(let i = 0; i < prevState.data.links.length; i++) {
+				prevState.data.links[i].label = prevState.data.links[i].label.split("(")[0];
+			}
+			return prevState;
+		});
 	};
 
 	eraseAll = () => {
@@ -872,7 +890,7 @@ class Board extends Component {
 				 <br/>
 				 <Row justify="center">
 					 <Col span={18}>
-						 <div className={"enterButton"} onClick={this.runAlgorithm}>
+						 <div className={"enterButton"} onClick={this.callAlgorithm}>
 							 <p>Run Algorithm</p>
 						 </div>
 					 </Col>
@@ -939,7 +957,7 @@ class Board extends Component {
                                     Clean
                                 </Button>
                                 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
-                                        onClick={() => this.setState({isMaxOrMinModalOpen: true})}
+                                        onClick={this.runAlgorithm}
                                 >
                                     RUN
                                 </Button>
