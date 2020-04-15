@@ -4,10 +4,10 @@
         let FocusNodeColor = "#FAAC58";
         let FocusEdgeColor = "#F4FA58";
         let SelectNodeColor = "#819FF7"; //Only for start
+        for(let i=0;i<matrizad.length;i++){//Column
         //Search Start Node and End Node
         //Choice the start node
         let start,end;
-        for(let i=0;i<matrizad.length;i++){//Column
             let onlyZeros = true;
                 for(let j=0;j<matrizad.length;j++){//Row
                     if(matrizad[j][i]!=0){
