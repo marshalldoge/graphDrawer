@@ -57,7 +57,13 @@ export function asignacion(matrixad, task){
             response.message = response.message.concat("El costo minimo es ",resultCost,"#");
         }
         for(let i=0;i<info.destinies.length;i++){
-            response.message = response.message.concat("El nodo ",solution[i]," es asignado a ",info.destinies[i],"#");
+            if(i == info.destinies.length-1){
+                response.message = response.message.concat("El nodo ",solution[i]," es asignado a ",info.destinies[i]);
+            }
+            else{
+                response.message = response.message.concat("El nodo ",solution[i]," es asignado a ",info.destinies[i],"#");
+            }
+            
             let object1 = {
                 type: "node",
                 id: solution[i],
@@ -122,7 +128,13 @@ export function asignacion(matrixad, task){
             response.message = response.message.concat("El costo minimo es ",resultCost,"#");
         }
         for(let i=0;i<info.sources.length;i++){
-            response.message = response.message.concat("El nodo ",info.sources[i]," es asignado a ",solution[i],"#");
+            if(i== info.sources.length-1){
+                response.message = response.message.concat("El nodo ",info.sources[i]," es asignado a ",solution[i]);
+            }
+            else{
+                response.message = response.message.concat("El nodo ",info.sources[i]," es asignado a ",solution[i],"#");
+            }
+            
             let object1 = {
                 type: "node",
                 id: info.sources[i],
