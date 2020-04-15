@@ -35,7 +35,7 @@ export function asignacion(matrixad, task){
             }
             //console.log(resultCost);
             //console.log(solution.join(','));
-            response.message = response.message.concat("El costo maximo es ",resultCost,"<br>");
+            response.message = response.message.concat("El costo maximo es ",resultCost," ");
         }
         if(task == "min"){
             resultCost = 1000000;
@@ -54,10 +54,10 @@ export function asignacion(matrixad, task){
             }
             //console.log(resultCost);
             //console.log(solution.join(','));
-            response.message = response.message.concat("El costo minimo es ",resultCost,"<br>");
+            response.message = response.message.concat("El costo minimo es ",resultCost," ");
         }
         for(let i=0;i<info.destinies.length;i++){
-            response.message = response.message.concat("El nodo ",solution[i]," es asignado a ",info.destinies[i],"<br>");
+            response.message = response.message.concat("El nodo ",solution[i]," es asignado a ",info.destinies[i]," ");
             let object1 = {
                 type: "node",
                 id: solution[i],
@@ -100,7 +100,7 @@ export function asignacion(matrixad, task){
             }
             //console.log(resultCost);
            // console.log(solution.join(','));
-            response.message = response.message.concat("El costo maximo es ",resultCost,"<br>");
+            response.message = response.message.concat("El costo maximo es ",resultCost," ");
         }
         if(task == "min"){
             resultCost = 1000000;
@@ -119,10 +119,10 @@ export function asignacion(matrixad, task){
             }
             //console.log(resultCost);
             //console.log(solution.join(','));
-            response.message = response.message.concat("El costo minimo es ",resultCost,"<br>");
+            response.message = response.message.concat("El costo minimo es ",resultCost," ");
         }
         for(let i=0;i<info.sources.length;i++){
-            response.message = response.message.concat("El nodo ",info.sources[i]," es asignado a ",solution[i],"<br>");
+            response.message = response.message.concat("El nodo ",info.sources[i]," es asignado a ",solution[i]," ");
             let object1 = {
                 type: "node",
                 id: info.sources[i],
