@@ -3,7 +3,7 @@
 //task is a string "max" for maximization "min" for minimization
 let permutations = []
 export function asignacion(matrixad, task){ 
-    let colors = ["#800000","#FF0000","#FFA500","#808000","#800080","#FF00FF","#008000","#000080","#0000FF","#008080","#000000","#808080"];
+    let colors = ["#ff5131","#fd558f","#e254ff","#9d46ff","#7a7cff","#64c1ff","#62ebff","#5df2d6","#5efc82","#e4ff54","#ffdd4b","#ffff52"];
     let response = {
         array: [],
         message: "",
