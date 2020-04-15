@@ -538,7 +538,6 @@ class Board extends Component {
 					 </Row>
 				);
 			}
-			res.push(<br/>)
 		}
 		return res;
 	};
@@ -970,7 +969,6 @@ class Board extends Component {
 						 <p className={"modalQuestion"}>Answer</p>
 					 </Col>
 				 </Row>
-				 <br/>
 				 {this.MessageProccesser()}
 				 <br/>
 				 <Row justify="center">
