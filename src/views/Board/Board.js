@@ -592,6 +592,10 @@ class Board extends Component {
 		me.setState((prevState) => {
 			for(let i = 0; i < prevState.data.links.length; i++) {
 				prevState.data.links[i].label = prevState.data.links[i].label.split("(")[0];
+				prevState.data.links[i].color = "#f6edcf";
+			}
+			for(let i = 0; i < prevState.data.nodes.length; i++) {
+				prevState.data.nodes[i].color = "#f6edcf";
 			}
 			return prevState;
 		});

@@ -50,8 +50,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="585" column="29" selection-start-line="585" selection-start-column="29" selection-end-line="585" selection-end-column="29" />
+            <state relative-caret-position="332">
+              <caret line="597" column="36" selection-start-line="597" selection-start-column="36" selection-end-line="597" selection-end-column="36" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -143,6 +143,9 @@
       <find>algorithmPicked</find>
       <find>runal</find>
       <find>animation</find>
+      <find>color</find>
+      <find>clean</find>
+      <find>dirty</find>
     </findStrings>
     <replaceStrings>
       <replace>right</replace>
@@ -300,12 +303,12 @@
       <workItem from="1585446042729" duration="559000" />
       <workItem from="1585721757425" duration="2945000" />
       <workItem from="1586233306806" duration="992000" />
-      <workItem from="1586922721010" duration="7756000" />
+      <workItem from="1586922721010" duration="8167000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="76579000" />
+    <option name="totallyTimeSpent" value="76990000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="819" extended-state="6" />
@@ -455,8 +458,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="585" column="29" selection-start-line="585" selection-start-column="29" selection-end-line="585" selection-end-column="29" />
+        <state relative-caret-position="332">
+          <caret line="597" column="36" selection-start-line="597" selection-start-column="36" selection-end-line="597" selection-end-column="36" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
