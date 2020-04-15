@@ -4,10 +4,10 @@
         let FocusNodeColor = "#FAAC58";
         let FocusEdgeColor = "#F4FA58";
         let SelectNodeColor = "#819FF7"; //Only for start
+	    let start,end;
         for(let i=0;i<matrizad.length;i++){//Column
         //Search Start Node and End Node
         //Choice the start node
-        let start,end;
             let onlyZeros = true;
                 for(let j=0;j<matrizad.length;j++){//Row
                     if(matrizad[j][i]!=0){
@@ -17,8 +17,8 @@
             if(onlyZeros){
                 start = i;
             }
-        } 
-        //Choice end node 
+        }
+        //Choice end node
         for(let i=0;i<matrizad.length;i++){//Row
             let onlyZeros = true;
                 for(let j=0;j<matrizad.length;j++){//Column
@@ -30,7 +30,7 @@
                 end = i;
             }
         }
-        //ANIMATION 
+        //ANIMATION
         let object = {
             type: "node",
             id: start,
@@ -160,22 +160,22 @@
 
 
         //Compute Flexibility
-        // Create one dimensional array 
+        // Create one dimensional array
         let flexibilidad = new Array(matrizjohn.length);
-        // Loop to create 2D array using 1D array 
-        for (let i = 0; i < flexibilidad.length; i++) { 
-            flexibilidad[i] = new Array(matrizjohn.length); 
-        } 
-        // Loop to initilize 2D array elements. 
-        for (let i = 0; i < flexibilidad.length; i++) { 
-            for (let j = 0; j <flexibilidad.length; j++) { 
+        // Loop to create 2D array using 1D array
+        for (let i = 0; i < flexibilidad.length; i++) {
+            flexibilidad[i] = new Array(matrizjohn.length);
+        }
+        // Loop to initilize 2D array elements.
+        for (let i = 0; i < flexibilidad.length; i++) {
+            for (let j = 0; j <flexibilidad.length; j++) {
                 //Si la matriz adyacencia tiene 0 en este campo copiar el 0 en la de flexibilidad
                 if(matrizad[i][j]==0){
                     flexibilidad[i][j]=0;
                 }
                 else{
                     //Formula si existe un envio diferente de 0
-                    flexibilidad[i][j] = matrizjohn[j][1]-matrizjohn[i][0]-matrizad[i][j]; 
+                    flexibilidad[i][j] = matrizjohn[j][1]-matrizjohn[i][0]-matrizad[i][j];
                     //ANIMATION RO AND CRITICAL PATH
                     object = {
                         type: "edge",
@@ -205,9 +205,9 @@
                             color: FocusNodeColor
                         };
                         array.push(object);
-                    }    
-                }      
+                    }
+                }
             }
-        }  
+        }
         return array;
     }

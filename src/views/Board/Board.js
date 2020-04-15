@@ -1,5 +1,10 @@
 import React, {Component} from "react";
-import {Row, Col, Button, Typography, message} from 'antd';
+import {Row, Col, Button, Typography, message, Menu, Layout} from 'antd';
+import {
+	RadarChartOutlined,
+	HeatMapOutlined,
+	PlayCircleOutlined
+} from '@ant-design/icons';
 import { Graph } from "react-d3-graph";
 import 'antd/dist/antd.css';
 import Modal from 'react-modal';
@@ -9,6 +14,8 @@ import { johnson } from '../../algorithms/johnson';
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
 const SelfLoopLabels = React.lazy(() => import("../../components/SelfLoopLabels/SelfLoopLabels"));
+const { Header, Content, Footer, Sider } = Layout;
+const { SubMenu } = Menu;
 
 class Board extends Component {
 
@@ -37,71 +44,104 @@ class Board extends Component {
 			"0": {}
 		},
 		erasedNodes: false,
-		animationState: 0
+		animationState: 0,
+		collapsed: false,
+		algorithmPicked: "jhonson"
+	};
+
+	//Hide or Show the sider
+	onCollapse = collapsed => {
+		console.log(collapsed);
+		this.setState({ collapsed });
 	};
 
 	// Function that receives a node and returns a JSX view.
 	viewGenerator = node => {
-		let nodeColor = node.color ? node.color : "#f6edcf";
-		const nodeCtn = {
-			borderRadius: "40px",
-			width: "60px",
-			height: "60px",
-			backgroundColor: nodeColor,
-			fontSize: "15px"
-		};
-		const bottomCtn = {
-			width: "60px",
-			height: "30px",
-			minHeight: "40px",
-			textAlign: "center",
-		};
+		if(this.state.algorithmPicked === "jhonson") {
+			let nodeColor = node.color ? node.color : "#f6edcf";
+			const nodeCtn = {
+				borderRadius: "40px",
+				width: "60px",
+				height: "60px",
+				backgroundColor: nodeColor,
+				fontSize: "15px"
+			};
+			const bottomCtn = {
+				width: "60px",
+				height: "30px",
+				minHeight: "40px",
+				textAlign: "center",
+			};
 
-		const leftBlock = {
-			width: "50%",
-			/*float: left;*/
-			display: "inline-block",
-			borderTopStyle: "solid",
-			borderColor: "black transparent transparent transparent",
-			borderStyle: "solid solid solid solid",
-			borderWidth: "1px 0 0 0"
-		};
+			const leftBlock = {
+				width: "50%",
+				/*float: left;*/
+				display: "inline-block",
+				borderTopStyle: "solid",
+				borderColor: "black transparent transparent transparent",
+				borderStyle: "solid solid solid solid",
+				borderWidth: "1px 0 0 0"
+			};
 
-		const rightBlock = {
-			width: "50%",
-			/*float: left;*/
-			display: "inline-block",
-			borderTopStyle: "solid",
-			borderColor: "black transparent transparent black",
-			borderStyle: "solid solid solid solid",
-			borderWidth: "1px 0 0 1px"
-		};
+			const rightBlock = {
+				width: "50%",
+				/*float: left;*/
+				display: "inline-block",
+				borderTopStyle: "solid",
+				borderColor: "black transparent transparent black",
+				borderStyle: "solid solid solid solid",
+				borderWidth: "1px 0 0 1px"
+			};
 
-		const nodeId = {
-			width: "100%",
-			height: "30px",
-			textAlign: "center",
-			paddingTop: "8px"
-		};
+			const nodeId = {
+				width: "100%",
+				height: "30px",
+				textAlign: "center",
+				paddingTop: "8px"
+			};
 
-		let leftValue = node.left !== undefined ? node.left : "NULL";
-		let rightValue = node.right !== undefined ? node.right : "NULL";
-		//console.log("Drawing: ", node.id, " L: ", node.left, "R: ",node.right);
-		return (
-			 <div style={nodeCtn}>
-				 <div style={nodeId}>
-					 {node.id}
-				 </div>
-				 <div style={bottomCtn}>
-					 <div style={leftBlock}>
-						 {leftValue}
+			let leftValue = node.left !== undefined ? node.left : "NULL";
+			let rightValue = node.right !== undefined ? node.right : "NULL";
+			//console.log("Drawing: ", node.id, " L: ", node.left, "R: ",node.right);
+			return (
+				 <div style={nodeCtn}>
+					 <div style={nodeId}>
+						 {node.id}
 					 </div>
-					 <div style={rightBlock}>
-						 {rightValue}
+					 <div style={bottomCtn}>
+						 <div style={leftBlock}>
+							 {leftValue}
+						 </div>
+						 <div style={rightBlock}>
+							 {rightValue}
+						 </div>
 					 </div>
 				 </div>
-			 </div>
-		);
+			);
+		} else {
+			let nodeColor = node.color ? node.color : "#f6edcf";
+			const nodeCtn = {
+				borderRadius: "40px",
+				width: "60px",
+				height: "60px",
+				backgroundColor: nodeColor,
+				fontSize: "15px"
+			};
+			const nodeId = {
+				width: "100%",
+				height: "30px",
+				textAlign: "center",
+				paddingTop: "8px"
+			};
+			return (
+				 <div style={nodeCtn}>
+					 <div style={nodeId}>
+						 {node.id}
+					 </div>
+				 </div>
+			);
+		}
+
 	};
 
 	myConfig = {
@@ -466,108 +506,37 @@ class Board extends Component {
 
 	runAlgorithm = () => {
 		let me = this;
-		let nodesLength = this.state.data.nodes.length;
-		let length = this.state.data.links.length;
-		let matrix = [];
-		for(let i = 0; i < nodesLength; i++){
-			let row = [];
-			for(let j = 0; j < nodesLength; j++){
-				row.push(0);
-			}
-			matrix.push(row);
-		}
-		console.log("empty matrix: ",matrix);
-		for(let i = 0; i < length; i++) {
-			matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
-		}
-		console.log("Filled matrix: ",matrix);
-		/*
-		let answer = johnson([[0,3,0,0,2,0],
-			[0,0,7,6,0,0],
-			[0,0,0,6,0,0],
-			[0,0,0,0,0,3],
-			[0,0,0,4,0,0],
-			[0,0,0,0,0,0]]);
-		 */
-		let commands = johnson(matrix);
-		console.log("Andwer from algorithm: ",commands);
-		this.runAnimation(commands);
-
-
-		/*
-		for(let i = 0; i < commands.length; i++) {
-			if (commands[i].type === "node") {
-				me.setState((prevState) => {
-					let aux = {
-						...prevState.data.nodes[commands[i].id],
-						color: commands[i].color,
-						left: commands[i].left ? commands[i].left : prevState.data.nodes[commands[i].id].left,
-						right: commands[i].right ? commands[i].right : prevState.data.nodes[commands[i].id].right,
-						nodes: prevState.data.nodes
-					};
-
-					console.log("Node to draw PREV: ", aux);
-					prevState.data.nodes[commands[i].id] = aux;
-				});
-			} else {
-				me.setState((prevState) => {
-					for (let j = 0; j < prevState.data.links.length; j++) {
-						if (
-							 prevState.data.links[j].source === commands[i].source.toString() &&
-							 prevState.data.links[j].target === commands[i].target.toString()
-						) {
-							let newRo = commands[i].ro !== undefined ? commands[i].ro : (prevState.data.links[j].ro === "" ? 0 : prevState.data.links[j].ro);
-							let newLabel = commands[i].label !== undefined ?  commands[i].label : prevState.data.links[j].label.split("(")[0];
-							prevState.data.links[j] = {
-								...prevState.data.links[j],
-								label: newLabel + "(" + newRo + ")",
-								color: commands[i].color
-							}
-						}
-					}
-				});
-			}
-			for(let k = 0; k < 9999999; k++) {
-
-			}
-			this.setState(this.state);
-		}
-
-		 */
-		//To disable erase or undo buttons
-		this.setState({erasedNodes: true});
-		/*
-		me.setState((prevState) => {
-			for(let i = 0; i < commands.length; i++) {
-				if(commands[i].type === "node") {
-					let aux = {
-						...prevState.data.nodes[commands[i].id],
-						color: commands[i].color,
-						left: commands[i].left ? commands[i].left : prevState.data.nodes[commands[i].id].left,
-						right: commands[i].right ? commands[i].right : prevState.data.nodes[commands[i].id].right,
-						nodes: prevState.data.nodes
-					};
-
-					console.log("Node to draw PREV: ",aux);
-					prevState.data.nodes[commands[i].id] = aux;
-				}else{
-					for(let i = 0; i < prevState.data.links.length; i++) {
-						if(
-							 prevState.data.links[i].source === commands[i].source.toString() &&
-							 prevState.data.links[i].target === commands[i].target.toString()
-						) {
-							prevState.data.links[i] = {
-								...prevState.data.links[i],
-								label: commands[i].label + "(" + commands[i].ro + ")",
-								color: commands[i].color
-							}
-						}
-					}
+		if(this.state.algorithmPicked === "jhonson") {
+			let nodesLength = this.state.data.nodes.length;
+			let length = this.state.data.links.length;
+			let matrix = [];
+			for(let i = 0; i < nodesLength; i++){
+				let row = [];
+				for(let j = 0; j < nodesLength; j++){
+					row.push(0);
 				}
+				matrix.push(row);
 			}
-			return prevState;
-		});
-		 */
+			console.log("empty matrix: ",matrix);
+			for(let i = 0; i < length; i++) {
+				matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
+			}
+			console.log("Filled matrix: ",matrix);
+			/*
+			let answer = johnson([[0,3,0,0,2,0],
+				[0,0,7,6,0,0],
+				[0,0,0,6,0,0],
+				[0,0,0,0,0,3],
+				[0,0,0,4,0,0],
+				[0,0,0,0,0,0]]);
+			 */
+			let commands = johnson(matrix);
+			console.log("Andwer from algorithm: ",commands);
+			this.runAnimation(commands);
+			this.setState({erasedNodes: true});
+		} else {
+
+		}
 	};
 
 	eraseAll = () => {
@@ -807,85 +776,126 @@ class Board extends Component {
 		);
 	};
 
+	Logo = () => {
+		if(this.state.collapsed) {
+			return (
+				 <div className={"logoCtn"}>
+					 <img className={"logoCollapsed"} src={require("../../assets/logos/logoCollapsed.png")}/>
+				 </div>
+			);
+		} else {
+			return (
+				 <div className={"logoCtn"}>
+					 <img className={"logo"} src={require("../../assets/logos/logo.png")}/>
+				 </div>
+			);
+		}
+	};
+
+	setAlgorithmPicked = (e,alg) => {
+		console.log("Algoritmo escogido: ",alg);
+		this.setState({algorithmPicked: alg});
+	};
+
 
 	render() {
 		return (
-			 <div className={"mainCtn"}>
-				 <Row type="flex" justify="space-around" align="middle">
-					 <h1 className={"boardTitle"}>Graph Drawer</h1>
-				 </Row>
-				 <Row type="flex" justify="space-around" align="middle">
-					 <Button type="normal" icon="dribbble" size={'large'}
-					         onClick={e => this.setTypeInput(e,"node")}
-					         disabled={this.state.inputType === "node"}
-					 >
-						 Draw/Move Nodes
-					 </Button>
-					 <Button type="normal" icon="arrows-alt" size={'large'}
-					    onClick={e => this.setTypeInput(e,"edge")}
-					         disabled={this.state.inputType === "edge"}
-					 >
-						 Draw Links
-					 </Button>
-					 <Button type="danger" icon="reload" size={'large'}
-					         onClick={this.undoAction}
-					         disabled={!this.state.lastActionType || this.state.erasedNodes}
-					 >
-						 Undo
-					 </Button>
-					 <Button type="danger" icon="highlight" size={'large'}
-					         onClick={this.eraseNode}
-					 >
-						 Erase
-					 </Button>
-					 <Button type="danger" icon="delete" size={'large'}
-					         onClick={this.eraseAll}
-					 >
-						 Clean
-					 </Button>
-					 <Button type="normal" icon="DeploymentUnitOutlined" size={'large'}
-					         onClick={this.runAlgorithm}
-					 >
-						 Johnson
-					 </Button>
-				 </Row>
-				 <Row type="flex" justify="space-around" align="middle">
-					 <Col span={23}>
-						 <div className={"board"}>
-							 <div className={"graphCtn"} onClick={this.createNode}>
-								 <Graph
-									  ref="graph"
-									  id="graph-id" // id is mandatory, if no id is defined rd3g will throw an error
-									  data={this.state.data}
-									  config={this.myConfig}
-									  onClickNode={this.onClickNode}
-									  onRightClickNode={this.onRightClickNode}
-									  onClickGraph={this.onClickGraph}
-									  onClickLink={this.onClickLink}
-									  onRightClickLink={this.onRightClickLink}
-									  onNodePositionChange={this.onNodePositionChange}
-								 />
-								 <SelfLoopLabels
-									  data = {this.state.selfLoopLabels}
-								 />
-							 </div>
-						 </div>
-					 </Col>
-				 </Row>
-				 <br/>
-				 <Row type="flex" justify="space-around" align="middle">
+			 <Layout style={{ minHeight: '100vh' }}>
+				 <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
+					 {this.Logo()}
+					 <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+						 <Menu.Item key="1" onClick={e => this.setAlgorithmPicked(e,"jhonson")}>
+							 <RadarChartOutlined />
+							 <span>Jhonson</span>
+						 </Menu.Item>
+						 <Menu.Item key="2" onClick={e => this.setAlgorithmPicked(e,"asignation")}>
+							 <HeatMapOutlined />
+							 <span>Asignation</span>
+						 </Menu.Item>
+					 </Menu>
+				 </Sider>
+				 <Layout className="site-layout bodyCtn">
+					 <Content style={{ margin: '0 16px' }}>
+						 <div className={"mainCtn"}>
+							 <Row type="flex" justify="space-around" align="middle">
+								 <h1 className={"boardTitle"}>Graph Drawer</h1>
+							 </Row>
+							 <Row type="flex" justify="space-around" align="middle">
+								 <Button type="normal" icon="dribbble" size={'large'}
+								         onClick={e => this.setTypeInput(e,"node")}
+								         disabled={this.state.inputType === "node"}
+								 >
+									 Draw/Move Nodes
+								 </Button>
+								 <Button type="normal" icon="arrows-alt" size={'large'}
+								         onClick={e => this.setTypeInput(e,"edge")}
+								         disabled={this.state.inputType === "edge"}
+								 >
+									 Draw Links
+								 </Button>
+								 <Button type="danger" icon="reload" size={'large'}
+								         onClick={this.undoAction}
+								         disabled={!this.state.lastActionType || this.state.erasedNodes}
+								 >
+									 Undo
+								 </Button>
+								 <Button type="danger" icon="highlight" size={'large'}
+								         onClick={this.eraseNode}
+								 >
+									 Erase
+								 </Button>
+								 <Button type="danger" icon="delete" size={'large'}
+								         onClick={this.eraseAll}
+								 >
+									 Clean
+								 </Button>
+								 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
+								         onClick={this.runAlgorithm}
+								 >
+									 RUN
+								 </Button>
+							 </Row>
+							 <Row type="flex" justify="space-around" align="middle">
+								 <Col span={23}>
+									 <div className={"board"}>
+										 <div className={"graphCtn"} onClick={this.createNode}>
+											 <Graph
+												  ref="graph"
+												  id="graph-id" // id is mandatory, if no id is defined rd3g will throw an error
+												  data={this.state.data}
+												  config={this.myConfig}
+												  onClickNode={this.onClickNode}
+												  onRightClickNode={this.onRightClickNode}
+												  onClickGraph={this.onClickGraph}
+												  onClickLink={this.onClickLink}
+												  onRightClickLink={this.onRightClickLink}
+												  onNodePositionChange={this.onNodePositionChange}
+											 />
+											 <SelfLoopLabels
+												  data = {this.state.selfLoopLabels}
+											 />
+										 </div>
+									 </div>
+								 </Col>
+							 </Row>
+							 <br/>
+							 <Row type="flex" justify="space-around" align="middle">
 
-						 <h1 className={"boardTitle"}>Adjacency Matrix</h1>
-				 </Row>
-				 <Row type="flex" justify={this.state.isMobile? "start" :"space-around"} align="middle">
-					 <Col justify={this.state.isMobile? "start" :"space-around"} span={15}>
-						 {this.ProcessedMatrix()}
-					 </Col>
-				 </Row>
-				 <br/>
-				 <br/>
-				 {this.AddLinkLabelModal()}
-			 </div>
+								 <h1 className={"boardTitle"}>Adjacency Matrix</h1>
+							 </Row>
+							 <Row type="flex" justify={this.state.isMobile? "start" :"space-around"} align="middle">
+								 <Col justify={this.state.isMobile? "start" :"space-around"} span={15}>
+									 {this.ProcessedMatrix()}
+								 </Col>
+							 </Row>
+							 <br/>
+							 <br/>
+							 {this.AddLinkLabelModal()}
+						 </div>
+					 </Content>
+					 <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+				 </Layout>
+			 </Layout>
 		);
 	}
 }

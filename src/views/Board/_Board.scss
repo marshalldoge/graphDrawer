@@ -1,5 +1,9 @@
 $background: #2C313C;
 $board: #F4F4F4;
+$green: #368471;
+.bodyCtn {
+  background-color: $background;
+}
 .mainCtn {
   width: 100%;
   min-height: 100vh;
@@ -50,4 +54,24 @@ $board: #F4F4F4;
   text-align: center;
   vertical-align: center;
   cursor: pointer;
+}
+.logoCtn {
+  text-align: center;
+}
+.logo {
+  height: 40px;
+  width: 150px;
+  margin: 4px;
+}
+.logoCollapsed {
+  height: 40px;
+  width: 40px;
+  margin: 4px;
+}
+.site-layout .site-layout-background {
+  background: #fff;
+}
+.runButton {
+  background-color: $green;
+  border-color: $green;
 }
