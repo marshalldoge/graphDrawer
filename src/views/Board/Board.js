@@ -54,7 +54,9 @@ class Board extends Component {
 		animationState: 0,
 		collapsed: false,
 		algorithmPicked: "jhonson",
-		maximizeAlgorithm: true
+		maximizeAlgorithm: true,
+		isMessageModalOpen: false,
+		messageText: ""
 	};
 
 	//Hide or Show the sider
@@ -575,7 +577,11 @@ class Board extends Component {
 			console.log("Andwer from asignation algorithm: ",answer);
 			this.closeMaxOrMinModalOpen();
 			this.runAnimation(commands);
-			this.setState({erasedNodes: true});
+			this.setState({
+				erasedNodes: true,
+				messageText: message,
+				isMessageModalOpen: true
+			});
 		}
 	};
 
@@ -690,6 +696,9 @@ class Board extends Component {
 	};
 	closeMaxOrMinModalOpen = () => {
 		this.setState({isMaxOrMinModalOpen: false});
+	};
+	closeMessageModal = () => {
+		this.setState({isMessageModalOpen: false});
 	};
 	handleChange = e => {
 		let me = this;
@@ -903,6 +912,53 @@ class Board extends Component {
 		);
 	};
 
+	MessageModal = () => {
+		let me = this;
+		const customStyles = {
+			overlay: {
+				backgroundColor: 'transparent'
+			},
+			content : {
+				top                   : '30%',
+				left                  : '80%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				//marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)'
+			}
+		};
+		return (
+			 <Modal
+				  isOpen={this.state.isMessageModalOpen}
+				  onRequestClose={this.closeMessageModal}
+				  style={customStyles}
+				  contentLabel="MAX or MIN"
+				  ariaHideApp={true}
+			 >
+				 <Row justify="center">
+					 <Col span={18}>
+						 <p className={"modalQuestion"}>Answer</p>
+					 </Col>
+				 </Row>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <Row justify="center">
+							 {this.state.messageText}
+						 </Row>
+					 </Col>
+				 </Row>
+				 <br/>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <div className={"enterButton"} onClick={this.closeMessageModal}>
+							 <p>Accept</p>
+						 </div>
+					 </Col>
+				 </Row>
+			 </Modal>
+		);
+	};
+
 	setAlgorithmPicked = (e,alg) => {
 		console.log("Algoritmo escogido: ",alg);
 		this.setState({algorithmPicked: alg});
@@ -1003,6 +1059,7 @@ class Board extends Component {
                             <br/>
                             {this.AddLinkLabelModal()}
 	                        {this.MaxOrMinModal()}
+	                        {this.MessageModal()}
                         </div>
                     </Content>
                     <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
