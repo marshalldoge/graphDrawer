@@ -24,6 +24,9 @@ export function asignacion(matrixad, task){
                 let iterationCost = 0;
                 for(let j=0;j<info.destinies.length;j++){
                     iterationCost += matrixad[permutations[i][j]][info.destinies[j]];
+                    if(matrixad[permutations[i][j]][info.destinies[j]]==0){
+                        iterationCost -= 1000000;
+                    }
                 }
                 if(iterationCost > resultCost){ 
                     resultCost = iterationCost;
@@ -40,6 +43,9 @@ export function asignacion(matrixad, task){
                 let iterationCost = 0;
                 for(let j=0;j<info.destinies.length;j++){
                     iterationCost += matrixad[permutations[i][j]][info.destinies[j]];
+                    if(matrixad[permutations[i][j]][info.destinies[j]]==0){
+                        iterationCost += 1000000;
+                    }
                 }
                 if(iterationCost < resultCost){ 
                     resultCost = iterationCost;
@@ -83,6 +89,9 @@ export function asignacion(matrixad, task){
                 let iterationCost = 0;
                 for(let j=0;j<info.sources.length;j++){
                     iterationCost += matrixad[info.sources[j]][permutations[i][j]];
+                    if(matrixad[info.sources[j]][permutations[i][j]] == 0){
+                        iterationCost -= 1000000;
+                    }
                 }
                 if(iterationCost > resultCost){ 
                     resultCost = iterationCost;
@@ -99,6 +108,9 @@ export function asignacion(matrixad, task){
                 let iterationCost = 0;
                 for(let j=0;j<info.sources.length;j++){
                     iterationCost += matrixad[info.sources[j]][permutations[i][j]];
+                    if(matrixad[info.sources[j]][permutations[i][j]] == 0){
+                        iterationCost += 1000000;
+                    }
                 }
                 if(iterationCost < resultCost){ 
                     resultCost = iterationCost;
