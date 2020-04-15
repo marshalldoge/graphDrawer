@@ -1,6 +1,7 @@
 $background: #2C313C;
 $board: #F4F4F4;
 $green: #368471;
+$blue: #003152;
 .bodyCtn {
   background-color: $background;
 }
@@ -74,4 +75,11 @@ $green: #368471;
 .runButton {
   background-color: $green;
   border-color: $green;
+}
+.modalQuestion {
+  color: $blue;
+  font-weight: bolder;
+  font-size: large;
+  font-weight: 400;
+  font-size: 20px;
 }

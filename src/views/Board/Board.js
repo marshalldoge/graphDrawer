@@ -1,15 +1,21 @@
 import React, {Component} from "react";
-import {Row, Col, Button, Typography, message, Menu, Layout} from 'antd';
+import {Row, Col, Button, Typography, message, Menu, Layout, Radio} from 'antd';
 import {
-	RadarChartOutlined,
-	HeatMapOutlined,
-	PlayCircleOutlined
+    ArrowsAltOutlined,
+    DeleteOutlined,
+    DribbbleOutlined,
+    HeatMapOutlined,
+    HighlightOutlined,
+    PlayCircleOutlined,
+    RadarChartOutlined,
+    ReloadOutlined,
 } from '@ant-design/icons';
 import { Graph } from "react-d3-graph";
 import 'antd/dist/antd.css';
 import Modal from 'react-modal';
 import './_Board.scss';
 import { johnson } from '../../algorithms/johnson';
+import { asignacion } from '../../algorithms/asignacion';
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
@@ -35,6 +41,7 @@ class Board extends Component {
 		linkSource: null,
 		linkTarget: null,
 		isAddLinkLabelModalOpen: false,
+		isMaxOrMinModalOpen: false,
 		//isAddNodeLabelModalOpen
 		clickedLink: null,
 		addLabelInputValue: "",
@@ -46,7 +53,8 @@ class Board extends Component {
 		erasedNodes: false,
 		animationState: 0,
 		collapsed: false,
-		algorithmPicked: "jhonson"
+		algorithmPicked: "jhonson",
+		maximizeAlgorithm: true
 	};
 
 	//Hide or Show the sider
@@ -531,11 +539,43 @@ class Board extends Component {
 				[0,0,0,0,0,0]]);
 			 */
 			let commands = johnson(matrix);
-			console.log("Andwer from algorithm: ",commands);
+			console.log("Andwer from Jhonson algorithm: ",commands);
+			this.closeMaxOrMinModalOpen();
 			this.runAnimation(commands);
 			this.setState({erasedNodes: true});
 		} else {
-
+			let nodesLength = this.state.data.nodes.length;
+			let length = this.state.data.links.length;
+			let matrix = [];
+			for(let i = 0; i < nodesLength; i++){
+				let row = [];
+				for(let j = 0; j < nodesLength; j++){
+					row.push(0);
+				}
+				matrix.push(row);
+			}
+			console.log("empty matrix: ",matrix);
+			for(let i = 0; i < length; i++) {
+				matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
+			}
+			console.log("Filled matrix: ",matrix);
+			/*
+			let answer = johnson([[0,3,0,0,2,0],
+				[0,0,7,6,0,0],
+				[0,0,0,6,0,0],
+				[0,0,0,0,0,3],
+				[0,0,0,4,0,0],
+				[0,0,0,0,0,0]]);
+			 */
+			let maxOrMin = this.state.maximizeAlgorithm? "max":"min";
+			console.log("Se va a ",maxOrMin," la solución");
+			let answer =  asignacion(matrix, maxOrMin);
+			let commands = answer["array"];
+			let message = answer["message"];
+			console.log("Andwer from asignation algorithm: ",answer);
+			this.closeMaxOrMinModalOpen();
+			this.runAnimation(commands);
+			this.setState({erasedNodes: true});
 		}
 	};
 
@@ -626,7 +666,9 @@ class Board extends Component {
 	closeAddLinkLabelModal = () => {
 		this.setState({isAddLinkLabelModalOpen: false});
 	};
-
+	closeMaxOrMinModalOpen = () => {
+		this.setState({isMaxOrMinModalOpen: false});
+	};
 	handleChange = e => {
 		let me = this;
 		me.setState({addLabelInputValue: e.target.value});
@@ -792,6 +834,53 @@ class Board extends Component {
 		}
 	};
 
+	MaxOrMinModal = () => {
+		let me = this;
+		const customStyles = {
+			content : {
+				top                   : '50%',
+				left                  : '50%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)'
+			}
+		};
+		return (
+			 <Modal
+				  isOpen={this.state.isMaxOrMinModalOpen}
+				  onRequestClose={this.closeMaxOrMinModalOpen}
+				  style={customStyles}
+				  contentLabel="MAX or MIN"
+				  ariaHideApp={false}
+			 >
+				 <Row justify="center">
+					 <Col span={18}>
+						 <p className={"modalQuestion"}>Would you like to minimize or maximize?</p>
+					 </Col>
+				 </Row>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <Row justify="center">
+						 <Radio.Group>
+							 <Radio.Button value="minimize" onClick={() => this.setState({maximizeAlgorithm: false})}>Minimize</Radio.Button>
+							 <Radio.Button value="maximize" onClick={() => this.setState({maximizeAlgorithm: true})}>Maximize</Radio.Button>
+						 </Radio.Group>
+						 </Row>
+					 </Col>
+				 </Row>
+				 <br/>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <div className={"enterButton"} onClick={this.runAlgorithm}>
+							 <p>Run Algorithm</p>
+						 </div>
+					 </Col>
+				 </Row>
+			 </Modal>
+		);
+	};
+
 	setAlgorithmPicked = (e,alg) => {
 		console.log("Algoritmo escogido: ",alg);
 		this.setState({algorithmPicked: alg});
@@ -800,103 +889,104 @@ class Board extends Component {
 
 	render() {
 		return (
-			 <Layout style={{ minHeight: '100vh' }}>
-				 <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
-					 {this.Logo()}
-					 <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-						 <Menu.Item key="1" onClick={e => this.setAlgorithmPicked(e,"jhonson")}>
-							 <RadarChartOutlined />
-							 <span>Jhonson</span>
-						 </Menu.Item>
-						 <Menu.Item key="2" onClick={e => this.setAlgorithmPicked(e,"asignation")}>
-							 <HeatMapOutlined />
-							 <span>Asignation</span>
-						 </Menu.Item>
-					 </Menu>
-				 </Sider>
-				 <Layout className="site-layout bodyCtn">
-					 <Content style={{ margin: '0 16px' }}>
-						 <div className={"mainCtn"}>
-							 <Row type="flex" justify="space-around" align="middle">
-								 <h1 className={"boardTitle"}>Graph Drawer</h1>
-							 </Row>
-							 <Row type="flex" justify="space-around" align="middle">
-								 <Button type="normal" icon="dribbble" size={'large'}
-								         onClick={e => this.setTypeInput(e,"node")}
-								         disabled={this.state.inputType === "node"}
-								 >
-									 Draw/Move Nodes
-								 </Button>
-								 <Button type="normal" icon="arrows-alt" size={'large'}
-								         onClick={e => this.setTypeInput(e,"edge")}
-								         disabled={this.state.inputType === "edge"}
-								 >
-									 Draw Links
-								 </Button>
-								 <Button type="danger" icon="reload" size={'large'}
-								         onClick={this.undoAction}
-								         disabled={!this.state.lastActionType || this.state.erasedNodes}
-								 >
-									 Undo
-								 </Button>
-								 <Button type="danger" icon="highlight" size={'large'}
-								         onClick={this.eraseNode}
-								 >
-									 Erase
-								 </Button>
-								 <Button type="danger" icon="delete" size={'large'}
-								         onClick={this.eraseAll}
-								 >
-									 Clean
-								 </Button>
-								 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
-								         onClick={this.runAlgorithm}
-								 >
-									 RUN
-								 </Button>
-							 </Row>
-							 <Row type="flex" justify="space-around" align="middle">
-								 <Col span={23}>
-									 <div className={"board"}>
-										 <div className={"graphCtn"} onClick={this.createNode}>
-											 <Graph
-												  ref="graph"
-												  id="graph-id" // id is mandatory, if no id is defined rd3g will throw an error
-												  data={this.state.data}
-												  config={this.myConfig}
-												  onClickNode={this.onClickNode}
-												  onRightClickNode={this.onRightClickNode}
-												  onClickGraph={this.onClickGraph}
-												  onClickLink={this.onClickLink}
-												  onRightClickLink={this.onRightClickLink}
-												  onNodePositionChange={this.onNodePositionChange}
-											 />
-											 <SelfLoopLabels
-												  data = {this.state.selfLoopLabels}
-											 />
-										 </div>
-									 </div>
-								 </Col>
-							 </Row>
-							 <br/>
-							 <Row type="flex" justify="space-around" align="middle">
+            <Layout style={{ minHeight: '100vh' }}>
+                <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
+                    {this.Logo()}
+                    <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+                        <Menu.Item key="1" onClick={e => this.setAlgorithmPicked(e,"jhonson")}>
+                            <RadarChartOutlined />
+                            <span>Jhonson</span>
+                        </Menu.Item>
+                        <Menu.Item key="2" onClick={e => this.setAlgorithmPicked(e,"asignation")}>
+                            <HeatMapOutlined />
+                            <span>Asignation</span>
+                        </Menu.Item>
+                    </Menu>
+                </Sider>
+                <Layout className="site-layout bodyCtn">
+                    <Content style={{ margin: '0 16px' }}>
+                        <div className={"mainCtn"}>
+                            <Row type="flex" justify="space-around" align="middle">
+                                <h1 className={"boardTitle"}>Graph Drawer</h1>
+                            </Row>
+                            <Row type="flex" justify="space-around" align="middle">
+                                <Button type="normal" icon={<DribbbleOutlined />} size={'large'}
+                                        onClick={e => this.setTypeInput(e,"node")}
+                                        disabled={this.state.inputType === "node"}
+                                >
+                                    Draw/Move Nodes
+                                </Button>
+                                <Button type="normal" icon={<ArrowsAltOutlined />} size={'large'}
+                                        onClick={e => this.setTypeInput(e,"edge")}
+                                        disabled={this.state.inputType === "edge"}
+                                >
+                                    Draw Links
+                                </Button>
+                                <Button type="danger" icon={<ReloadOutlined />} size={'large'}
+                                        onClick={this.undoAction}
+                                        disabled={!this.state.lastActionType || this.state.erasedNodes}
+                                >
+                                    Undo
+                                </Button>
+                                <Button type="danger" icon={<HighlightOutlined />} size={'large'}
+                                        onClick={this.eraseNode}
+                                >
+                                    Erase
+                                </Button>
+                                <Button type="danger" icon={<DeleteOutlined />} size={'large'}
+                                        onClick={this.eraseAll}
+                                >
+                                    Clean
+                                </Button>
+                                <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
+                                        onClick={() => this.setState({isMaxOrMinModalOpen: true})}
+                                >
+                                    RUN
+                                </Button>
+                            </Row>
+                            <Row type="flex" justify="space-around" align="middle">
+                                <Col span={23}>
+                                    <div className={"board"}>
+                                        <div className={"graphCtn"} onClick={this.createNode}>
+                                            <Graph
+                                                 ref="graph"
+                                                 id="graph-id" // id is mandatory, if no id is defined rd3g will throw an error
+                                                 data={this.state.data}
+                                                 config={this.myConfig}
+                                                 onClickNode={this.onClickNode}
+                                                 onRightClickNode={this.onRightClickNode}
+                                                 onClickGraph={this.onClickGraph}
+                                                 onClickLink={this.onClickLink}
+                                                 onRightClickLink={this.onRightClickLink}
+                                                 onNodePositionChange={this.onNodePositionChange}
+                                            />
+                                            <SelfLoopLabels
+                                                 data = {this.state.selfLoopLabels}
+                                            />
+                                        </div>
+                                    </div>
+                                </Col>
+                            </Row>
+                            <br/>
+                            <Row type="flex" justify="space-around" align="middle">
 
-								 <h1 className={"boardTitle"}>Adjacency Matrix</h1>
-							 </Row>
-							 <Row type="flex" justify={this.state.isMobile? "start" :"space-around"} align="middle">
-								 <Col justify={this.state.isMobile? "start" :"space-around"} span={15}>
-									 {this.ProcessedMatrix()}
-								 </Col>
-							 </Row>
-							 <br/>
-							 <br/>
-							 {this.AddLinkLabelModal()}
-						 </div>
-					 </Content>
-					 <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
-				 </Layout>
-			 </Layout>
-		);
+                                <h1 className={"boardTitle"}>Adjacency Matrix</h1>
+                            </Row>
+                            <Row type="flex" justify={this.state.isMobile? "start" :"space-around"} align="middle">
+                                <Col justify={this.state.isMobile? "start" :"space-around"} span={15}>
+                                    {this.ProcessedMatrix()}
+                                </Col>
+                            </Row>
+                            <br/>
+                            <br/>
+                            {this.AddLinkLabelModal()}
+	                        {this.MaxOrMinModal()}
+                        </div>
+                    </Content>
+                    <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+                </Layout>
+            </Layout>
+        );
 	}
 }
 

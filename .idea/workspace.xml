@@ -2,12 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c0ab0c0-61bc-4d75-bdcb-3b662c2e6d1b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/assets/logos/logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/logos/logoCollapsed.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/algorithms/johnson.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithms/johnson.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Board/Board.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/Board.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Board/_Board.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/_Board.scss" afterDir="false" />
     </list>
@@ -22,11 +19,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
-              <caret line="9" column="23" selection-start-line="9" selection-start-column="23" selection-end-line="9" selection-end-column="23" />
+            <state relative-caret-position="357">
+              <caret line="17" column="4" lean-forward="true" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -57,8 +54,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="332">
-              <caret line="851" column="105" selection-start-line="851" selection-start-column="105" selection-end-line="851" selection-end-column="105" />
+            <state relative-caret-position="328">
+              <caret line="572" column="43" lean-forward="true" selection-start-line="572" selection-start-column="43" selection-end-line="572" selection-end-column="43" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -67,10 +64,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/algorithms/asignacion.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2149">
+              <caret line="136" column="27" lean-forward="true" selection-start-line="136" selection-start-column="27" selection-end-line="136" selection-end-column="27" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/views/Board/_Board.scss">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="48" column="14" selection-start-line="48" selection-start-column="14" selection-end-line="48" selection-end-column="14" />
+            <state relative-caret-position="525">
+              <caret line="83" column="18" selection-start-line="83" selection-start-column="18" selection-end-line="83" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -80,18 +86,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state>
               <caret line="18" column="55" selection-start-line="18" selection-start-column="55" selection-end-line="18" selection-end-column="55" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/components/Matrix/Matrix.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret selection-end-line="3" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#39#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -151,6 +145,7 @@
       <find>i</find>
       <find>start</find>
       <find>algorithmPicked</find>
+      <find>runal</find>
     </findStrings>
     <replaceStrings>
       <replace>right</replace>
@@ -164,7 +159,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/src/App.scss" />
         <option value="$PROJECT_DIR$/src/components/node.js" />
         <option value="$PROJECT_DIR$/src/components/Node.js" />
@@ -181,8 +175,9 @@
         <option value="$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js" />
         <option value="$PROJECT_DIR$/src/algorithms/example.js" />
         <option value="$PROJECT_DIR$/src/algorithms/johnson.js" />
-        <option value="$PROJECT_DIR$/src/views/Board/_Board.scss" />
+        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/src/views/Board/Board.js" />
+        <option value="$PROJECT_DIR$/src/views/Board/_Board.scss" />
       </list>
     </option>
   </component>
@@ -308,15 +303,16 @@
       <workItem from="1585446042729" duration="559000" />
       <workItem from="1585721757425" duration="2945000" />
       <workItem from="1586233306806" duration="992000" />
-      <workItem from="1586922721010" duration="4391000" />
+      <workItem from="1586922721010" duration="6986000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="73214000" />
+    <option name="totallyTimeSpent" value="75809000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="819" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18604651" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -439,27 +435,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/views/Board/_Board.scss">
+    <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="48" column="14" selection-start-line="48" selection-start-column="14" selection-end-line="48" selection-end-column="14" />
+        <state relative-caret-position="357">
+          <caret line="17" column="4" lean-forward="true" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="332">
-          <caret line="851" column="105" selection-start-line="851" selection-start-column="105" selection-end-line="851" selection-end-column="105" />
+        <state relative-caret-position="328">
+          <caret line="572" column="43" lean-forward="true" selection-start-line="572" selection-start-column="43" selection-end-line="572" selection-end-column="43" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
+    <entry file="file://$PROJECT_DIR$/src/algorithms/asignacion.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="9" column="23" selection-start-line="9" selection-start-column="23" selection-end-line="9" selection-end-column="23" />
+        <state relative-caret-position="2149">
+          <caret line="136" column="27" lean-forward="true" selection-start-line="136" selection-start-column="27" selection-end-line="136" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/views/Board/_Board.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="83" column="18" selection-start-line="83" selection-start-column="18" selection-end-line="83" selection-end-column="18" />
         </state>
       </provider>
     </entry>
