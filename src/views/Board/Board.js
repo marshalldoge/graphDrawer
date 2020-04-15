@@ -513,6 +513,36 @@ class Board extends Component {
 		}, 1000);
 	};
 
+	MessageProccesser = () => {
+		let msgs = this.state.messageText.split('#');
+		let res = [];
+		for(let i = 0; i < msgs.length; i++) {
+			if(i === 0){
+				res.push(
+					 <Row justify="center">
+						 <Col span={24}>
+							 <Row justify="center">
+								 <p key={i} className={"title"}>{msgs[i]}</p>
+							 </Row>
+						 </Col>
+					 </Row>
+				);
+			}else{
+				res.push(
+					 <Row justify="center">
+						 <Col span={24}>
+							 <Row justify="center">
+								 <p key={i} className={"assignation"}>{msgs[i]}</p>
+							 </Row>
+						 </Col>
+					 </Row>
+				);
+			}
+			res.push(<br/>)
+		}
+		return res;
+	};
+
 
 	callAlgorithm = () => {
 		let me = this;
@@ -936,17 +966,12 @@ class Board extends Component {
 				  ariaHideApp={true}
 			 >
 				 <Row justify="center">
-					 <Col span={18}>
+					 <Col span={10}>
 						 <p className={"modalQuestion"}>Answer</p>
 					 </Col>
 				 </Row>
-				 <Row justify="center">
-					 <Col span={18}>
-						 <Row justify="center">
-							 {this.state.messageText}
-						 </Row>
-					 </Col>
-				 </Row>
+				 <br/>
+				 {this.MessageProccesser()}
 				 <br/>
 				 <Row justify="center">
 					 <Col span={18}>
