@@ -16,6 +16,7 @@ import Modal from 'react-modal';
 import './_Board.scss';
 import { johnson } from '../../algorithms/johnson';
 import { asignacion } from '../../algorithms/asignacion';
+import { noroeste } from '../../algorithms/noroeste';
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
@@ -585,7 +586,7 @@ class Board extends Component {
 					 <Row justify="center">
 						 <Col span={24}>
 							 <Row justify="center">
-								 <p key={i} className={"title"}>{msgs[i]}</p>
+								 <p key={i} className={"messageModalTitle"}>{msgs[i]}</p>
 							 </Row>
 						 </Col>
 					 </Row>
@@ -608,72 +609,116 @@ class Board extends Component {
 
 	callAlgorithm = () => {
 		let me = this;
-		if(this.state.algorithmPicked === "jhonson") {
-			let nodesLength = this.state.data.nodes.length;
-			let length = this.state.data.links.length;
-			let matrix = [];
-			for(let i = 0; i < nodesLength; i++){
-				let row = [];
-				for(let j = 0; j < nodesLength; j++){
-					row.push(0);
+		let commands, nodesLength, length, matrix, maxOrMin, answer, message;
+		switch (this.state.algorithmPicked) {
+			case "jhonson":
+				nodesLength = this.state.data.nodes.length;
+				length = this.state.data.links.length;
+				matrix = [];
+				for(let i = 0; i < nodesLength; i++){
+					let row = [];
+					for(let j = 0; j < nodesLength; j++){
+						row.push(0);
+					}
+					matrix.push(row);
 				}
-				matrix.push(row);
-			}
-			console.log("empty matrix: ",matrix);
-			for(let i = 0; i < length; i++) {
-				matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
-			}
-			console.log("Filled matrix: ",matrix);
-			/*
-			let answer = johnson([[0,3,0,0,2,0],
-				[0,0,7,6,0,0],
-				[0,0,0,6,0,0],
-				[0,0,0,0,0,3],
-				[0,0,0,4,0,0],
-				[0,0,0,0,0,0]]);
-			 */
-			let commands = johnson(matrix);
-			console.log("Andwer from Jhonson algorithm: ",commands);
-			this.closeMaxOrMinModalOpen();
-			this.runAnimation(commands);
-			this.setState({erasedNodes: true});
-		} else {
-			let nodesLength = this.state.data.nodes.length;
-			let length = this.state.data.links.length;
-			let matrix = [];
-			for(let i = 0; i < nodesLength; i++){
-				let row = [];
-				for(let j = 0; j < nodesLength; j++){
-					row.push(0);
+				console.log("empty matrix: ",matrix);
+				for(let i = 0; i < length; i++) {
+					matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
 				}
-				matrix.push(row);
-			}
-			console.log("empty matrix: ",matrix);
-			for(let i = 0; i < length; i++) {
-				matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
-			}
-			console.log("Filled matrix: ",matrix);
-			/*
-			let answer = johnson([[0,3,0,0,2,0],
-				[0,0,7,6,0,0],
-				[0,0,0,6,0,0],
-				[0,0,0,0,0,3],
-				[0,0,0,4,0,0],
-				[0,0,0,0,0,0]]);
-			 */
-			let maxOrMin = this.state.maximizeAlgorithm? "max":"min";
-			console.log("Se va a ",maxOrMin," la solución");
-			let answer =  asignacion(matrix, maxOrMin);
-			let commands = answer["array"];
-			let message = answer["message"];
-			console.log("Andwer from asignation algorithm: ",answer);
-			this.closeMaxOrMinModalOpen();
-			this.runAnimation(commands);
-			this.setState({
-				erasedNodes: true,
-				messageText: message,
-				isMessageModalOpen: true
-			});
+				console.log("Filled matrix: ",matrix);
+				/*
+				let answer = johnson([[0,3,0,0,2,0],
+					[0,0,7,6,0,0],
+					[0,0,0,6,0,0],
+					[0,0,0,0,0,3],
+					[0,0,0,4,0,0],
+					[0,0,0,0,0,0]]);
+				 */
+				commands = johnson(matrix);
+				console.log("Andwer from Jhonson algorithm: ",commands);
+				this.closeMaxOrMinModalOpen();
+				this.runAnimation(commands);
+				this.setState({erasedNodes: true});
+				break;
+			case "asignation":
+				nodesLength = this.state.data.nodes.length;
+				length = this.state.data.links.length;
+				matrix = [];
+				for(let i = 0; i < nodesLength; i++){
+					let row = [];
+					for(let j = 0; j < nodesLength; j++){
+						row.push(0);
+					}
+					matrix.push(row);
+				}
+				console.log("empty matrix: ",matrix);
+				for(let i = 0; i < length; i++) {
+					matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
+				}
+				console.log("Filled matrix: ",matrix);
+				/*
+				let answer = johnson([[0,3,0,0,2,0],
+					[0,0,7,6,0,0],
+					[0,0,0,6,0,0],
+					[0,0,0,0,0,3],
+					[0,0,0,4,0,0],
+					[0,0,0,0,0,0]]);
+				 */
+				maxOrMin = this.state.maximizeAlgorithm? "max":"min";
+				console.log("Se va a ",maxOrMin," la solución");
+				answer =  asignacion(matrix, maxOrMin);
+				commands = answer["array"];
+				message = answer["message"];
+				console.log("Andwer from asignation algorithm: ",answer);
+				this.closeMaxOrMinModalOpen();
+				this.runAnimation(commands);
+				this.setState({
+					erasedNodes: true,
+					messageText: message,
+					isMessageModalOpen: true
+				});
+				break;
+			case "noroeste":
+				//noroeste
+				nodesLength = this.state.data.nodes.length;
+				length = this.state.data.links.length;
+				matrix = [];
+				for(let i = 0; i < nodesLength; i++){
+					let row = [];
+					for(let j = 0; j < nodesLength; j++){
+						row.push(0);
+					}
+					matrix.push(row);
+				}
+				console.log("empty matrix: ",matrix);
+				for(let i = 0; i < length; i++) {
+					matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
+				}
+				console.log("Filled matrix: ",matrix);
+				/*
+				let answer = johnson([[0,3,0,0,2,0],
+					[0,0,7,6,0,0],
+					[0,0,0,6,0,0],
+					[0,0,0,0,0,3],
+					[0,0,0,4,0,0],
+					[0,0,0,0,0,0]]);
+				 */
+				maxOrMin = this.state.maximizeAlgorithm? "max":"min";
+				console.log("Se va a ",maxOrMin," la solución");
+				answer =  noroeste(matrix,this.state.data.nodes, maxOrMin);
+				commands = answer["array"];
+				message = answer["message"];
+				console.log("Andwer from asignation algorithm: ",answer);
+				this.closeMaxOrMinModalOpen();
+				//this.runAnimation(commands);
+				this.setState({
+					erasedNodes: true,
+					messageText: message,
+					isMessageModalOpen: true
+				});
+
+				break;
 		}
 	};
 
@@ -684,7 +729,7 @@ class Board extends Component {
 				this.setState({
 					animationState: 0
 				});
-				this.runAlgorithm();
+				this.callAlgorithm();
 				break;
 			case "asignation":
 				this.setState({
@@ -694,9 +739,9 @@ class Board extends Component {
 				break;
 			case "noroeste":
 				this.setState({
+					isMaxOrMinModalOpen: true,
 					animationState: 0
 				});
-				this.runAlgorithm();
 				break;
 		}
 	};
@@ -1062,7 +1107,8 @@ class Board extends Component {
 				right                 : 'auto',
 				bottom                : 'auto',
 				//marginRight           : '-50%',
-				transform             : 'translate(-50%, -50%)'
+				transform             : 'translate(-50%, -50%)',
+				width                 : '300px'
 			}
 		};
 		return (
