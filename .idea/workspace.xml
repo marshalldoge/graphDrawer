@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c0ab0c0-61bc-4d75-bdcb-3b662c2e6d1b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Board/Board.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/Board.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -27,7 +28,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/App.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
+            <state relative-caret-position="147">
               <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
@@ -50,8 +51,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="970" column="23" selection-start-line="970" selection-start-column="23" selection-end-line="970" selection-end-column="23" />
+            <state relative-caret-position="209">
+              <caret line="366" column="44" selection-start-line="366" selection-start-column="44" selection-end-line="366" selection-end-column="44" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -62,8 +63,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/algorithms/asignacion.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2730">
-              <caret line="130" column="42" selection-start-line="130" selection-start-column="42" selection-end-line="130" selection-end-column="42" />
+            <state relative-caret-position="2541">
+              <caret line="121" column="47" selection-start-line="121" selection-start-column="47" selection-end-line="121" selection-end-column="47" />
             </state>
           </provider>
         </entry>
@@ -117,18 +118,12 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>crating new node</find>
-      <find>.data.nodes[i].id</find>
-      <find>TO</find>
-      <find>To</find>
       <find>AFTER</find>
       <find>push</find>
       <find>this.state</find>
       <find>getNodes</find>
       <find>selfLoopLabels</find>
       <find>createno</find>
-      <find>create</find>
-      <find>clickedLink</find>
       <find>tostrin</find>
       <find>left</find>
       <find>createnode</find>
@@ -147,6 +142,12 @@
       <find>br</find>
       <find>callal</find>
       <find>call</find>
+      <find>messagep</find>
+      <find>create</find>
+      <find>createº</find>
+      <find>clickedLink</find>
+      <find>saveno</find>
+      <find>save</find>
     </findStrings>
     <replaceStrings>
       <replace>right</replace>
@@ -185,7 +186,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="819" />
@@ -309,15 +310,18 @@
       <workItem from="1586233306806" duration="992000" />
       <workItem from="1586922721010" duration="8361000" />
       <workItem from="1586962380944" duration="2337000" />
-      <workItem from="1586964782150" duration="241000" />
+      <workItem from="1586964782150" duration="1408000" />
+      <workItem from="1587096462882" duration="8000" />
+      <workItem from="1587257976767" duration="59000" />
+      <workItem from="1587370823952" duration="6565000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="79762000" />
+    <option name="totallyTimeSpent" value="87561000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="819" extended-state="6" />
+    <frame x="-1" y="23" width="1440" height="819" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18604651" />
@@ -403,7 +407,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/App.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
+        <state relative-caret-position="147">
           <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
@@ -422,8 +426,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/algorithms/asignacion.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2730">
-          <caret line="130" column="42" selection-start-line="130" selection-start-column="42" selection-end-line="130" selection-end-column="42" />
+        <state relative-caret-position="2541">
+          <caret line="121" column="47" selection-start-line="121" selection-start-column="47" selection-end-line="121" selection-end-column="47" />
         </state>
       </provider>
     </entry>
@@ -464,8 +468,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="970" column="23" selection-start-line="970" selection-start-column="23" selection-end-line="970" selection-end-column="23" />
+        <state relative-caret-position="209">
+          <caret line="366" column="44" selection-start-line="366" selection-start-column="44" selection-end-line="366" selection-end-column="44" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>

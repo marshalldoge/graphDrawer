@@ -30,7 +30,7 @@ class Board extends Component {
 		inputType: "node",
 		nodeRadius: 200,
 		data: {
-			nodes: [{ id: "0",x: window.innerWidth/4 - 40, y: window.innerHeight/2.5 - 40, left: 0, right: 0 }],
+			nodes: [{ id: "0",x: window.innerWidth/6 - 40, y: window.innerHeight/4 - 40, left: 0, right: 0 }],
 			links: [],
 		},
 		nodesPosition: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
@@ -42,8 +42,10 @@ class Board extends Component {
 		linkTarget: null,
 		isAddLinkLabelModalOpen: false,
 		isMaxOrMinModalOpen: false,
+		isNodeInputModalOpen: false,
 		//isAddNodeLabelModalOpen
 		clickedLink: null,
+		clickedNode: null,
 		addLabelInputValue: "",
 		directed: true,
 		isMobile: window.innerWidth<480,
@@ -56,7 +58,9 @@ class Board extends Component {
 		algorithmPicked: "jhonson",
 		maximizeAlgorithm: true,
 		isMessageModalOpen: false,
-		messageText: ""
+		messageText: "",
+		nodeInputModalName: "",
+		nodeInputModalValue: ""
 	};
 
 	//Hide or Show the sider
@@ -67,89 +71,134 @@ class Board extends Component {
 
 	// Function that receives a node and returns a JSX view.
 	viewGenerator = node => {
-		if(this.state.algorithmPicked === "jhonson") {
-			let nodeColor = node.color ? node.color : "#f6edcf";
-			const nodeCtn = {
-				borderRadius: "40px",
-				width: "60px",
-				height: "60px",
-				backgroundColor: nodeColor,
-				fontSize: "15px"
-			};
-			const bottomCtn = {
-				width: "60px",
-				height: "30px",
-				minHeight: "40px",
-				textAlign: "center",
-			};
+		let nodeColor;
+		let nodeCtn, bottomCtn, nodeId, leftBlock, rightBlock;
+		switch (this.state.algorithmPicked) {
+			case "jhonson":
+				nodeColor = node.color ? node.color : "#f6edcf";
+				nodeCtn = {
+					borderRadius: "40px",
+					width: "60px",
+					height: "60px",
+					backgroundColor: nodeColor,
+					fontSize: "15px"
+				};
+				bottomCtn = {
+					width: "60px",
+					height: "30px",
+					minHeight: "40px",
+					textAlign: "center",
+				};
 
-			const leftBlock = {
-				width: "50%",
-				/*float: left;*/
-				display: "inline-block",
-				borderTopStyle: "solid",
-				borderColor: "black transparent transparent transparent",
-				borderStyle: "solid solid solid solid",
-				borderWidth: "1px 0 0 0"
-			};
+				leftBlock = {
+					width: "50%",
+					/*float: left;*/
+					display: "inline-block",
+					borderTopStyle: "solid",
+					borderColor: "black transparent transparent transparent",
+					borderStyle: "solid solid solid solid",
+					borderWidth: "1px 0 0 0"
+				};
 
-			const rightBlock = {
-				width: "50%",
-				/*float: left;*/
-				display: "inline-block",
-				borderTopStyle: "solid",
-				borderColor: "black transparent transparent black",
-				borderStyle: "solid solid solid solid",
-				borderWidth: "1px 0 0 1px"
-			};
+				rightBlock = {
+					width: "50%",
+					/*float: left;*/
+					display: "inline-block",
+					borderTopStyle: "solid",
+					borderColor: "black transparent transparent black",
+					borderStyle: "solid solid solid solid",
+					borderWidth: "1px 0 0 1px"
+				};
 
-			const nodeId = {
-				width: "100%",
-				height: "30px",
-				textAlign: "center",
-				paddingTop: "8px"
-			};
+				nodeId = {
+					width: "100%",
+					height: "30px",
+					textAlign: "center",
+					paddingTop: "8px"
+				};
 
-			let leftValue = node.left !== undefined ? node.left : "NULL";
-			let rightValue = node.right !== undefined ? node.right : "NULL";
-			//console.log("Drawing: ", node.id, " L: ", node.left, "R: ",node.right);
-			return (
-				 <div style={nodeCtn}>
-					 <div style={nodeId}>
-						 {node.id}
-					 </div>
-					 <div style={bottomCtn}>
-						 <div style={leftBlock}>
-							 {leftValue}
+				let leftValue = node.left !== undefined ? node.left : "NULL";
+				let rightValue = node.right !== undefined ? node.right : "NULL";
+				//console.log("Drawing: ", node.id, " L: ", node.left, "R: ",node.right);
+				return (
+					 <div style={nodeCtn}>
+						 <div style={nodeId}>
+							 {node.id}
 						 </div>
-						 <div style={rightBlock}>
-							 {rightValue}
+						 <div style={bottomCtn}>
+							 <div style={leftBlock}>
+								 {leftValue}
+							 </div>
+							 <div style={rightBlock}>
+								 {rightValue}
+							 </div>
 						 </div>
 					 </div>
-				 </div>
-			);
-		} else {
-			let nodeColor = node.color ? node.color : "#f6edcf";
-			const nodeCtn = {
-				borderRadius: "40px",
-				width: "60px",
-				height: "60px",
-				backgroundColor: nodeColor,
-				fontSize: "15px"
-			};
-			const nodeId = {
-				width: "100%",
-				height: "30px",
-				textAlign: "center",
-				paddingTop: "8px"
-			};
-			return (
-				 <div style={nodeCtn}>
-					 <div style={nodeId}>
-						 {node.id}
+				);
+				break;
+			case "asignation":
+				nodeColor = node.color ? node.color : "#f6edcf";
+				nodeCtn = {
+					borderRadius: "40px",
+					width: "60px",
+					height: "60px",
+					backgroundColor: nodeColor,
+					fontSize: "15px"
+				};
+				nodeId = {
+					width: "100%",
+					height: "30px",
+					textAlign: "center",
+					paddingTop: "8px"
+				};
+				return (
+					 <div style={nodeCtn}>
+						 <div style={nodeId}>
+							 {node.id}
+						 </div>
 					 </div>
-				 </div>
-			);
+				);
+				break;
+			case "noroeste":
+				nodeColor = node.color ? node.color : "#f6edcf";
+				nodeCtn = {
+					borderRadius: "40px",
+					width: "60px",
+					height: "60px",
+					backgroundColor: nodeColor,
+					fontSize: "15px"
+				};
+				bottomCtn = {
+					width: "60px",
+					height: "30px",
+					minHeight: "40px",
+					textAlign: "center",
+					borderColor: "black transparent transparent transparent",
+					borderStyle: "solid solid solid solid",
+					borderWidth: "1px"
+				};
+
+				nodeId = {
+					width: "100%",
+					height: "30px",
+					textAlign: "center",
+					paddingTop: "8px"
+				};
+
+				let nodeInputModalName = node.nodeInputModalName !== undefined ? node.nodeInputModalName : "";
+				let nodeInputModalValue = node.nodeInputModalValue !== undefined ? node.nodeInputModalValue : "";
+				//console.log("Drawing: ", node.id, " L: ", node.left, "R: ",node.right);
+				return (
+					 <div style={nodeCtn}>
+						 <div style={nodeId}>
+							 {nodeInputModalName}
+						 </div>
+						 <div style={bottomCtn}>
+							 {nodeInputModalValue}
+						 </div>
+					 </div>
+				);
+				break;
 		}
 
 	};
@@ -243,7 +292,18 @@ class Board extends Component {
 		switch(this.state.inputType) {
 			case "node":
 			me.setState((prevState) => {
-
+				switch (this.state.algorithmPicked) {
+					case "jhonson":
+						break;
+					case "asignation":
+						break;
+					case "noroeste":
+						this.setState({
+							isNodeInputModalOpen: true,
+							clickedNode: nodeId
+						});
+						break;
+				}
 				return prevState;
 			});
 			break;
@@ -257,6 +317,7 @@ class Board extends Component {
 					for(let i = 0; i < length; i++) {
 						if(prevState.data.nodes[i].id === nodeId) {
 							prevState.data.nodes[i] = {
+								...prevState.data.nodes[i],
 								id: nodeId,
 								color: "#446984",
 								left: prevState.data.nodes[i].left,
@@ -299,9 +360,11 @@ class Board extends Component {
 
 						//Creating the node for view
 						prevState.data.nodes[prevState.linkSource] = {
+							...prevState.data.nodes[prevState.linkSource],
 							id: prevState.linkSource,
 							left: prevState.data.nodes[prevState.linkSource].left,
-							right: prevState.data.nodes[prevState.linkSource].right
+							right: prevState.data.nodes[prevState.linkSource].right,
+							color: "#f6edcf"
 						};
 
 						prevState.data.links.push(
@@ -379,7 +442,7 @@ class Board extends Component {
 	};
 
 	onRightClickNode = function(event, nodeId) {
-		window.alert(`Right clicked node ${nodeId}`);
+		console.log("OPEEEENNNN MODALLLLL!!!");
 	};
 
 	onMouseOverNode = function(nodeId) {
@@ -616,10 +679,26 @@ class Board extends Component {
 
 	runAlgorithm = () => {
 		this.clearDirtyGraph();
-		this.setState({
-			isMaxOrMinModalOpen: true,
-			animationState: 0
-		});
+		switch (this.state.algorithmPicked) {
+			case "jhonson":
+				this.setState({
+					animationState: 0
+				});
+				this.runAlgorithm();
+				break;
+			case "asignation":
+				this.setState({
+					isMaxOrMinModalOpen: true,
+					animationState: 0
+				});
+				break;
+			case "noroeste":
+				this.setState({
+					animationState: 0
+				});
+				this.runAlgorithm();
+				break;
+		}
 	};
 
 	clearDirtyGraph = () => {
@@ -726,12 +805,42 @@ class Board extends Component {
 	closeMaxOrMinModalOpen = () => {
 		this.setState({isMaxOrMinModalOpen: false});
 	};
+	closeNodeInputModalOpen = () => {
+		this.setState({isMaxOrMinModalOpen: false});
+	};
 	closeMessageModal = () => {
 		this.setState({isMessageModalOpen: false});
 	};
 	handleChange = e => {
 		let me = this;
 		me.setState({addLabelInputValue: e.target.value});
+	};
+	handleInputNodeModalNameChange = e => {
+		let me = this;
+		me.setState({nodeInputModalName: e.target.value});
+	};
+	handleInputNodeModalValueChange = e => {
+		let me = this;
+		me.setState({nodeInputModalValue: e.target.value});
+	};
+
+	saveNodeInfo = () => {
+		let me = this;
+		me.setState((prevState) => {
+			for(let i = 0; i < prevState.data.nodes.length; i++) {
+				if(prevState.data.nodes[i].id === prevState.clickedNode) {
+					prevState.data.nodes[i] = {
+						...prevState.data.nodes[i],
+						nodeInputModalName: prevState.nodeInputModalName,
+						nodeInputModalValue: prevState.nodeInputModalValue
+					}
+				}
+			}
+			prevState.nodeInputModalName = "";
+			prevState.nodeInputModalValue = "";
+			prevState.isNodeInputModalOpen = false;
+			return prevState;
+		});
 	};
 
 	addLinkLabel = (e) => {
@@ -811,7 +920,7 @@ class Board extends Component {
 				  isOpen={this.state.isAddLinkLabelModalOpen}
 				  onRequestClose={this.closeAddLinkLabelModal}
 				  style={customStyles}
-				  contentLabel="Add Edge"
+				  contentLabel="Añadir arco"
 				  ariaHideApp={false}
 			 >
 				 <Row>
@@ -821,7 +930,7 @@ class Board extends Component {
 							  type="text"
 							  value={this.state.addLabelInputValue}
 							  onChange={this.handleChange}
-							  placeholder={"Weight..."}
+							  placeholder={"Peso..."}
 							  onKeyUp={this.addLinkLabel}
 							  autoFocus
 						 />
@@ -916,7 +1025,7 @@ class Board extends Component {
 			 >
 				 <Row justify="center">
 					 <Col span={18}>
-						 <p className={"modalQuestion"}>Would you like to minimize or maximize?</p>
+						 <p className={"modalQuestion"}>¿Quieres maximizar o minimizar?</p>
 					 </Col>
 				 </Row>
 				 <Row justify="center">
@@ -933,7 +1042,7 @@ class Board extends Component {
 				 <Row justify="center">
 					 <Col span={18}>
 						 <div className={"enterButton"} onClick={this.callAlgorithm}>
-							 <p>Run Algorithm</p>
+							 <p>Correr Algoritmo</p>
 						 </div>
 					 </Col>
 				 </Row>
@@ -962,11 +1071,11 @@ class Board extends Component {
 				  onRequestClose={this.closeMessageModal}
 				  style={customStyles}
 				  contentLabel="MAX or MIN"
-				  ariaHideApp={true}
+				  ariaHideApp={false}
 			 >
 				 <Row justify="center">
 					 <Col span={10}>
-						 <p className={"modalQuestion"}>Answer</p>
+						 <p className={"modalQuestion"}>Respuesta</p>
 					 </Col>
 				 </Row>
 				 {this.MessageProccesser()}
@@ -974,7 +1083,69 @@ class Board extends Component {
 				 <Row justify="center">
 					 <Col span={18}>
 						 <div className={"enterButton"} onClick={this.closeMessageModal}>
-							 <p>Accept</p>
+							 <p>Aceptar</p>
+						 </div>
+					 </Col>
+				 </Row>
+			 </Modal>
+		);
+	};
+
+	NodeInputModal = () => {
+		let me = this;
+		const customStyles = {
+			content : {
+				top                   : '50%',
+				left                  : '50%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)'
+			}
+		};
+		return (
+			 <Modal
+				  isOpen={this.state.isNodeInputModalOpen}
+				  onRequestClose={this.closeNodeInputModalOpen}
+				  style={customStyles}
+				  contentLabel="MAX or MIN"
+				  ariaHideApp={false}
+			 >
+				 <Row justify="center">
+					 <Col span={18}>
+						 <p className={"modalQuestion"}>Introduzca los datos del nodo</p>
+					 </Col>
+				 </Row>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <Row justify="center">
+							 <input
+								  className={"linkLabelInput"}
+								  type="text"
+								  value={this.state.nodeInputModalName}
+								  onChange={this.handleInputNodeModalNameChange}
+								  placeholder={"Nombre"}
+								  onKeyUp={this.addLinkLabel}
+								  autoFocus
+							 />
+						 </Row>
+						 <Row justify="center">
+							 <input
+								  className={"linkLabelInput"}
+								  type="text"
+								  value={this.state.nodeInputModalValue}
+								  onChange={this.handleInputNodeModalValueChange}
+								  placeholder={"Valor"}
+								  onKeyUp={this.addLinkLabel}
+							 />
+						 </Row>
+					 </Col>
+				 </Row>
+				 <br/>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <div className={"enterButton"} onClick={this.saveNodeInfo}>
+							 <p>Guardar Nodo</p>
 						 </div>
 					 </Col>
 				 </Row>
@@ -1000,55 +1171,59 @@ class Board extends Component {
                         </Menu.Item>
                         <Menu.Item key="2" onClick={e => this.setAlgorithmPicked(e,"asignation")}>
                             <HeatMapOutlined />
-                            <span>Asignation</span>
+                            <span>Asignación</span>
                         </Menu.Item>
+	                    <Menu.Item key="3" onClick={e => this.setAlgorithmPicked(e,"noroeste")}>
+		                    <HeatMapOutlined />
+		                    <span>NorOeste</span>
+	                    </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout className="site-layout bodyCtn">
                     <Content style={{ margin: '0 16px' }}>
                         <div className={"mainCtn"}>
                             <Row type="flex" justify="space-around" align="middle">
-                                <h1 className={"boardTitle"}>Graph Drawer</h1>
+                                <br/>
                             </Row>
                             <Row type="flex" justify="space-around" align="middle">
                                 <Button type="normal" icon={<DribbbleOutlined />} size={'large'}
                                         onClick={e => this.setTypeInput(e,"node")}
                                         disabled={this.state.inputType === "node"}
                                 >
-                                    Draw/Move Nodes
+                                   NODOS
                                 </Button>
                                 <Button type="normal" icon={<ArrowsAltOutlined />} size={'large'}
                                         onClick={e => this.setTypeInput(e,"edge")}
                                         disabled={this.state.inputType === "edge"}
                                 >
-                                    Draw Links
+                                    ARCOS
                                 </Button>
                                 <Button type="danger" icon={<ReloadOutlined />} size={'large'}
                                         onClick={this.undoAction}
                                         disabled={!this.state.lastActionType || this.state.erasedNodes}
                                 >
-                                    Undo
+                                    DESHACER
                                 </Button>
                                 <Button type="danger" icon={<HighlightOutlined />} size={'large'}
                                         onClick={this.eraseNode}
                                 >
-                                    Erase
+                                    BORRAR
                                 </Button>
                                 <Button type="danger" icon={<DeleteOutlined />} size={'large'}
                                         onClick={this.eraseAll}
                                 >
-                                    Clean
+                                    LIMPIAR
                                 </Button>
                                 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
                                         onClick={this.runAlgorithm}
                                 >
-                                    RUN
+                                    INICIAR
                                 </Button>
                             </Row>
                             <Row type="flex" justify="space-around" align="middle">
                                 <Col span={23}>
                                     <div className={"board"}>
-                                        <div className={"graphCtn"} onClick={this.createNode}>
+                                        <div className={"graphCtn"}>
                                             <Graph
                                                  ref="graph"
                                                  id="graph-id" // id is mandatory, if no id is defined rd3g will throw an error
@@ -1056,7 +1231,7 @@ class Board extends Component {
                                                  config={this.myConfig}
                                                  onClickNode={this.onClickNode}
                                                  onRightClickNode={this.onRightClickNode}
-                                                 onClickGraph={this.onClickGraph}
+                                                 onClickGraph={this.createNode}
                                                  onClickLink={this.onClickLink}
                                                  onRightClickLink={this.onRightClickLink}
                                                  onNodePositionChange={this.onNodePositionChange}
@@ -1071,7 +1246,7 @@ class Board extends Component {
                             <br/>
                             <Row type="flex" justify="space-around" align="middle">
 
-                                <h1 className={"boardTitle"}>Adjacency Matrix</h1>
+                                <h1 className={"boardTitle"}>Matriz de Adyacencia</h1>
                             </Row>
                             <Row type="flex" justify={this.state.isMobile? "start" :"space-around"} align="middle">
                                 <Col justify={this.state.isMobile? "start" :"space-around"} span={15}>
@@ -1083,6 +1258,7 @@ class Board extends Component {
                             {this.AddLinkLabelModal()}
 	                        {this.MaxOrMinModal()}
 	                        {this.MessageModal()}
+	                        {this.NodeInputModal()}
                         </div>
                     </Content>
                     <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
