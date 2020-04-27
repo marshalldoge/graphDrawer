@@ -539,42 +539,44 @@ class Board extends Component {
 
 	runAnimation(commands) {
 		let me = this;
-		let animation = setInterval(function(){
-			me.setState((prevState) => {
-				console.log("Animating command",prevState.animationState);
-				if (commands[prevState.animationState].type === "node") {
-					let aux = {
-						...prevState.data.nodes[commands[prevState.animationState].id],
-						color: commands[prevState.animationState].color,
-						left: commands[prevState.animationState].left ? commands[prevState.animationState].left : prevState.data.nodes[commands[prevState.animationState].id].left,
-						right: commands[prevState.animationState].right ? commands[prevState.animationState].right : prevState.data.nodes[commands[prevState.animationState].id].right,
-						nodes: prevState.data.nodes
-					};
+		if(commands.length > 0) {
+			let animation = setInterval(function () {
+				me.setState((prevState) => {
+					console.log("Animating command", prevState.animationState);
+					if (commands[prevState.animationState].type === "node") {
+						let aux = {
+							...prevState.data.nodes[commands[prevState.animationState].id],
+							color: commands[prevState.animationState].color,
+							left: commands[prevState.animationState].left ? commands[prevState.animationState].left : prevState.data.nodes[commands[prevState.animationState].id].left,
+							right: commands[prevState.animationState].right ? commands[prevState.animationState].right : prevState.data.nodes[commands[prevState.animationState].id].right,
+							nodes: prevState.data.nodes
+						};
 
-					//console.log("Node to draw PREV: ", aux);
-					prevState.data.nodes[commands[prevState.animationState].id] = aux;
-				}else {
-					for (let j = 0; j < prevState.data.links.length; j++) {
-						if (
-							 prevState.data.links[j].source === commands[prevState.animationState].source.toString() &&
-							 prevState.data.links[j].target === commands[prevState.animationState].target.toString()
-						) {
-							let newRo = commands[prevState.animationState].ro !== undefined ? commands[prevState.animationState].ro : (prevState.data.links[j].ro === "" ? 0 : prevState.data.links[j].ro);
-							let newLabel = commands[prevState.animationState].label !== undefined ?  commands[prevState.animationState].label : prevState.data.links[j].label.split("(")[0];
-							prevState.data.links[j] = {
-								...prevState.data.links[j],
-								label: newLabel + "(" + newRo + ")",
-								color: commands[prevState.animationState].color
+						//console.log("Node to draw PREV: ", aux);
+						prevState.data.nodes[commands[prevState.animationState].id] = aux;
+					} else {
+						for (let j = 0; j < prevState.data.links.length; j++) {
+							if (
+								 prevState.data.links[j].source === commands[prevState.animationState].source.toString() &&
+								 prevState.data.links[j].target === commands[prevState.animationState].target.toString()
+							) {
+								let newRo = commands[prevState.animationState].ro !== undefined ? commands[prevState.animationState].ro : (prevState.data.links[j].ro === "" ? 0 : prevState.data.links[j].ro);
+								let newLabel = commands[prevState.animationState].label !== undefined ? commands[prevState.animationState].label : prevState.data.links[j].label.split("(")[0];
+								prevState.data.links[j] = {
+									...prevState.data.links[j],
+									label: newLabel + "(" + newRo + ")",
+									color: commands[prevState.animationState].color
+								}
 							}
 						}
 					}
-				}
-				prevState.animationState = prevState.animationState + 1;
-				if(prevState.animationState === commands.length) clearInterval(animation);
-				return prevState;
-			} )
+					prevState.animationState = prevState.animationState + 1;
+					if (prevState.animationState === commands.length) clearInterval(animation);
+					return prevState;
+				})
 
-		}, 1000);
+			}, 1000);
+		}
 	};
 
 	MessageProccesser = () => {
@@ -682,6 +684,7 @@ class Board extends Component {
 			case "noroeste":
 				//noroeste
 				nodesLength = this.state.data.nodes.length;
+				let copyNodes = [...this.state.data.nodes];
 				length = this.state.data.links.length;
 				matrix = [];
 				for(let i = 0; i < nodesLength; i++){
@@ -690,7 +693,10 @@ class Board extends Component {
 						row.push(0);
 					}
 					matrix.push(row);
+					//copyNodes[i]["id"] = parseInt(copyNodes[i]["id"]);
+					copyNodes[i]["nodeInputModalValue"] = parseInt(copyNodes[i]["nodeInputModalValue"]);
 				}
+
 				console.log("empty matrix: ",matrix);
 				for(let i = 0; i < length; i++) {
 					matrix[this.state.data.links[i].source][this.state.data.links[i].target] = parseInt(this.state.data.links[i].label);
@@ -706,12 +712,16 @@ class Board extends Component {
 				 */
 				maxOrMin = this.state.maximizeAlgorithm? "max":"min";
 				console.log("Se va a ",maxOrMin," la solución");
-				answer =  noroeste(matrix,this.state.data.nodes, maxOrMin);
+
+				 console.log("Real nodes in graph: ",this.state.data.nodes);
+				console.log("Nodes sent to algorithm: ", copyNodes);
+				//answer =  noroeste(matrizad,nodesp, maxOrMin);
+				answer =  noroeste(matrix,copyNodes, maxOrMin);
 				commands = answer["array"];
 				message = answer["message"];
 				console.log("Andwer from asignation algorithm: ",answer);
 				this.closeMaxOrMinModalOpen();
-				//this.runAnimation(commands);
+				this.runAnimation(commands);
 				this.setState({
 					erasedNodes: true,
 					messageText: message,
@@ -821,10 +831,15 @@ class Board extends Component {
 		let hash = {};
 		let nodesLength = this.state.data.nodes.length;
 		let length = this.state.data.links.length;
+
 		for(let i = 0; i < length; i++) {
 			let hashValue =
 				 this.getNodeIndex(this.state.data.links[i].source)*nodesLength+
 				 this.getNodeIndex(this.state.data.links[i].target);
+			/*console.log("PM:: Link: ",i," has source"+this.state.data.links[i].source,"(",this.getNodeIndex(this.state.data.links[i].source),
+			") and target ",this.state.data.links[i].target,"(",this.getNodeIndex(this.state.data.links[i].target),")");
+			
+			 */
 			hash[hashValue] = this.state.data.links[i].label.split("(")[0];
 		}
 		for(let i = 0; i < length; i++) {
@@ -833,6 +848,7 @@ class Board extends Component {
 				 this.getNodeIndex(this.state.data.links[i].source);
 			if(hash[inverseHashValue]===undefined && !this.state.directed)hash[inverseHashValue] = this.state.data.links[i].label.split("(")[0];
 		}
+		console.log("Graph data: ",this.state.data);
 		console.log("Graph map: ",this.state.graphMap);
 		console.log("Hash: ",hash);
 
@@ -1137,6 +1153,29 @@ class Board extends Component {
 		);
 	};
 
+	addNodeLabel = (e) => {
+		let me = this;
+		if (e.keyCode === 13) {
+			console.log("Clicked enter!");
+			let me = this;
+			me.setState((prevState) => {
+				for(let i = 0; i < prevState.data.nodes.length; i++) {
+					if(prevState.data.nodes[i].id === prevState.clickedNode) {
+						prevState.data.nodes[i] = {
+							...prevState.data.nodes[i],
+							nodeInputModalName: prevState.nodeInputModalName,
+							nodeInputModalValue: prevState.nodeInputModalValue
+						}
+					}
+				}
+				prevState.nodeInputModalName = "";
+				prevState.nodeInputModalValue = "";
+				prevState.isNodeInputModalOpen = false;
+				return prevState;
+			});
+		}
+	};
+
 	NodeInputModal = () => {
 		let me = this;
 		const customStyles = {
@@ -1171,7 +1210,7 @@ class Board extends Component {
 								  value={this.state.nodeInputModalName}
 								  onChange={this.handleInputNodeModalNameChange}
 								  placeholder={"Nombre"}
-								  onKeyUp={this.addLinkLabel}
+								  onKeyUp={this.addNodeLabel}
 								  autoFocus
 							 />
 						 </Row>
@@ -1182,7 +1221,7 @@ class Board extends Component {
 								  value={this.state.nodeInputModalValue}
 								  onChange={this.handleInputNodeModalValueChange}
 								  placeholder={"Valor"}
-								  onKeyUp={this.addLinkLabel}
+								  onKeyUp={this.addNodeLabel}
 							 />
 						 </Row>
 					 </Col>
@@ -1206,6 +1245,7 @@ class Board extends Component {
 
 
 	render() {
+		console.log("MAIN RETURN :",this.state.data);
 		return (
             <Layout style={{ minHeight: '100vh' }}>
                 <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
