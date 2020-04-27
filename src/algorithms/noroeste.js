@@ -202,7 +202,7 @@ export function noroeste(matrizad, nodes, task){
                 }
             }
         }
-        response.message = response.message + "El costo total es " + total_cost.toString();
+        response.message = "El costo total es " + total_cost.toString() +"#" + response.message;
     }
     else{
         response.message = response.message + "La demanda no coincide con la disponibilidad";
