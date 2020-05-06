@@ -1,0 +1,49 @@
+$background: #2C313C;
+$matrix-radius: 7px;
+.matrixCtn {
+  background-color: #F4F4F4;
+  border-bottom-right-radius: $matrix-radius;
+}
+.matrixMobileCtn {
+  width: 400px;
+  overflow: hidden;
+  height: 500px;
+}
+.matrixMobileInnerCtn {
+  width: 500px;
+  overflow-x: scroll;
+  height: 500px;
+}
+.topTitleCtn {
+  background-color: #F4F4F4;
+  border-top-right-radius: $matrix-radius;
+}
+.leftTitleCtn {
+  background-color: #F4F4F4;
+  border-top-left-radius: $matrix-radius;
+  border-bottom-left-radius: $matrix-radius;
+}
+.title {
+  color: #2C313C;
+  width: 80px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: lightgray;
+  font-weight: bolder;
+  text-align: center;
+}
+.cell {
+  color: #2C313C;
+  width: 60px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: lightgray;
+  text-align: center;
+  &.bold {
+    width: 100px;
+    font-weight: bolder;
+    &.thin {
+      width: 60px;
+    }
+  }
+}

@@ -20,6 +20,7 @@ import { noroeste } from '../../algorithms/noroeste';
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
+const RawMatrix = React.lazy(() => import("../../components/RawMatrix/RawMatrix"));
 const SelfLoopLabels = React.lazy(() => import("../../components/SelfLoopLabels/SelfLoopLabels"));
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -61,7 +62,10 @@ class Board extends Component {
 		isMessageModalOpen: false,
 		messageText: "",
 		nodeInputModalName: "",
-		nodeInputModalValue: ""
+		nodeInputModalValue: "",
+		showProcessedMatrix: true,
+		costMatrix: null,
+		solutionMatrix: null
 	};
 
 	//Hide or Show the sider
@@ -725,7 +729,10 @@ class Board extends Component {
 				this.setState({
 					erasedNodes: true,
 					messageText: message,
-					isMessageModalOpen: true
+					isMessageModalOpen: true,
+					costMatrix: answer["matrix_cost"],
+					solutionMatrix: answer["matrix_sol"],
+					showProcessedMatrix: false
 				});
 
 				break;
@@ -828,36 +835,59 @@ class Board extends Component {
 	};
 
 	ProcessedMatrix = () => {
-		let hash = {};
-		let nodesLength = this.state.data.nodes.length;
-		let length = this.state.data.links.length;
+		if(this.state.showProcessedMatrix){
+			let hash = {};
+			let nodesLength = this.state.data.nodes.length;
+			let length = this.state.data.links.length;
 
-		for(let i = 0; i < length; i++) {
-			let hashValue =
-				 this.getNodeIndex(this.state.data.links[i].source)*nodesLength+
-				 this.getNodeIndex(this.state.data.links[i].target);
-			/*console.log("PM:: Link: ",i," has source"+this.state.data.links[i].source,"(",this.getNodeIndex(this.state.data.links[i].source),
-			") and target ",this.state.data.links[i].target,"(",this.getNodeIndex(this.state.data.links[i].target),")");
-			
-			 */
-			hash[hashValue] = this.state.data.links[i].label.split("(")[0];
-		}
-		for(let i = 0; i < length; i++) {
-			let inverseHashValue =
-				 this.getNodeIndex(this.state.data.links[i].target)*nodesLength+
-				 this.getNodeIndex(this.state.data.links[i].source);
-			if(hash[inverseHashValue]===undefined && !this.state.directed)hash[inverseHashValue] = this.state.data.links[i].label.split("(")[0];
-		}
-		console.log("Graph data: ",this.state.data);
-		console.log("Graph map: ",this.state.graphMap);
-		console.log("Hash: ",hash);
+			for(let i = 0; i < length; i++) {
+				let hashValue =
+					 this.getNodeIndex(this.state.data.links[i].source)*nodesLength+
+					 this.getNodeIndex(this.state.data.links[i].target);
+				/*console.log("PM:: Link: ",i," has source"+this.state.data.links[i].source,"(",this.getNodeIndex(this.state.data.links[i].source),
+				") and target ",this.state.data.links[i].target,"(",this.getNodeIndex(this.state.data.links[i].target),")");
 
-		return (
-			 <Matrix
-				  nodes={this.state.data.nodes}
-				  edges={hash}
-			 />
-		);
+				 */
+				hash[hashValue] = this.state.data.links[i].label.split("(")[0];
+			}
+			for(let i = 0; i < length; i++) {
+				let inverseHashValue =
+					 this.getNodeIndex(this.state.data.links[i].target)*nodesLength+
+					 this.getNodeIndex(this.state.data.links[i].source);
+				if(hash[inverseHashValue]===undefined && !this.state.directed)hash[inverseHashValue] = this.state.data.links[i].label.split("(")[0];
+			}
+			console.log("Graph data: ",this.state.data);
+			console.log("Graph map: ",this.state.graphMap);
+			console.log("Hash: ",hash);
+			return (
+				 <Row class="RawMatrixBoardCtn" justify="space-between">
+					 <Col span={24}>
+						 <Matrix
+							  nodes={this.state.data.nodes}
+							  edges={hash}
+						 />
+					 </Col>
+				 </Row>
+			);
+		} else {
+			return (
+				 <Row class="RawMatrixBoardCtn" justify="space-between">
+					 <Col span={10}>
+						 <h1 className={"boardTitle"}>Matriz de Costos</h1>
+						 <RawMatrix
+							  data={this.state.costMatrix}
+						 />
+					 </Col>
+					 <Col span={10}>
+						 <h1 className={"boardTitle"}>Matriz Solución</h1>
+						 <RawMatrix
+							  data={this.state.solutionMatrix}
+						 />
+					 </Col>
+				 </Row>
+
+			);
+		}
 	};
 
 	closeAddLinkLabelModal = () => {
@@ -1331,11 +1361,10 @@ class Board extends Component {
                             </Row>
                             <br/>
                             <Row type="flex" justify="space-around" align="middle">
-
-                                <h1 className={"boardTitle"}>Matriz de Adyacencia</h1>
+	                            {(<h1 className={"boardTitle"}>Matriz de Adyacencia</h1>) && this.state.showProcessedMatrix}
                             </Row>
-                            <Row type="flex" justify={this.state.isMobile? "start" :"space-around"} align="middle">
-                                <Col justify={this.state.isMobile? "start" :"space-around"} span={15}>
+                            <Row type="flex" justify="center" align="middle">
+                                <Col justify={this.state.isMobile? "start" :"space-around"} span={20}>
                                     {this.ProcessedMatrix()}
                                 </Col>
                             </Row>
