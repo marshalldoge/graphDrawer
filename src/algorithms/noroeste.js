@@ -1,8 +1,10 @@
 export function noroeste(matrizad, nodes, task){
-    let colors = ["#800000","#FF0000","#FFA500","#808000","#800080","#FF00FF","#008000","#000080","#0000FF","#008080","#000000","#808080"];
+    let colors = ["#ff5131","#fd558f","#e254ff","#9d46ff","#7a7cff","#64c1ff","#62ebff","#5df2d6","#5efc82","#e4ff54","#ffdd4b","#ffff52"];
     let response = {
         array: [],
         message: "",
+        matrix_cost: [],
+        matrix_sol: []
     };
     let info = {
         sources: [],
@@ -28,6 +30,14 @@ export function noroeste(matrizad, nodes, task){
         //Solution
         //Precharge Solution
         let sol = [];
+        let copy_disponibility = [];
+        for(let i=0;i<info.disponibility.length;i++){
+            copy_disponibility.push(info.disponibility[i]);
+        }
+        let copy_demand = [];
+        for(let j=0;j<info.demand.length;j++){
+            copy_demand.push(info.demand[j]);
+        }
         for(let i=0;i<info.cost_matrix.length;i++){
             let aux = [];
             for(let j=0;j<info.cost_matrix[i].length;j++){
@@ -203,11 +213,68 @@ export function noroeste(matrizad, nodes, task){
             }
         }
         response.message = "El costo total es " + total_cost.toString() +"#" + response.message;
+        
+        //Matrix for output
+    //Matrix Cost
+    //1st Row
+    let matrix_row_aux = ["Origen/Destino"];
+    for(let i=0;i<info.destinies.length;i++){
+        matrix_row_aux.push(label_of(info.destinies[i],nodes));
+    }
+    matrix_row_aux.push("Disponibilidad");
+    response.matrix_cost.push(matrix_row_aux);
+    //Next Rows
+    for(let i=0;i<info.cost_matrix.length;i++){
+        matrix_row_aux = [label_of(info.sources[i],nodes)];
+        for(let j=0;j<info.cost_matrix[i].length;j++){
+            matrix_row_aux.push(info.cost_matrix[i][j].toString());
+        }
+        matrix_row_aux.push(copy_disponibility[i].toString());
+        response.matrix_cost.push(matrix_row_aux);
+    }
+    //Last Row
+    let suma = 0;
+    matrix_row_aux = ["Demanda"];
+    for(let i=0;i<copy_demand.length;i++){
+        matrix_row_aux.push(copy_demand[i].toString());
+        suma = suma + copy_demand[i];
+    }
+    matrix_row_aux.push(suma.toString());
+    response.matrix_cost.push(matrix_row_aux);
+    //Matrix Solution
+    //1st Row
+    matrix_row_aux = ["Origen/Destino"];
+    for(let i=0;i<info.destinies.length;i++){
+        matrix_row_aux.push(label_of(info.destinies[i],nodes));
+    }
+    matrix_row_aux.push("Disponibilidad");
+    response.matrix_sol.push(matrix_row_aux);
+    //Next Rows
+    for(let i=0;i<sol.length;i++){
+        matrix_row_aux = [label_of(info.sources[i],nodes)];
+        for(let j=0;j<sol[i].length;j++){
+            matrix_row_aux.push(sol[i][j].toString());
+        }
+        matrix_row_aux.push(copy_disponibility[i].toString());
+        response.matrix_sol.push(matrix_row_aux);
+    }
+    //Last Row
+    suma = 0;
+    matrix_row_aux = ["Demanda"];
+    for(let i=0;i<copy_demand.length;i++){
+        matrix_row_aux.push(copy_demand[i].toString());
+        suma = suma + copy_demand[i];
+    }
+    matrix_row_aux.push(suma.toString());
+    response.matrix_sol.push(matrix_row_aux);
+    console.log(response.matrix_cost.join("\n"));
+    console.log(response.matrix_sol.join("\n"));
     }
     else{
         response.message = response.message + "La demanda no coincide con la disponibilidad";
     }
     //console.log(response.message);
+    
     return response;
 }
 function label_of(target, nodes){
