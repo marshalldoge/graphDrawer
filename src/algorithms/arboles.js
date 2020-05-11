@@ -29,6 +29,7 @@ export function trees(nodes, task){
     for(let i=0;i<response.array.length;i++){
         console.log(response.array[i]);
     }
+    return response;
 }
 function inorder(pos, arbol, response,colorFocus, colorDone){
     if(arbol[pos]==-1){
