@@ -679,7 +679,7 @@ class Board extends Component {
 					return prevState;
 				})
 
-			}, 1000);
+			}, 1400);
 		}
 	};
 
@@ -842,10 +842,12 @@ class Board extends Component {
 				answer =  trees(this.state.treeArray,this.state.orderType);
 				console.log("Andwer from tree algorithm: ",answer);
 				commands = answer["array"];
+				message = answer["message"];
 				this.closeOrderTypeModal();
 				this.runTreeAnimation(commands);
 				this.setState({
-
+					messageText: message,
+					isMessageModalOpen: true,
 				});
 
 				break;
@@ -1205,7 +1207,7 @@ class Board extends Component {
 						shape: 'circle',
 						shapeProps: {
 							r: 10,
-							fill: '#003152',
+							fill: this.state.treeNodeColor
 						},
 					},
 					children: []
@@ -1228,7 +1230,7 @@ class Board extends Component {
 						shape: 'circle',
 						shapeProps: {
 							r: 10,
-							fill: '#003152',
+							fill: this.state.treeNodeColor,
 						},
 					},
 					children: []
@@ -1255,7 +1257,7 @@ class Board extends Component {
 							shape: 'circle',
 							shapeProps: {
 								r: 10,
-								fill: '#003152',
+								fill: this.state.treeNodeColor,
 							},
 						},
 						children: []
@@ -1268,16 +1270,30 @@ class Board extends Component {
 				return prevState;
 			});
 		}else{
-			let tree = this.dfs(this.state.treeData[0]);
-			console.log("Final tree: ",tree);
-			me.setState((prevState) => {
-				prevState.isTreeNodeModalOpen = false;
-				prevState.treeArray.push(parseInt(prevState.treeNodeModalInputValue));
-				prevState.treeNodeModalInputValue = "";
-				prevState.treeSize = prevState.treeSize + 1;
-				prevState.treeData = [tree];
-				return prevState;
-			});
+			let found = false;
+			for(let i =0; i < this.state.treeArray.length; i++) {
+				if(this.state.treeArray[i]===parseInt(this.state.treeNodeModalInputValue)){
+					found = true;
+				}
+			}
+			if(!found){
+				let tree = this.dfs(this.state.treeData[0]);
+				console.log("Final tree: ",tree);
+				me.setState((prevState) => {
+					prevState.isTreeNodeModalOpen = false;
+					prevState.treeArray.push(parseInt(prevState.treeNodeModalInputValue));
+					prevState.treeNodeModalInputValue = "";
+					prevState.treeSize = prevState.treeSize + 1;
+					prevState.treeData = [tree];
+					return prevState;
+				});
+			}else{
+				me.setState((prevState) => {
+					prevState.isTreeNodeModalOpen = false;
+					prevState.treeNodeModalInputValue = "";
+					return prevState;
+				});
+			}
 		}
 	};
 
@@ -1711,6 +1727,7 @@ class Board extends Component {
 								  }
 							  }}
 							  collapsible={false}
+							  translate={{x: 550, y: 70}}
 						 />
 
 					 </div>
