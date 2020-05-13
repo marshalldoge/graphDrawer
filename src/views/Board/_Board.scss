@@ -24,6 +24,8 @@ $blue: #003152;
 }
 .graphCtn {
   //margin: 10px;
+  width: 100%;
+  height: 100%;
 }
 .linkLabelInput {
   border-width: 0 0 1px 0;
@@ -96,5 +98,8 @@ $blue: #003152;
   border-bottom-width: 1px;
   border-bottom-color: lightgray;
   font-weight: bolder;
+  text-align: center;
+}
+.boardCtn {
   text-align: center;
 }

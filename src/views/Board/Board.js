@@ -11,17 +11,20 @@ import {
     ReloadOutlined,
 } from '@ant-design/icons';
 import { Graph } from "react-d3-graph";
+import Tree from 'react-d3-tree';
 import 'antd/dist/antd.css';
 import Modal from 'react-modal';
 import './_Board.scss';
 import { johnson } from '../../algorithms/johnson';
 import { asignacion } from '../../algorithms/asignacion';
 import { noroeste } from '../../algorithms/noroeste';
+import { trees } from '../../algorithms/arboles';
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
 const RawMatrix = React.lazy(() => import("../../components/RawMatrix/RawMatrix"));
 const SelfLoopLabels = React.lazy(() => import("../../components/SelfLoopLabels/SelfLoopLabels"));
+const TreeNode = React.lazy(() => import("../../components/TreeNode/TreeNode"));
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 
@@ -35,6 +38,17 @@ class Board extends Component {
 			nodes: [{ id: "0",x: window.innerWidth/6 - 40, y: window.innerHeight/4 - 40, left: 0, right: 0 }],
 			links: [],
 		},
+		treeData: [
+			{
+				name: "",
+				attributes: {
+					value: ""
+				}
+			},
+		],
+		treeSize: 0,
+		treeArray: [],
+		treeNodeColor: '#f6edcf',
 		nodesPosition: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
 		lastNodeIndex: 0,
 		selfLoopLabels: [],
@@ -45,10 +59,13 @@ class Board extends Component {
 		isAddLinkLabelModalOpen: false,
 		isMaxOrMinModalOpen: false,
 		isNodeInputModalOpen: false,
+		isTreeNodeModalOpen: false,
+		isOrderTypeModalOpen: false,
 		//isAddNodeLabelModalOpen
 		clickedLink: null,
 		clickedNode: null,
 		addLabelInputValue: "",
+		treeNodeModalInputValue: "",
 		directed: true,
 		isMobile: window.innerWidth<480,
 		graphMap: {
@@ -59,6 +76,7 @@ class Board extends Component {
 		collapsed: false,
 		algorithmPicked: "jhonson",
 		maximizeAlgorithm: true,
+		orderType: 'pre',
 		isMessageModalOpen: false,
 		messageText: "",
 		nodeInputModalName: "",
@@ -206,6 +224,31 @@ class Board extends Component {
 				break;
 		}
 
+	};
+
+	treeNode = (node) => {
+		let nodeColor, nodeCtn, nodeId;
+		nodeColor = node.color ? node.color : "#f6edcf";
+		nodeCtn = {
+			borderRadius: "40px",
+			width: "30px",
+			height: "30px",
+			backgroundColor: nodeColor,
+			fontSize: "15px"
+		};
+		nodeId = {
+			width: "100%",
+			height: "30px",
+			textAlign: "center",
+			paddingTop: "8px"
+		};
+		return (
+			 <div style={nodeCtn}>
+				 <div style={nodeId}>
+					 {node.id}
+				 </div>
+			 </div>
+		);
 	};
 
 	myConfig = {
@@ -583,6 +626,63 @@ class Board extends Component {
 		}
 	};
 
+	updatedTree = (treeNode,command) => {
+		console.log("treeNode: ",treeNode, " with command: ",command);
+		console.log("DFS At ", treeNode.attributes);
+		if (parseInt(treeNode.attributes.value) === command.node) {
+			console.log("Changing color!");
+			treeNode.nodeSvgShape = {
+				...treeNode.nodeSvgShape,
+				shapeProps: {
+					r: 10,
+					fill: command.color,
+				},
+			};
+			return treeNode;
+		}
+		//console.log("Verifying: ",this.state.treeNodeModalInputValue,"<",treeNode.attributes.value," ?");
+		let posLeft = null;
+		let posRight = null;
+		for (let i = 0; i < treeNode.children.length; i++) {
+			if (treeNode.children[i].attributes.position === 'right') {
+				posRight = i;
+			}
+			if (treeNode.children[i].attributes.position === 'left') {
+				posLeft = i;
+			}
+		}
+		if (parseInt(command.node) < parseInt(treeNode.attributes.value)) {
+			//check if it has two chidlren
+			if (posLeft != null) {
+				console.log("UT Going left!");
+				treeNode.children[posLeft] = this.updatedTree(treeNode.children[posLeft], command);
+			}
+		} else {
+			console.log("UT Going right!");
+			if (posRight != null) {
+				treeNode.children[posRight] = this.updatedTree(treeNode.children[posRight], command);
+			}
+		}
+		return treeNode;
+	};
+
+	runTreeAnimation(commands) {
+		let me = this;
+		if(commands.length > 0) {
+			let animation = setInterval(function () {
+				me.setState((prevState) => {
+					console.log("Treedata before updating: ",prevState.treeData);
+					prevState.treeData = [me.updatedTree(prevState.treeData[0],commands[prevState.animationState])];
+					console.log("New tree data after updating color: ",prevState.treeData);
+					prevState.animationState = prevState.animationState + 1;
+					if (prevState.animationState === commands.length) clearInterval(animation);
+					return prevState;
+				})
+
+			}, 1000);
+		}
+	};
+
 	MessageProccesser = () => {
 		let msgs = this.state.messageText.split('#');
 		let res = [];
@@ -736,11 +836,25 @@ class Board extends Component {
 				});
 
 				break;
+			case "tree":
+				//tree
+				 console.log("Array sent to tree alg: ",this.state.treeArray,"with algo ",this.state.orderType);
+				answer =  trees(this.state.treeArray,this.state.orderType);
+				console.log("Andwer from tree algorithm: ",answer);
+				commands = answer["array"];
+				this.closeOrderTypeModal();
+				this.runTreeAnimation(commands);
+				this.setState({
+
+				});
+
+				break;
 		}
 	};
 
 	runAlgorithm = () => {
 		this.clearDirtyGraph();
+
 		switch (this.state.algorithmPicked) {
 			case "jhonson":
 				this.setState({
@@ -760,6 +874,13 @@ class Board extends Component {
 					animationState: 0
 				});
 				break;
+			case "tree":
+				//this.clearDirtyTree();
+				this.setState({
+					isOrderTypeModalOpen: true,
+					animationState: 0
+				});
+				break;
 		}
 	};
 
@@ -773,8 +894,46 @@ class Board extends Component {
 			for(let i = 0; i < prevState.data.nodes.length; i++) {
 				prevState.data.nodes[i].color = "#f6edcf";
 			}
+			prevState.treeData = [me.cleanTreeDfs(prevState.treeData[0])];
 			return prevState;
 		});
+	};
+
+	clearDirtyTree = () => {
+		let me = this;
+		me.setState((prevState) => {
+			console.log("Tree before clear data ", prevState.treeData);
+			prevState.treeData = [me.cleanTreeDfs(prevState.treeData[0])];
+			console.log("Tree after clear data ", prevState.treeData);
+			return prevState;
+		});
+	};
+
+	cleanTreeDfs = (treeNode) => {
+		treeNode.nodeSvgShape = {
+			...treeNode.nodeSvgShape,
+			shapeProps: {
+				r: 10,
+				fill: this.state.treeNodeColor,
+			},
+		};
+		let posLeft = null;
+		let posRight = null;
+		for (let i = 0; i < treeNode.children.length; i++) {
+			if (treeNode.children[i].attributes.position === 'right') {
+				posRight = i;
+			}
+			if (treeNode.children[i].attributes.position === 'left') {
+				posLeft = i;
+			}
+		}
+		if (posLeft != null) {
+			treeNode.children[posLeft] = this.cleanTreeDfs(treeNode.children[posLeft]);
+		}
+		if (posRight != null) {
+			treeNode.children[posRight] = this.cleanTreeDfs(treeNode.children[posRight]);
+		}
+		return treeNode;
 	};
 
 	eraseAll = () => {
@@ -835,6 +994,9 @@ class Board extends Component {
 	};
 
 	ProcessedMatrix = () => {
+		if(this.state.algorithmPicked==="tree"){
+			return null;
+		}
 		if(this.state.showProcessedMatrix){
 			let hash = {};
 			let nodesLength = this.state.data.nodes.length;
@@ -860,7 +1022,7 @@ class Board extends Component {
 			console.log("Graph map: ",this.state.graphMap);
 			console.log("Hash: ",hash);
 			return (
-				 <Row class="RawMatrixBoardCtn" justify="space-between">
+				 <Row className="RawMatrixBoardCtn" justify="space-between">
 					 <Col span={24}>
 						 <Matrix
 							  nodes={this.state.data.nodes}
@@ -871,7 +1033,7 @@ class Board extends Component {
 			);
 		} else {
 			return (
-				 <Row class="RawMatrixBoardCtn" justify="space-between">
+				 <Row className="RawMatrixBoardCtn" justify="space-between">
 					 <Col span={10}>
 						 <h1 className={"boardTitle"}>Matriz de Costos</h1>
 						 <RawMatrix
@@ -902,6 +1064,12 @@ class Board extends Component {
 	closeMessageModal = () => {
 		this.setState({isMessageModalOpen: false});
 	};
+	closeTreeNodeModal = () => {
+		this.setState({isTreeNodeModalOpen: false});
+	};
+	closeOrderTypeModal = () => {
+		this.setState({isOrderTypeModalOpen: false});
+	};
 	handleChange = e => {
 		let me = this;
 		me.setState({addLabelInputValue: e.target.value});
@@ -913,6 +1081,11 @@ class Board extends Component {
 	handleInputNodeModalValueChange = e => {
 		let me = this;
 		me.setState({nodeInputModalValue: e.target.value});
+	};
+
+	handleTreeNodeModalValueChange = e => {
+		let me = this;
+		me.setState({treeNodeModalInputValue: e.target.value});
 	};
 
 	saveNodeInfo = () => {
@@ -973,6 +1146,12 @@ class Board extends Component {
 			}
 		}
 	};
+	addTreeNodeKeyUpEvent = (e) => {
+		let me = this;
+		if (e.keyCode === 13) {
+			this.addTreeNodeToGraph();
+		}
+	};
 	addLinkLabelEnterButton = () => {
 		let me = this;
 		console.log("Clicked enter!");
@@ -991,6 +1170,114 @@ class Board extends Component {
 				});
 				break;
 			}
+		}
+	};
+
+	dfs = (treeNode) => {
+		console.log("DFS At ",treeNode.attributes.value);
+		console.log("Verifying: ",this.state.treeNodeModalInputValue,"<",treeNode.attributes.value," ?");
+		let posLeft = null;
+		let posRight = null;
+		for(let i = 0; i<treeNode.children.length;i++) {
+			console.log("Checking: ",treeNode.children[i].attributes.position);
+			if (treeNode.children[i].attributes.position === 'right') {
+				posRight = i;
+			}
+			if (treeNode.children[i].attributes.position === 'left') {
+				posLeft = i;
+			}
+		}
+		console.log(posLeft," -- ",posRight );
+		if(parseInt(this.state.treeNodeModalInputValue) < parseInt(treeNode.attributes.value)){
+			//check if it has two chidlren
+			console.log("Going left!");
+			if(posLeft != null) {
+				treeNode.children[posLeft] = this.dfs(treeNode.children[posLeft]);
+			}else{
+				console.log("Found free space left! at idx",treeNode.attributes.value);
+				treeNode.children.unshift( {
+					name: (this.state.treeSize+1).toString(),
+					attributes: {
+						value: this.state.treeNodeModalInputValue,
+						position: 'left'
+					},
+					nodeSvgShape: {
+						shape: 'circle',
+						shapeProps: {
+							r: 10,
+							fill: '#003152',
+						},
+					},
+					children: []
+				});
+			}
+		}else{
+			console.log("Going right!");
+			if(posRight != null) {
+				console.log("There is a right Child already, goingt to it");
+				treeNode.children[posRight] = this.dfs(treeNode.children[posRight]);
+			}else{
+				console.log("Found free space right! at idx",treeNode.attributes.value);
+				treeNode.children.push( {
+					name: (this.state.treeSize+1).toString(),
+					attributes: {
+						value: this.state.treeNodeModalInputValue,
+						position: 'right',
+					},
+					nodeSvgShape: {
+						shape: 'circle',
+						shapeProps: {
+							r: 10,
+							fill: '#003152',
+						},
+					},
+					children: []
+				});
+			}
+		}
+		return treeNode;
+	};
+
+	addTreeNodeToGraph = () => {
+		let me = this;
+		console.log("Adding tree node");
+		//treeNodeModalInputValue
+		if(this.state.treeArray.length===0){
+			me.setState((prevState) => {
+				prevState.treeData = [
+					{
+						name: "0",
+						attributes: {
+							value: prevState.treeNodeModalInputValue,
+							position: 'right'
+						},
+						nodeSvgShape: {
+							shape: 'circle',
+							shapeProps: {
+								r: 10,
+								fill: '#003152',
+							},
+						},
+						children: []
+					}
+				];
+				prevState.isTreeNodeModalOpen = false;
+				prevState.treeArray.push(parseInt(prevState.treeNodeModalInputValue));
+				prevState.treeNodeModalInputValue = "";
+				prevState.treeSize = prevState.treeSize + 1;
+				return prevState;
+			});
+		}else{
+			let tree = this.dfs(this.state.treeData[0]);
+			console.log("Final tree: ",tree);
+			me.setState((prevState) => {
+				prevState.isTreeNodeModalOpen = false;
+				prevState.treeArray.push(parseInt(prevState.treeNodeModalInputValue));
+				prevState.treeNodeModalInputValue = "";
+				prevState.treeSize = prevState.treeSize + 1;
+				prevState.treeData = [tree];
+				return prevState;
+			});
 		}
 	};
 
@@ -1028,48 +1315,6 @@ class Board extends Component {
 					 </Col>
 					 <Col span={6}>
 						 <div className={"enterButton"} onClick={this.addLinkLabelEnterButton}>
-							 <p>Enter</p>
-						 </div>
-					 </Col>
-				 </Row>
-			 </Modal>
-		);
-	};
-
-	AddNodeLabelModal = () => {
-		let me = this;
-		const customStyles = {
-			content : {
-				top                   : '50%',
-				left                  : '50%',
-				right                 : 'auto',
-				bottom                : 'auto',
-				marginRight           : '-50%',
-				transform             : 'translate(-50%, -50%)'
-			}
-		};
-		return (
-			 <Modal
-				  isOpen={this.state.isAddLinkLabelModalOpen}
-				  onRequestClose={this.closeAddLinkLabelModal}
-				  style={customStyles}
-				  contentLabel="Add Edge"
-				  ariaHideApp={false}
-			 >
-				 <Row>
-					 <Col span={20}>
-						 <input
-							  className={"linkLabelInput"}
-							  type="text"
-							  value={this.state.addLabelInputValue}
-							  onChange={this.handleChange}
-							  placeholder={"Node Name..."}
-							  onKeyUp={this.addLinkLabel}
-							  autoFocus
-						 />
-					 </Col>
-					 <Col span={4}>
-						 <div className={"enterButton"}>
 							 <p>Enter</p>
 						 </div>
 					 </Col>
@@ -1123,8 +1368,8 @@ class Board extends Component {
 					 <Col span={18}>
 						 <Row justify="center">
 						 <Radio.Group>
-							 <Radio.Button value="minimize" onClick={() => this.setState({maximizeAlgorithm: false})}>Minimize</Radio.Button>
-							 <Radio.Button value="maximize" onClick={() => this.setState({maximizeAlgorithm: true})}>Maximize</Radio.Button>
+							 <Radio.Button value="minimize" onClick={() => this.setState({maximizeAlgorithm: false})}>Minimizar</Radio.Button>
+							 <Radio.Button value="maximize" onClick={() => this.setState({maximizeAlgorithm: true})}>Maximizar</Radio.Button>
 						 </Radio.Group>
 						 </Row>
 					 </Col>
@@ -1176,6 +1421,97 @@ class Board extends Component {
 					 <Col span={18}>
 						 <div className={"enterButton"} onClick={this.closeMessageModal}>
 							 <p>Aceptar</p>
+						 </div>
+					 </Col>
+				 </Row>
+			 </Modal>
+		);
+	};
+
+	AddTreeNodeModal = () => {
+		let me = this;
+		const customStyles = {
+			content : {
+				top                   : '50%',
+				left                  : '50%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)'
+			}
+		};
+		return (
+			 <Modal
+				  isOpen={this.state.isTreeNodeModalOpen}
+				  onRequestClose={this.closeTreeNodeModal}
+				  style={customStyles}
+				  contentLabel="Añadir nodo"
+				  ariaHideApp={false}
+			 >
+				 <Row>
+					 <Col span={18}>
+						 <input
+							  className={"linkLabelInput"}
+							  type="text"
+							  value={this.state.treeNodeModalInputValue}
+							  onChange={this.handleTreeNodeModalValueChange}
+							  placeholder={"Valor..."}
+							  onKeyUp={this.addTreeNodeKeyUpEvent}
+							  autoFocus
+						 />
+					 </Col>
+					 <Col span={6}>
+						 <div className={"enterButton"} onClick={this.addTreeNodeToGraph}>
+							 <p>Agregar</p>
+						 </div>
+					 </Col>
+				 </Row>
+			 </Modal>
+		);
+	};
+
+	OrderTypeModal = () => {
+		let me = this;
+		const customStyles = {
+			content : {
+				top                   : '50%',
+				left                  : '50%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)',
+				width                 : '500px'
+			}
+		};
+		return (
+			 <Modal
+				  isOpen={this.state.isOrderTypeModalOpen}
+				  onRequestClose={this.closeOrderTypeModal}
+				  style={customStyles}
+				  contentLabel="Order Type"
+				  ariaHideApp={false}
+			 >
+				 <Row justify="center">
+					 <Col span={18} style={{textAlign: "center"}}>
+						 <p className={"modalQuestion"}>¿Qué algoritmo desea correr?</p>
+					 </Col>
+				 </Row>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <Row justify="center">
+							 <Radio.Group>
+								 <Radio.Button value="preorder" onClick={() => this.setState({orderType: 'pre'})}>Pre Orden</Radio.Button>
+								 <Radio.Button value="inorder" onClick={() => this.setState({orderType: 'in'})}>In Orden</Radio.Button>
+								 <Radio.Button value="postorder" onClick={() => this.setState({orderType: 'post'})}>Post Orden</Radio.Button>
+							 </Radio.Group>
+						 </Row>
+					 </Col>
+				 </Row>
+				 <br/>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <div className={"enterButton"} onClick={this.callAlgorithm}>
+							 <p>Correr Algoritmo</p>
 						 </div>
 					 </Col>
 				 </Row>
@@ -1270,12 +1606,138 @@ class Board extends Component {
 
 	setAlgorithmPicked = (e,alg) => {
 		console.log("Algoritmo escogido: ",alg);
-		this.setState({algorithmPicked: alg});
+		switch (alg) {
+			case "tree":
+				console.log("Tree algorithm picked!");
+				this.setState({
+					algorithmPicked: alg,
+					data: {
+						nodes: [{ id: "",x: window.innerWidth, y: window.innerHeight, left: 0, right: 0 }],
+						links: [],
+					},
+				});
+				break;
+			default:
+				this.setState({algorithmPicked: alg});
+				break;
+		}
+	};
+
+	Buttons = () => {
+		if(this.state.algorithmPicked === "tree") {
+			return (
+				 <Row type="flex" justify="space-around" align="middle">
+					 <Button type="normal" icon={<DribbbleOutlined />} size={'large'}
+					         onClick={()=>this.setState({isTreeNodeModalOpen: true})}
+					 >
+						 AGREGAR
+					 </Button>
+					 <Button type="danger" icon={<ReloadOutlined />} size={'large'}
+					         onClick={this.undoAction}
+					 >
+						 DESHACER
+					 </Button>
+					 <Button type="danger" icon={<HighlightOutlined />} size={'large'}
+					         onClick={this.eraseNode}
+					 >
+						 BORRAR
+					 </Button>
+					 <Button type="danger" icon={<DeleteOutlined />} size={'large'}
+					         onClick={this.eraseAll}
+					 >
+						 LIMPIAR
+					 </Button>
+					 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
+					         onClick={this.runAlgorithm}
+					 >
+						 INICIAR
+					 </Button>
+				 </Row>
+			);
+		}
+		return (
+			 <Row type="flex" justify="space-around" align="middle">
+				 <Button type="normal" icon={<DribbbleOutlined />} size={'large'}
+				         onClick={e => this.setTypeInput(e,"node")}
+				         disabled={this.state.inputType === "node"}
+				 >
+					 NODOS
+				 </Button>
+				 <Button type="normal" icon={<ArrowsAltOutlined />} size={'large'}
+				         onClick={e => this.setTypeInput(e,"edge")}
+				         disabled={this.state.inputType === "edge"}
+				 >
+					 ARCOS
+				 </Button>
+				 <Button type="danger" icon={<ReloadOutlined />} size={'large'}
+				         onClick={this.undoAction}
+				         disabled={!this.state.lastActionType || this.state.erasedNodes}
+				 >
+					 DESHACER
+				 </Button>
+				 <Button type="danger" icon={<HighlightOutlined />} size={'large'}
+				         onClick={this.eraseNode}
+				 >
+					 BORRAR
+				 </Button>
+				 <Button type="danger" icon={<DeleteOutlined />} size={'large'}
+				         onClick={this.eraseAll}
+				 >
+					 LIMPIAR
+				 </Button>
+				 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
+				         onClick={this.runAlgorithm}
+				 >
+					 INICIAR
+				 </Button>
+			 </Row>
+		);
+	};
+
+	GraphDrawerBoard = () => {
+		switch (this.state.algorithmPicked) {
+			case "tree":
+				return (
+					 <div id="treeWrapper" style={{left: '100px', width: '100%', height: '100%'}}>
+
+						 <Tree
+							  data={this.state.treeData}
+							  orientation={"vertical"}
+							  allowForeignObjects
+							  nodeLabelComponent={{
+								  render: <TreeNode className='myLabelComponentInSvg' />,
+								  foreignObjectWrapper: {
+									  y: 24
+								  }
+							  }}
+							  collapsible={false}
+						 />
+
+					 </div>
+
+				);
+				break;
+			default:
+				return (
+					 <Graph
+						  ref="graph"
+						  id="graph-id" // id is mandatory, if no id is defined rd3g will throw an error
+						  data={this.state.data}
+						  config={this.myConfig}
+						  onClickNode={this.onClickNode}
+						  onRightClickNode={this.onRightClickNode}
+						  onClickGraph={this.createNode}
+						  onClickLink={this.onClickLink}
+						  onRightClickLink={this.onRightClickLink}
+						  onNodePositionChange={this.onNodePositionChange}
+					 />
+				)
+		}
 	};
 
 
 	render() {
-		console.log("MAIN RETURN :",this.state.data);
+		//console.log("MAIN RETURN :",this.state.data);
 		return (
             <Layout style={{ minHeight: '100vh' }}>
                 <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
@@ -1293,6 +1755,10 @@ class Board extends Component {
 		                    <HeatMapOutlined />
 		                    <span>NorOeste</span>
 	                    </Menu.Item>
+	                    <Menu.Item key="4" onClick={e => this.setAlgorithmPicked(e,"tree")}>
+		                    <HeatMapOutlined />
+		                    <span>Árboles</span>
+	                    </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout className="site-layout bodyCtn">
@@ -1301,57 +1767,12 @@ class Board extends Component {
                             <Row type="flex" justify="space-around" align="middle">
                                 <br/>
                             </Row>
-                            <Row type="flex" justify="space-around" align="middle">
-                                <Button type="normal" icon={<DribbbleOutlined />} size={'large'}
-                                        onClick={e => this.setTypeInput(e,"node")}
-                                        disabled={this.state.inputType === "node"}
-                                >
-                                   NODOS
-                                </Button>
-                                <Button type="normal" icon={<ArrowsAltOutlined />} size={'large'}
-                                        onClick={e => this.setTypeInput(e,"edge")}
-                                        disabled={this.state.inputType === "edge"}
-                                >
-                                    ARCOS
-                                </Button>
-                                <Button type="danger" icon={<ReloadOutlined />} size={'large'}
-                                        onClick={this.undoAction}
-                                        disabled={!this.state.lastActionType || this.state.erasedNodes}
-                                >
-                                    DESHACER
-                                </Button>
-                                <Button type="danger" icon={<HighlightOutlined />} size={'large'}
-                                        onClick={this.eraseNode}
-                                >
-                                    BORRAR
-                                </Button>
-                                <Button type="danger" icon={<DeleteOutlined />} size={'large'}
-                                        onClick={this.eraseAll}
-                                >
-                                    LIMPIAR
-                                </Button>
-                                <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
-                                        onClick={this.runAlgorithm}
-                                >
-                                    INICIAR
-                                </Button>
-                            </Row>
+	                        {this.Buttons()}
                             <Row type="flex" justify="space-around" align="middle">
                                 <Col span={23}>
                                     <div className={"board"}>
                                         <div className={"graphCtn"}>
-                                            <Graph
-                                                 ref="graph"
-                                                 id="graph-id" // id is mandatory, if no id is defined rd3g will throw an error
-                                                 data={this.state.data}
-                                                 config={this.myConfig}
-                                                 onClickNode={this.onClickNode}
-                                                 onRightClickNode={this.onRightClickNode}
-                                                 onClickGraph={this.createNode}
-                                                 onClickLink={this.onClickLink}
-                                                 onRightClickLink={this.onRightClickLink}
-                                                 onNodePositionChange={this.onNodePositionChange}
-                                            />
+	                                        {this.GraphDrawerBoard()}
                                             <SelfLoopLabels
                                                  data = {this.state.selfLoopLabels}
                                             />
@@ -1374,6 +1795,8 @@ class Board extends Component {
 	                        {this.MaxOrMinModal()}
 	                        {this.MessageModal()}
 	                        {this.NodeInputModal()}
+	                        {this.AddTreeNodeModal()}
+	                        {this.OrderTypeModal()}
                         </div>
                     </Content>
                     <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
