@@ -44,6 +44,7 @@ function next_iteration(nodes){
 }
 function is_different(a){
     let res = false;
+    let px,py;
     if(a.length>0){
         px = a[0].x;
         py = a[0].y;
