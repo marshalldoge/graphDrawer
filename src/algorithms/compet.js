@@ -1,4 +1,4 @@
-function compet(nodes){
+export function compet(nodes){
     let colors = ["#ff5131","#fd558f","#e254ff","#9d46ff","#7a7cff","#64c1ff","#62ebff","#5df2d6","#5efc82","#e4ff54","#ffdd4b","#ffff52"];
     let response = {
         message: "",
