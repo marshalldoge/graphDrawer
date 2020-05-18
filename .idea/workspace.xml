@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c0ab0c0-61bc-4d75-bdcb-3b662c2e6d1b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Board/Board.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/Board.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -19,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="201">
-              <caret line="733" column="53" selection-start-line="733" selection-start-column="53" selection-end-line="733" selection-end-column="53" />
+            <state relative-caret-position="318">
+              <caret line="616" column="23" selection-start-line="616" selection-start-column="23" selection-end-line="616" selection-end-column="23" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -110,7 +109,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>tostring</find>
       <find>space-ar</find>
       <find>onclick</find>
       <find>boardCº</find>
@@ -138,8 +136,9 @@
       <find>save</find>
       <find>runal</find>
       <find>10</find>
-      <find>callal</find>
       <find>runcom</find>
+      <find>callal</find>
+      <find>addcom</find>
     </findStrings>
     <replaceStrings>
       <replace>right</replace>
@@ -358,12 +357,12 @@
       <workItem from="1589750121351" duration="623000" />
       <workItem from="1589756266021" duration="1379000" />
       <workItem from="1589765211776" duration="8467000" />
-      <workItem from="1589808581480" duration="2503000" />
+      <workItem from="1589808581480" duration="3494000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="137809000" />
+    <option name="totallyTimeSpent" value="138800000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="812" extended-state="6" />
@@ -505,8 +504,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="733" column="53" selection-start-line="733" selection-start-column="53" selection-end-line="733" selection-end-column="53" />
+        <state relative-caret-position="318">
+          <caret line="616" column="23" selection-start-line="616" selection-start-column="23" selection-end-line="616" selection-end-column="23" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>

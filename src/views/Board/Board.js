@@ -606,6 +606,19 @@ class Board extends Component {
 				});
 			}
 		}
+		if(this.state.algorithmPicked === "compet") {
+			me.setState((prevState) => {
+				if(prevState.series[0].data.length>0){
+					let modifiedSeries= prevState.series[0].data;
+					modifiedSeries.pop();
+					prevState.series = [{
+						...this.state.series,
+						data: modifiedSeries
+					}];
+				}
+				return prevState;
+			});
+		}
 		/*
 		if(this.state.lastActionType) {
 			if (this.state.lastActionType === "node") {
@@ -1049,6 +1062,10 @@ class Board extends Component {
 				"0": {}
 			};
 			prevState.selfLoopLabels = [];
+			prevState.series = [{
+				name: 'Entrada',
+				data: []
+			}];
 			return prevState;
 		});
 	};
