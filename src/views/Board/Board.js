@@ -20,6 +20,7 @@ import { johnson } from '../../algorithms/johnson';
 import { asignacion } from '../../algorithms/asignacion';
 import { noroeste } from '../../algorithms/noroeste';
 import { trees } from '../../algorithms/arboles';
+import { compet } from '../../algorithms/compet';
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
@@ -70,11 +71,11 @@ class Board extends Component {
 			},
 			xaxis: {
 				type: 'numeric',
-				max: 150,
+				max: 500,
 				min: 0
 			},
 			yaxis: {
-				max: 150,
+				max: 500,
 				min: 0
 			}
 		},
@@ -722,36 +723,41 @@ class Board extends Component {
 			let animation = setInterval(function () {
 				me.setState((prevState) => {
 					console.log("Compet before updating: ",prevState.series," with command: ",commands[prevState.animationState]);
-					let procesedCommand = [];
-					let newRadius = Math.pow(0.5,prevState.animationState+1);
-					if(commands.length-1 === prevState.animationState){
-						newRadius = 0.9;
+					if(commands[prevState.animationState]) {
+						let procesedCommand = [];
+						let newRadius = Math.pow(0.5, prevState.animationState + 1);
+						if (commands.length - 1 === prevState.animationState) {
+							newRadius = 0.9;
+						}
+						console.log("New radius: ", prevState.competInitialRadius * newRadius);
+						for (let i = 0; i < commands[prevState.animationState].length; i++) {
+							procesedCommand.push({
+								x: commands[prevState.animationState][i].x,
+								y: commands[prevState.animationState][i].y,
+								z: prevState.competInitialRadius * newRadius
+							})
+						}
+						console.log("Comandos procesados: ", procesedCommand);
+						let newSeries = {
+							name: "Iteración " + prevState.animationState.toString(),
+							data: procesedCommand
+						};
+						//prevState.series.push(newSeries);
+						prevState.series = [
+							...prevState.series,
+							newSeries
+						];
+						console.log("New compet data after updating: ", prevState.series);
+						prevState.animationState = prevState.animationState + 1;
 					}
-					console.log("New radius: ",prevState.competInitialRadius*newRadius);
-					for(let i = 0; i < commands[prevState.animationState].length;i++){
-						procesedCommand.push({
-							x: commands[prevState.animationState][i].x,
-							y: commands[prevState.animationState][i].y,
-							z: prevState.competInitialRadius*newRadius
-						})
+					if (prevState.animationState === commands.length) {
+						console.log("Breaking at animation state ",prevState.animationState);
+						clearInterval(animation);
 					}
-					console.log("Comandos procesados: ",procesedCommand);
-					let newSeries = {
-						name: "Iteración "+prevState.animationState.toString(),
-						data: procesedCommand
-					};
-					//prevState.series.push(newSeries);
-					prevState.series = [
-						 ...prevState.series,
-						 newSeries
-					];
-					console.log("New compet data after updating: ",prevState.series);
-					prevState.animationState = prevState.animationState + 1;
-					if (prevState.animationState === commands.length) clearInterval(animation);
 					return prevState;
 				})
 
-			}, 1400);
+			}, 500);
 		}
 	};
 
@@ -925,77 +931,15 @@ class Board extends Component {
 				break;
 			case "compet":
 				//compet
-
-				/*answer =  compet(this.state.series.data[0]);
-				console.log("Andwer from tree algorithm: ",answer);
+				answer =  compet(this.state.series[0].data);
+				console.log("Andwer from compet algorithm: ",answer);
 				commands = answer["array"];
 				message = answer["message"];
-				this.closeOrderTypeModal();
 				this.runCompetAnimation(commands);
 				this.setState({
 					messageText: message,
 					isMessageModalOpen: true,
 				});
-
-				 */
-				commands = [
-					 [
-						 {
-						 	x: 10,
-							 y: 10
-						 },
-						 {
-						 	x: 20,
-							 y: 10
-						 },
-						 {
-							 x: 20,
-							 y: 20
-						 },
-						 {
-							 x: 10,
-							 y: 20
-						 }
-					 ],
-					[
-						{
-							x: 5,
-							y: 5
-						},
-						{
-							x: 15,
-							y: 5
-						},
-						{
-							x: 15,
-							y: 15
-						},
-						{
-							x: 5,
-							y: 15
-						}
-					],
-					 [
-						 {
-							 x: 30,
-							 y: 30
-						 },
-						 {
-							 x: 40,
-							 y: 30
-						 },
-						 {
-							 x: 40,
-							 y: 60
-						 },
-						 {
-							 x: 30,
-							 y: 60
-						 }
-					 ]
-				];
-				this.runCompetAnimation(commands);
-
 				break;
 		}
 	};

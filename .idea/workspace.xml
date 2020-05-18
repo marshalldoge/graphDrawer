@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c0ab0c0-61bc-4d75-bdcb-3b662c2e6d1b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Board/Board.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/Board.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -18,20 +19,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="76" column="24" selection-start-line="76" selection-start-column="24" selection-end-line="76" selection-end-column="24" />
+            <state relative-caret-position="417">
+              <caret line="759" column="18" selection-start-line="759" selection-start-column="18" selection-end-line="759" selection-end-column="18" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node_modules/react-apexcharts/types/react-apexcharts.d.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="8" column="45" selection-start-line="8" selection-start-column="39" selection-end-line="8" selection-end-column="45" />
             </state>
           </provider>
         </entry>
@@ -118,7 +110,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>call</find>
       <find>tostring</find>
       <find>space-ar</find>
       <find>onclick</find>
@@ -143,11 +134,12 @@
       <find>tree</find>
       <find>addtreenode</find>
       <find>runtree</find>
-      <find>callal</find>
       <find>Modal</find>
       <find>save</find>
       <find>runal</find>
       <find>10</find>
+      <find>callal</find>
+      <find>runcom</find>
     </findStrings>
     <replaceStrings>
       <replace>right</replace>
@@ -365,12 +357,13 @@
       <workItem from="1589749958550" duration="150000" />
       <workItem from="1589750121351" duration="623000" />
       <workItem from="1589756266021" duration="1379000" />
-      <workItem from="1589765211776" duration="8331000" />
+      <workItem from="1589765211776" duration="8467000" />
+      <workItem from="1589808581480" duration="744000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="135170000" />
+    <option name="totallyTimeSpent" value="136050000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="812" extended-state="6" />
@@ -503,20 +496,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="76" column="24" selection-start-line="76" selection-start-column="24" selection-end-line="76" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/react-apexcharts/types/react-apexcharts.d.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
           <caret line="8" column="45" selection-start-line="8" selection-start-column="39" selection-end-line="8" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="417">
+          <caret line="759" column="18" selection-start-line="759" selection-start-column="18" selection-end-line="759" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
