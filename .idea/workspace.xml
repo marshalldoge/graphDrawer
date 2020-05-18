@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c0ab0c0-61bc-4d75-bdcb-3b662c2e6d1b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Board/Board.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/Board.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -21,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="527">
-              <caret line="1165" column="31" selection-start-line="1165" selection-start-column="31" selection-end-line="1165" selection-end-column="31" />
+            <state relative-caret-position="480">
+              <caret line="76" column="24" selection-start-line="76" selection-start-column="24" selection-end-line="76" selection-end-column="24" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -121,7 +118,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>color</find>
       <find>call</find>
       <find>tostring</find>
       <find>space-ar</find>
@@ -131,7 +127,6 @@
       <find>dfss</find>
       <find>class</find>
       <find>orderType</find>
-      <find>runal</find>
       <find>addTreeNodeToGraph</find>
       <find>runan</find>
       <find>runanima</find>
@@ -151,6 +146,8 @@
       <find>callal</find>
       <find>Modal</find>
       <find>save</find>
+      <find>runal</find>
+      <find>10</find>
     </findStrings>
     <replaceStrings>
       <replace>right</replace>
@@ -368,12 +365,12 @@
       <workItem from="1589749958550" duration="150000" />
       <workItem from="1589750121351" duration="623000" />
       <workItem from="1589756266021" duration="1379000" />
-      <workItem from="1589765211776" duration="4798000" />
+      <workItem from="1589765211776" duration="8331000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="131637000" />
+    <option name="totallyTimeSpent" value="135170000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="812" extended-state="6" />
@@ -508,8 +505,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="1165" column="31" selection-start-line="1165" selection-start-column="31" selection-end-line="1165" selection-end-column="31" />
+        <state relative-caret-position="480">
+          <caret line="76" column="24" selection-start-line="76" selection-start-column="24" selection-end-line="76" selection-end-column="24" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>

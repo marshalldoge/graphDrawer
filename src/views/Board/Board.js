@@ -44,14 +44,15 @@ class Board extends Component {
 				name: "",
 				attributes: {
 					value: ""
-				}
+				},
+				children:[]
 			},
 		],
 		treeSize: 0,
 		treeArray: [],
 		treeNodeColor: '#f6edcf',
 		series: [{
-			name: 'Puntos',
+			name: 'Entrada',
 			data: []
 		}],
 		options: {
@@ -69,13 +70,15 @@ class Board extends Component {
 			},
 			xaxis: {
 				type: 'numeric',
-				max: 50,
+				max: 150,
 				min: 0
 			},
 			yaxis: {
-				max: 50
+				max: 150,
+				min: 0
 			}
 		},
+		competInitialRadius: 15,
 		nodesPosition: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
 		lastNodeIndex: 0,
 		selfLoopLabels: [],
@@ -713,6 +716,45 @@ class Board extends Component {
 		}
 	};
 
+	runCompetAnimation(commands) {
+		let me = this;
+		if(commands.length > 0) {
+			let animation = setInterval(function () {
+				me.setState((prevState) => {
+					console.log("Compet before updating: ",prevState.series," with command: ",commands[prevState.animationState]);
+					let procesedCommand = [];
+					let newRadius = Math.pow(0.5,prevState.animationState+1);
+					if(commands.length-1 === prevState.animationState){
+						newRadius = 0.9;
+					}
+					console.log("New radius: ",prevState.competInitialRadius*newRadius);
+					for(let i = 0; i < commands[prevState.animationState].length;i++){
+						procesedCommand.push({
+							x: commands[prevState.animationState][i].x,
+							y: commands[prevState.animationState][i].y,
+							z: prevState.competInitialRadius*newRadius
+						})
+					}
+					console.log("Comandos procesados: ",procesedCommand);
+					let newSeries = {
+						name: "Iteración "+prevState.animationState.toString(),
+						data: procesedCommand
+					};
+					//prevState.series.push(newSeries);
+					prevState.series = [
+						 ...prevState.series,
+						 newSeries
+					];
+					console.log("New compet data after updating: ",prevState.series);
+					prevState.animationState = prevState.animationState + 1;
+					if (prevState.animationState === commands.length) clearInterval(animation);
+					return prevState;
+				})
+
+			}, 1400);
+		}
+	};
+
 	MessageProccesser = () => {
 		let msgs = this.state.messageText.split('#');
 		let res = [];
@@ -881,6 +923,80 @@ class Board extends Component {
 				});
 
 				break;
+			case "compet":
+				//compet
+
+				/*answer =  compet(this.state.series.data[0]);
+				console.log("Andwer from tree algorithm: ",answer);
+				commands = answer["array"];
+				message = answer["message"];
+				this.closeOrderTypeModal();
+				this.runCompetAnimation(commands);
+				this.setState({
+					messageText: message,
+					isMessageModalOpen: true,
+				});
+
+				 */
+				commands = [
+					 [
+						 {
+						 	x: 10,
+							 y: 10
+						 },
+						 {
+						 	x: 20,
+							 y: 10
+						 },
+						 {
+							 x: 20,
+							 y: 20
+						 },
+						 {
+							 x: 10,
+							 y: 20
+						 }
+					 ],
+					[
+						{
+							x: 5,
+							y: 5
+						},
+						{
+							x: 15,
+							y: 5
+						},
+						{
+							x: 15,
+							y: 15
+						},
+						{
+							x: 5,
+							y: 15
+						}
+					],
+					 [
+						 {
+							 x: 30,
+							 y: 30
+						 },
+						 {
+							 x: 40,
+							 y: 30
+						 },
+						 {
+							 x: 40,
+							 y: 60
+						 },
+						 {
+							 x: 30,
+							 y: 60
+						 }
+					 ]
+				];
+				this.runCompetAnimation(commands);
+
+				break;
 		}
 	};
 
@@ -913,6 +1029,12 @@ class Board extends Component {
 					animationState: 0
 				});
 				break;
+			case "compet":
+				this.setState({
+					animationState: 0
+				});
+				this.callAlgorithm();
+				break;
 		}
 	};
 
@@ -927,16 +1049,6 @@ class Board extends Component {
 				prevState.data.nodes[i].color = "#f6edcf";
 			}
 			prevState.treeData = [me.cleanTreeDfs(prevState.treeData[0])];
-			return prevState;
-		});
-	};
-
-	clearDirtyTree = () => {
-		let me = this;
-		me.setState((prevState) => {
-			console.log("Tree before clear data ", prevState.treeData);
-			prevState.treeData = [me.cleanTreeDfs(prevState.treeData[0])];
-			console.log("Tree after clear data ", prevState.treeData);
 			return prevState;
 		});
 	};
@@ -1026,61 +1138,65 @@ class Board extends Component {
 	};
 
 	ProcessedMatrix = () => {
-		if(this.state.algorithmPicked==="tree"){
-			return null;
-		}
-		if(this.state.showProcessedMatrix){
-			let hash = {};
-			let nodesLength = this.state.data.nodes.length;
-			let length = this.state.data.links.length;
+		switch(this.state.algorithmPicked) {
+			case "tree":
+				return null;
+			case "compet":
+				return null;
+			default:
+				if (this.state.showProcessedMatrix) {
+					let hash = {};
+					let nodesLength = this.state.data.nodes.length;
+					let length = this.state.data.links.length;
 
-			for(let i = 0; i < length; i++) {
-				let hashValue =
-					 this.getNodeIndex(this.state.data.links[i].source)*nodesLength+
-					 this.getNodeIndex(this.state.data.links[i].target);
-				/*console.log("PM:: Link: ",i," has source"+this.state.data.links[i].source,"(",this.getNodeIndex(this.state.data.links[i].source),
-				") and target ",this.state.data.links[i].target,"(",this.getNodeIndex(this.state.data.links[i].target),")");
+					for (let i = 0; i < length; i++) {
+						let hashValue =
+							 this.getNodeIndex(this.state.data.links[i].source) * nodesLength +
+							 this.getNodeIndex(this.state.data.links[i].target);
+						/*console.log("PM:: Link: ",i," has source"+this.state.data.links[i].source,"(",this.getNodeIndex(this.state.data.links[i].source),
+						") and target ",this.state.data.links[i].target,"(",this.getNodeIndex(this.state.data.links[i].target),")");
 
-				 */
-				hash[hashValue] = this.state.data.links[i].label.split("(")[0];
-			}
-			for(let i = 0; i < length; i++) {
-				let inverseHashValue =
-					 this.getNodeIndex(this.state.data.links[i].target)*nodesLength+
-					 this.getNodeIndex(this.state.data.links[i].source);
-				if(hash[inverseHashValue]===undefined && !this.state.directed)hash[inverseHashValue] = this.state.data.links[i].label.split("(")[0];
-			}
-			//console.log("Graph data: ",this.state.data);
-			//console.log("Graph map: ",this.state.graphMap);
-			//console.log("Hash: ",hash);
-			return (
-				 <Row className="RawMatrixBoardCtn" justify="space-between">
-					 <Col span={24}>
-						 <Matrix
-							  nodes={this.state.data.nodes}
-							  edges={hash}
-						 />
-					 </Col>
-				 </Row>
-			);
-		} else {
-			return (
-				 <Row className="RawMatrixBoardCtn" justify="space-between">
-					 <Col span={10}>
-						 <h1 className={"boardTitle"}>Matriz de Costos</h1>
-						 <RawMatrix
-							  data={this.state.costMatrix}
-						 />
-					 </Col>
-					 <Col span={10}>
-						 <h1 className={"boardTitle"}>Matriz Solución</h1>
-						 <RawMatrix
-							  data={this.state.solutionMatrix}
-						 />
-					 </Col>
-				 </Row>
+						 */
+						hash[hashValue] = this.state.data.links[i].label.split("(")[0];
+					}
+					for (let i = 0; i < length; i++) {
+						let inverseHashValue =
+							 this.getNodeIndex(this.state.data.links[i].target) * nodesLength +
+							 this.getNodeIndex(this.state.data.links[i].source);
+						if (hash[inverseHashValue] === undefined && !this.state.directed) hash[inverseHashValue] = this.state.data.links[i].label.split("(")[0];
+					}
+					//console.log("Graph data: ",this.state.data);
+					//console.log("Graph map: ",this.state.graphMap);
+					//console.log("Hash: ",hash);
+					return (
+						 <Row className="RawMatrixBoardCtn" justify="space-between">
+							 <Col span={24}>
+								 <Matrix
+									  nodes={this.state.data.nodes}
+									  edges={hash}
+								 />
+							 </Col>
+						 </Row>
+					);
+				} else {
+					return (
+						 <Row className="RawMatrixBoardCtn" justify="space-between">
+							 <Col span={10}>
+								 <h1 className={"boardTitle"}>Matriz de Costos</h1>
+								 <RawMatrix
+									  data={this.state.costMatrix}
+								 />
+							 </Col>
+							 <Col span={10}>
+								 <h1 className={"boardTitle"}>Matriz Solución</h1>
+								 <RawMatrix
+									  data={this.state.solutionMatrix}
+								 />
+							 </Col>
+						 </Row>
 
-			);
+					);
+				}
 		}
 	};
 
@@ -1155,16 +1271,17 @@ class Board extends Component {
 		newSeries.push({
 			x: parseInt(this.state.competInputModalX),
 			y: parseInt(this.state.competInputModalY),
-			z: 10
+			z: this.state.competInitialRadius
 		});
-		me.setState({
-			competInputModalX: "",
-			competInputModalY: "",
-			isCompetInputModalOpen: false,
-			series: [{
+		me.setState((prevState) => {
+			prevState.series = [{
 				...this.state.series,
 				data: newSeries
-			}]
+			}];
+			prevState.competInputModalX = "";
+			prevState.competInputModalY = "";
+			prevState.isCompetInputModalOpen = false;
+			return prevState;
 		});
 	};
 
@@ -1995,7 +2112,7 @@ class Board extends Component {
 	                        {this.CompetInputModal()}
                         </div>
                     </Content>
-                    <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+                    <Footer style={{ textAlign: 'center' }}>Investagación de Algoritmos UCB 1-2020</Footer>
                 </Layout>
             </Layout>
         );
