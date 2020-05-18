@@ -72,11 +72,11 @@ class Board extends Component {
 			xaxis: {
 				type: 'numeric',
 				max: 500,
-				min: 0
+				min: -50
 			},
 			yaxis: {
 				max: 500,
-				min: 0
+				min: -50
 			},
 			plotOptions: {
 				bubble: {
