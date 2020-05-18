@@ -81,7 +81,7 @@ class Board extends Component {
 			plotOptions: {
 				bubble: {
 					minBubbleRadius: 1,
-					maxBubbleRadius: 25
+					maxBubbleRadius: 15
 				}
 			}
 		},
