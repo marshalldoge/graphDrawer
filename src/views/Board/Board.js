@@ -77,6 +77,12 @@ class Board extends Component {
 			yaxis: {
 				max: 500,
 				min: 0
+			},
+			plotOptions: {
+				bubble: {
+					minBubbleRadius: 1,
+					maxBubbleRadius: 25
+				}
 			}
 		},
 		competInitialRadius: 15,
@@ -725,7 +731,7 @@ class Board extends Component {
 					console.log("Compet before updating: ",prevState.series," with command: ",commands[prevState.animationState]);
 					if(commands[prevState.animationState]) {
 						let procesedCommand = [];
-						let newRadius = Math.pow(0.5, prevState.animationState + 1);
+						let newRadius = Math.pow(0.78, prevState.animationState + 1);
 						if (commands.length - 1 === prevState.animationState) {
 							newRadius = 0.9;
 						}
@@ -750,14 +756,24 @@ class Board extends Component {
 						console.log("New compet data after updating: ", prevState.series);
 						prevState.animationState = prevState.animationState + 1;
 					}
-					if (prevState.animationState === commands.length) {
+					if (prevState.animationState >= commands.length) {
 						console.log("Breaking at animation state ",prevState.animationState);
+						let capaInicial = prevState.series[0];
+						let solution = prevState.series[prevState.series.length-1];
+						solution.data[0]= {
+							...solution.data[0],
+							z: prevState.competInitialRadius*0.3
+						};
+						prevState.series = [
+							capaInicial,
+							solution
+						];
 						clearInterval(animation);
 					}
 					return prevState;
 				})
 
-			}, 1000);
+			}, 700);
 		}
 	};
 
