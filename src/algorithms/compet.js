@@ -1,18 +1,13 @@
-export function compet(nodes){
+function compet(nodes){
     let colors = ["#ff5131","#fd558f","#e254ff","#9d46ff","#7a7cff","#64c1ff","#62ebff","#5df2d6","#5efc82","#e4ff54","#ffdd4b","#ffff52"];
     let response = {
         message: "",
         array: [],
         color: []
     };
-    let step = [];
     //console.log(nodes[0].x);
     let id=0;
-    while(is_different(nodes, step)){
-        step = [];
-        for(let i=0;i<nodes.length;i++){
-            step.push(nodes[i]);
-        }   
+    while(is_different(nodes)){   
         nodes = next_iteration(nodes);
         response.array.push(nodes);
         response.color.push(colors[id%12]);
@@ -47,20 +42,19 @@ function next_iteration(nodes){
     }
     return res;
 }
-function is_different(a, b){
+function is_different(a){
     let res = false;
-    if(a.length != b.length){
-        res = true;
-    }
-    else{
-        for(let i=0;i<a.length;i++){
-            if(a[i].x != b[i].x){
+    if(a.length>0){
+        px = a[0].x;
+        py = a[0].y;
+        for(let i=1;i<a.length;i++){
+            let dx = Math.abs(a[i].x - px);
+            let dy = Math.abs(a[i].y - py);
+            if(dx>0.01 || dy>0.01){
                 res = true;
             }
-            if(a[i].y != b[i].y){
-                res = true;
-            }
-        }
+        }    
     }
+    
     return res;
 }
