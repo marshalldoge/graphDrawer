@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons';
 import { Graph } from "react-d3-graph";
 import Tree from 'react-d3-tree';
+import ReactApexChart from "react-apexcharts";
 import 'antd/dist/antd.css';
 import Modal from 'react-modal';
 import './_Board.scss';
@@ -49,6 +50,32 @@ class Board extends Component {
 		treeSize: 0,
 		treeArray: [],
 		treeNodeColor: '#f6edcf',
+		series: [{
+			name: 'Puntos',
+			data: []
+		}],
+		options: {
+			chart: {
+				type: 'bubble',
+			},
+			dataLabels: {
+				enabled: false
+			},
+			fill: {
+				opacity: 0.8
+			},
+			title: {
+				text: 'Compet'
+			},
+			xaxis: {
+				type: 'numeric',
+				max: 50,
+				min: 0
+			},
+			yaxis: {
+				max: 50
+			}
+		},
 		nodesPosition: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
 		lastNodeIndex: 0,
 		selfLoopLabels: [],
@@ -61,6 +88,7 @@ class Board extends Component {
 		isNodeInputModalOpen: false,
 		isTreeNodeModalOpen: false,
 		isOrderTypeModalOpen: false,
+		isCompetInputModalOpen: false,
 		//isAddNodeLabelModalOpen
 		clickedLink: null,
 		clickedNode: null,
@@ -81,6 +109,8 @@ class Board extends Component {
 		messageText: "",
 		nodeInputModalName: "",
 		nodeInputModalValue: "",
+		competInputModalX: "",
+		competInputModalY: "",
 		showProcessedMatrix: true,
 		costMatrix: null,
 		solutionMatrix: null
@@ -1020,9 +1050,9 @@ class Board extends Component {
 					 this.getNodeIndex(this.state.data.links[i].source);
 				if(hash[inverseHashValue]===undefined && !this.state.directed)hash[inverseHashValue] = this.state.data.links[i].label.split("(")[0];
 			}
-			console.log("Graph data: ",this.state.data);
-			console.log("Graph map: ",this.state.graphMap);
-			console.log("Hash: ",hash);
+			//console.log("Graph data: ",this.state.data);
+			//console.log("Graph map: ",this.state.graphMap);
+			//console.log("Hash: ",hash);
 			return (
 				 <Row className="RawMatrixBoardCtn" justify="space-between">
 					 <Col span={24}>
@@ -1072,6 +1102,9 @@ class Board extends Component {
 	closeOrderTypeModal = () => {
 		this.setState({isOrderTypeModalOpen: false});
 	};
+	closeCompetInputModal = () => {
+		this.setState({isCompetInputModalOpen: false});
+	};
 	handleChange = e => {
 		let me = this;
 		me.setState({addLabelInputValue: e.target.value});
@@ -1084,7 +1117,14 @@ class Board extends Component {
 		let me = this;
 		me.setState({nodeInputModalValue: e.target.value});
 	};
-
+	handleCompetInputModalXChange = e => {
+		let me = this;
+		me.setState({competInputModalX: e.target.value});
+	};
+	handleCompetInputModalYChange = e => {
+		let me = this;
+		me.setState({competInputModalY: e.target.value});
+	};
 	handleTreeNodeModalValueChange = e => {
 		let me = this;
 		me.setState({treeNodeModalInputValue: e.target.value});
@@ -1108,6 +1148,26 @@ class Board extends Component {
 			return prevState;
 		});
 	};
+
+	saveCompetPoint = () => {
+		let me = this;
+		let newSeries = this.state.series[0].data;
+		newSeries.push({
+			x: parseInt(this.state.competInputModalX),
+			y: parseInt(this.state.competInputModalY),
+			z: 10
+		});
+		me.setState({
+			competInputModalX: "",
+			competInputModalY: "",
+			isCompetInputModalOpen: false,
+			series: [{
+				...this.state.series,
+				data: newSeries
+			}]
+		});
+	};
+
 
 	addLinkLabel = (e) => {
 		let me = this;
@@ -1558,6 +1618,13 @@ class Board extends Component {
 		}
 	};
 
+	addCompetPoint = (e) => {
+		let me = this;
+		if (e.keyCode === 13) {
+			this.saveCompetPoint();
+		}
+	};
+
 	NodeInputModal = () => {
 		let me = this;
 		const customStyles = {
@@ -1620,6 +1687,67 @@ class Board extends Component {
 		);
 	};
 
+	CompetInputModal = () => {
+		let me = this;
+		const customStyles = {
+			content : {
+				top                   : '50%',
+				left                  : '50%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)'
+			}
+		};
+		return (
+			 <Modal
+				  isOpen={this.state.isCompetInputModalOpen}
+				  onRequestClose={this.closeCompetInputModal}
+				  style={customStyles}
+				  contentLabel="Compet"
+				  ariaHideApp={false}
+			 >
+				 <Row justify="center">
+					 <Col span={18}>
+						 <p className={"modalQuestion"}>Introduzca los datos del punto</p>
+					 </Col>
+				 </Row>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <Row justify="center">
+							 <input
+								  className={"linkLabelInput"}
+								  type="text"
+								  value={this.state.competInputModalX}
+								  onChange={this.handleCompetInputModalXChange}
+								  placeholder={"X"}
+								  autoFocus
+							 />
+						 </Row>
+						 <Row justify="center">
+							 <input
+								  className={"linkLabelInput"}
+								  type="text"
+								  value={this.state.competInputModalY}
+								  onChange={this.handleCompetInputModalYChange}
+								  placeholder={"Y"}
+								  onKeyUp={this.addCompetPoint}
+							 />
+						 </Row>
+					 </Col>
+				 </Row>
+				 <br/>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <div className={"enterButton"} onClick={this.saveCompetPoint}>
+							 <p>Guardar Punto</p>
+						 </div>
+					 </Col>
+				 </Row>
+			 </Modal>
+		);
+	};
+
 	setAlgorithmPicked = (e,alg) => {
 		console.log("Algoritmo escogido: ",alg);
 		switch (alg) {
@@ -1640,74 +1768,109 @@ class Board extends Component {
 	};
 
 	Buttons = () => {
-		if(this.state.algorithmPicked === "tree") {
-			return (
-				 <Row type="flex" justify="space-around" align="middle">
-					 <Button type="normal" icon={<DribbbleOutlined />} size={'large'}
-					         onClick={()=>this.setState({isTreeNodeModalOpen: true})}
-					 >
-						 AGREGAR
-					 </Button>
-					 <Button type="danger" icon={<ReloadOutlined />} size={'large'}
-					         onClick={this.undoAction}
-					 >
-						 DESHACER
-					 </Button>
-					 <Button type="danger" icon={<HighlightOutlined />} size={'large'}
-					         onClick={this.eraseNode}
-					 >
-						 BORRAR
-					 </Button>
-					 <Button type="danger" icon={<DeleteOutlined />} size={'large'}
-					         onClick={this.eraseAll}
-					 >
-						 LIMPIAR
-					 </Button>
-					 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
-					         onClick={this.runAlgorithm}
-					 >
-						 INICIAR
-					 </Button>
-				 </Row>
-			);
+		switch(this.state.algorithmPicked) {
+			case "tree":
+				return (
+					 <Row type="flex" justify="space-around" align="middle">
+						 <Button type="normal" icon={<DribbbleOutlined/>} size={'large'}
+						         onClick={() => this.setState({isTreeNodeModalOpen: true})}
+						 >
+							 AGREGAR
+						 </Button>
+						 <Button type="danger" icon={<ReloadOutlined/>} size={'large'}
+						         onClick={this.undoAction}
+						 >
+							 DESHACER
+						 </Button>
+						 <Button type="danger" icon={<HighlightOutlined/>} size={'large'}
+						         onClick={this.eraseNode}
+						 >
+							 BORRAR
+						 </Button>
+						 <Button type="danger" icon={<DeleteOutlined/>} size={'large'}
+						         onClick={this.eraseAll}
+						 >
+							 LIMPIAR
+						 </Button>
+						 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined/>} size={'large'}
+						         onClick={this.runAlgorithm}
+						 >
+							 INICIAR
+						 </Button>
+					 </Row>
+				);
+				break;
+			case "compet":
+				return (
+					 <Row type="flex" justify="space-around" align="middle">
+						 <Button type="normal" icon={<DribbbleOutlined/>} size={'large'}
+						         onClick={() => this.setState({isCompetInputModalOpen: true})}
+						 >
+							 AGREGAR
+						 </Button>
+						 <Button type="danger" icon={<ReloadOutlined/>} size={'large'}
+						         onClick={this.undoAction}
+						 >
+							 DESHACER
+						 </Button>
+						 <Button type="danger" icon={<HighlightOutlined/>} size={'large'}
+						         onClick={this.eraseNode}
+						 >
+							 BORRAR
+						 </Button>
+						 <Button type="danger" icon={<DeleteOutlined/>} size={'large'}
+						         onClick={this.eraseAll}
+						 >
+							 LIMPIAR
+						 </Button>
+						 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined/>} size={'large'}
+						         onClick={this.runAlgorithm}
+						 >
+							 INICIAR
+						 </Button>
+					 </Row>
+				);
+				break;
+			default:
+				return (
+					 <Row type="flex" justify="space-around" align="middle">
+						 <Button type="normal" icon={<DribbbleOutlined/>} size={'large'}
+						         onClick={e => this.setTypeInput(e, "node")}
+						         disabled={this.state.inputType === "node"}
+						 >
+							 NODOS
+						 </Button>
+						 <Button type="normal" icon={<ArrowsAltOutlined/>} size={'large'}
+						         onClick={e => this.setTypeInput(e, "edge")}
+						         disabled={this.state.inputType === "edge"}
+						 >
+							 ARCOS
+						 </Button>
+						 <Button type="danger" icon={<ReloadOutlined/>} size={'large'}
+						         onClick={this.undoAction}
+						         disabled={!this.state.lastActionType || this.state.erasedNodes}
+						 >
+							 DESHACER
+						 </Button>
+						 <Button type="danger" icon={<HighlightOutlined/>} size={'large'}
+						         onClick={this.eraseNode}
+						 >
+							 BORRAR
+						 </Button>
+						 <Button type="danger" icon={<DeleteOutlined/>} size={'large'}
+						         onClick={this.eraseAll}
+						 >
+							 LIMPIAR
+						 </Button>
+						 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined/>} size={'large'}
+						         onClick={this.runAlgorithm}
+						 >
+							 INICIAR
+						 </Button>
+					 </Row>
+				);
+				break;
 		}
-		return (
-			 <Row type="flex" justify="space-around" align="middle">
-				 <Button type="normal" icon={<DribbbleOutlined />} size={'large'}
-				         onClick={e => this.setTypeInput(e,"node")}
-				         disabled={this.state.inputType === "node"}
-				 >
-					 NODOS
-				 </Button>
-				 <Button type="normal" icon={<ArrowsAltOutlined />} size={'large'}
-				         onClick={e => this.setTypeInput(e,"edge")}
-				         disabled={this.state.inputType === "edge"}
-				 >
-					 ARCOS
-				 </Button>
-				 <Button type="danger" icon={<ReloadOutlined />} size={'large'}
-				         onClick={this.undoAction}
-				         disabled={!this.state.lastActionType || this.state.erasedNodes}
-				 >
-					 DESHACER
-				 </Button>
-				 <Button type="danger" icon={<HighlightOutlined />} size={'large'}
-				         onClick={this.eraseNode}
-				 >
-					 BORRAR
-				 </Button>
-				 <Button type="danger" icon={<DeleteOutlined />} size={'large'}
-				         onClick={this.eraseAll}
-				 >
-					 LIMPIAR
-				 </Button>
-				 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined />} size={'large'}
-				         onClick={this.runAlgorithm}
-				 >
-					 INICIAR
-				 </Button>
-			 </Row>
-		);
 	};
 
 	GraphDrawerBoard = () => {
@@ -1734,6 +1897,17 @@ class Board extends Component {
 
 				);
 				break;
+			case "compet":
+				return (
+					 <ReactApexChart
+						  options={this.state.options}
+						  series={this.state.series}
+						  type="bubble"
+						  height={'100%'}
+						  width={'100%'}
+					 />
+				);
+				break;
 			default:
 				return (
 					 <Graph
@@ -1754,7 +1928,7 @@ class Board extends Component {
 
 
 	render() {
-		//console.log("MAIN RETURN :",this.state.data);
+		//console.log("MAIN RETURN :",this.state.competData);
 		return (
             <Layout style={{ minHeight: '100vh' }}>
                 <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
@@ -1775,6 +1949,10 @@ class Board extends Component {
 	                    <Menu.Item key="4" onClick={e => this.setAlgorithmPicked(e,"tree")}>
 		                    <HeatMapOutlined />
 		                    <span>Árboles</span>
+	                    </Menu.Item>
+	                    <Menu.Item key="5" onClick={e => this.setAlgorithmPicked(e,"compet")}>
+		                    <HeatMapOutlined />
+		                    <span>Compet</span>
 	                    </Menu.Item>
                     </Menu>
                 </Sider>
@@ -1814,6 +1992,7 @@ class Board extends Component {
 	                        {this.NodeInputModal()}
 	                        {this.AddTreeNodeModal()}
 	                        {this.OrderTypeModal()}
+	                        {this.CompetInputModal()}
                         </div>
                     </Content>
                     <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
