@@ -757,7 +757,7 @@ class Board extends Component {
 					return prevState;
 				})
 
-			}, 500);
+			}, 1000);
 		}
 	};
 
