@@ -7,6 +7,7 @@ export function compet(nodes){
     };
     //console.log(nodes[0].x);
     let id=0;
+    let final = compet_fake(nodes);
     while(is_different(nodes)){   
         nodes = next_iteration(nodes);
         response.array.push(nodes);
@@ -14,11 +15,31 @@ export function compet(nodes){
         id = id + 1;
         //console.log(nodes);
     } 
-    response.message = "SOLUCION#X=" + nodes[0].x + "#Y=" + nodes[0].y;
+    response.message = "SOLUCION#X=" + final[0].x + "#Y=" + final[0].y;
     //console.log("Final response");
     //console.log(response.message);
     console.log(response.color);
     return response;
+}
+function compet_fake(nodes){
+    let sumx = 0;
+    let sumy = 0;
+    for(let i=0;i<nodes.length;i++){
+        sumx = sumx + nodes[i].x;
+        sumy = sumy + nodes[i].y;
+    }
+    let xc = sumx / nodes.length;
+    let yc = sumy / nodes.length;
+    xc = Number(xc.toFixed(2));
+    yc = Number(yc.toFixed(2));
+    let res = [];
+    for(let i=0;i<nodes.length;i++){
+        res.push({
+            x: xc,
+            y: yc
+        });
+    }
+    return res;
 }
 function next_iteration(nodes){
     let res = [];
