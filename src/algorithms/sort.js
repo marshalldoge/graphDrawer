@@ -8,7 +8,7 @@ export function sort(values, algo){
         sorted = shell_sort(values,res);
     }
     if(algo=="selection"){
-        sorted = shell_sort(values,res);
+        sorted = selection(values,res);
     }
     if(algo=="insertion"){
         sorted = insertion(values,res);
@@ -22,8 +22,10 @@ export function sort(values, algo){
         id: aux,
         color: "#baffff"
     });
-    console.log(sorted.join(","));
-    console.log(res.array);
+    res.message = "ARREGLO ORDENADO#" + sorted.join(",");
+    //console.log(res.array);
+    //console.log(res.message)
+    return res;
 }
 
 function shell_sort(values, res){
@@ -104,6 +106,55 @@ function insertion(nums,res){
     }
     return nums;
 }
-
-let a = [3,44,38,5,47,15,36,26,27,2,46,4,19,50,48];
-sort(a,"shell");
+function selection(arr,res) {
+    let len = arr.length;
+    for (let i = 0; i < len; i++) {
+        res.array.push({
+            type: "color",
+            id: [i],
+            color: "#ffc246"
+        });
+        let min = i;
+        for (let j = i + 1; j < len; j++) {
+            if (arr[min] > arr[j]) {
+                if(min == i){
+                    res.array.push({
+                        type: "color",
+                        id: [j],
+                        color: "#ff1744"
+                    });
+                }
+                else{
+                    res.array.push({
+                        type: "color",
+                        id: [min],
+                        color: "#baffff"
+                    });
+                    res.array.push({
+                        type: "color",
+                        id: [j],
+                        color: "#ff1744"
+                    });
+                }
+                min = j;
+                
+            }
+        }
+        if (min !== i) {
+            let tmp = arr[i];
+            arr[i] = arr[min];
+            arr[min] = tmp;
+            res.array.push({
+                type: "color",
+                id: [min],
+                color: "#baffff0"
+            });
+            res.array.push({
+                type: "swap",
+                id1: i,
+                id2: min
+            });
+        }
+    }
+    return arr;
+}
