@@ -20,7 +20,7 @@ export function sort(values, algo){
     res.array.push({
         type: "color",
         id: aux,
-        color: "#baffff"
+        color: "#afd8e5"
     });
     res.message = "ARREGLO ORDENADO#" + sorted.join(",");
     //console.log(res.array);
@@ -72,7 +72,7 @@ function p_sort(values, res, gap){
         res.array.push({
             type: "color",
             id: positions,
-            color: "#baffff"
+            color: "#afd8e5"
         });
     }
     return values;
@@ -115,9 +115,24 @@ function selection(arr,res) {
             color: "#ffc246"
         });
         let min = i;
+        let araux = [];
         for (let j = i + 1; j < len; j++) {
+            araux.push(j);
             if (arr[min] > arr[j]) {
-                if(min == i){
+                if(min != i){
+                    res.array.push({
+                        type: "color",
+                        id: [min],
+                        color: "#4c8c4a"
+                    });
+                }
+                res.array.push({
+                    type: "color",
+                    id: [j],
+                    color: "#ff1744"
+                });
+                
+                /*if(min == i){
                     res.array.push({
                         type: "color",
                         id: [j],
@@ -128,16 +143,22 @@ function selection(arr,res) {
                     res.array.push({
                         type: "color",
                         id: [min],
-                        color: "#baffff"
+                        color: "afd8e5"
                     });
                     res.array.push({
                         type: "color",
                         id: [j],
                         color: "#ff1744"
                     });
-                }
+                }*/
                 min = j;
-                
+            }
+            else{
+                res.array.push({
+                    type: "color",
+                    id: [j],
+                    color: "#4c8c4a"
+                });
             }
         }
         if (min !== i) {
@@ -145,16 +166,21 @@ function selection(arr,res) {
             arr[i] = arr[min];
             arr[min] = tmp;
             res.array.push({
-                type: "color",
-                id: [min],
-                color: "#baffff0"
-            });
-            res.array.push({
                 type: "swap",
                 id1: i,
                 id2: min
             });
+            res.array.push({
+                type: "color",
+                id: [min],
+                color: "#4c8c4a"
+            })
         }
+        res.array.push({
+            type: "color",
+            id: araux,
+            color: "#afd8e5"
+        });
     }
     return arr;
 }
