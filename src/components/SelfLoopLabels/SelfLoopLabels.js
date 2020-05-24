@@ -49,7 +49,7 @@ class SelfLoopLabels extends Component {
 
 	render() {
 		let me = this;
-		console.log("Label being created: with posiotion: ",this.props.x,"-",this.props.y);
+		//console.log("Label being created: with posiotion: ",this.props.x,"-",this.props.y);
 		return (
 			 <div>
 				 {me.labels()}

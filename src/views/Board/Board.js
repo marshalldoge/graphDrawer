@@ -21,6 +21,7 @@ import { asignacion } from '../../algorithms/asignacion';
 import { noroeste } from '../../algorithms/noroeste';
 import { trees } from '../../algorithms/arboles';
 import { compet } from '../../algorithms/compet';
+import { sort } from '../../algorithms/sort';
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
@@ -59,6 +60,9 @@ class Board extends Component {
 		options: {
 			chart: {
 				type: 'bubble',
+				animations: {
+					enabled: false
+				}
 			},
 			dataLabels: {
 				enabled: false
@@ -86,6 +90,9 @@ class Board extends Component {
 			}
 		},
 		competInitialRadius: 15,
+		orderDefaultColumnColor: "#afd8e5",
+		orderChartData: [],
+		initialOrderChartData: [],
 		nodesPosition: [{ id: "0",x: window.innerWidth/2 - 40, y: window.innerHeight/2 - 40 }],
 		lastNodeIndex: 0,
 		selfLoopLabels: [],
@@ -99,6 +106,8 @@ class Board extends Component {
 		isTreeNodeModalOpen: false,
 		isOrderTypeModalOpen: false,
 		isCompetInputModalOpen: false,
+		isOrderInputModalOpen: false,
+		isOrderAlgorithmPickerModalOpen: false,
 		//isAddNodeLabelModalOpen
 		clickedLink: null,
 		clickedNode: null,
@@ -121,6 +130,8 @@ class Board extends Component {
 		nodeInputModalValue: "",
 		competInputModalX: "",
 		competInputModalY: "",
+		orderInputModalValue: "",
+		orderAlgorithmPicked: "",
 		showProcessedMatrix: true,
 		costMatrix: null,
 		solutionMatrix: null
@@ -790,6 +801,41 @@ class Board extends Component {
 		}
 	};
 
+	runOrderAnimation(commands) {
+		let me = this;
+		if(commands.length > 0) {
+			let animation = setInterval(function () {
+				me.setState((prevState) => {
+					console.log("Running command: ",commands[prevState.animationState]);
+					if (commands[prevState.animationState].type === "color") {
+						let ids = commands[prevState.animationState].id;
+						for(let i = 0; i < ids.length; i++){
+							prevState.orderChartData[ids[i]] = {
+								...prevState.orderChartData[ids[i]],
+								color: commands[prevState.animationState].color
+							};
+							//prevState.orderChartData[ids[i]].color = commands[prevState.animationState].color;
+						}
+					} else {
+						let aux = prevState.orderChartData[commands[prevState.animationState].id1];
+						prevState.orderChartData[commands[prevState.animationState].id1] = {
+							...prevState.orderChartData[commands[prevState.animationState].id1],
+							value: prevState.orderChartData[commands[prevState.animationState].id2].value
+						};
+						prevState.orderChartData[commands[prevState.animationState].id2] = {
+							...prevState.orderChartData[commands[prevState.animationState].id2],
+							value: aux.value
+						}
+					}
+					prevState.animationState = prevState.animationState + 1;
+					if (prevState.animationState === commands.length) clearInterval(animation);
+					return prevState;
+				})
+
+			}, 1000);
+		}
+	};
+
 	MessageProccesser = () => {
 		let msgs = this.state.messageText.split('#');
 		let res = [];
@@ -970,6 +1016,16 @@ class Board extends Component {
 					isMessageModalOpen: true,
 				});
 				break;
+			case "order":
+				//order
+				 let rawValues = this.state.orderChartData.map(x => parseInt(x.value));
+				 console.log("Senging this data to sort algoritngm: ",rawValues);
+				answer =  sort(rawValues,this.state.orderAlgorithmPicked);
+				console.log("Andwer from compet algorithm: ",answer);
+				commands = answer["array"];
+				this.runOrderAnimation(commands);
+				this.closeOrderAlgorithmPickerModal();
+				break;
 		}
 	};
 
@@ -1008,6 +1064,13 @@ class Board extends Component {
 				});
 				this.callAlgorithm();
 				break;
+			case "order":
+				this.setState({
+					animationState: 0
+				});
+				this.callAlgorithm();
+				break;
+
 		}
 	};
 
@@ -1120,6 +1183,8 @@ class Board extends Component {
 				return null;
 			case "compet":
 				return null;
+			case "order":
+				return null;
 			default:
 				if (this.state.showProcessedMatrix) {
 					let hash = {};
@@ -1198,6 +1263,12 @@ class Board extends Component {
 	closeCompetInputModal = () => {
 		this.setState({isCompetInputModalOpen: false});
 	};
+	closeOrderInputModal = () => {
+		this.setState({isOrderInputModalOpen: false});
+	};
+	closeOrderAlgorithmPickerModal = () => {
+		this.setState({isOrderAlgorithmPickerModalOpen: false});
+	};
 	handleChange = e => {
 		let me = this;
 		me.setState({addLabelInputValue: e.target.value});
@@ -1221,6 +1292,10 @@ class Board extends Component {
 	handleTreeNodeModalValueChange = e => {
 		let me = this;
 		me.setState({treeNodeModalInputValue: e.target.value});
+	};
+	handleOrderInputModalValueChange = e => {
+		let me = this;
+		me.setState({orderInputModalValue: e.target.value});
 	};
 
 	saveNodeInfo = () => {
@@ -1449,6 +1524,108 @@ class Board extends Component {
 				});
 			}
 		}
+	};
+
+	columnStyle = (data) => {
+		return {
+			height: data.height.toString()+"%",
+			backgroundColor: data.color
+		}
+	};
+	OrderColumn = (data) => {
+		//console.log("Rendering: ",data);
+		return (
+			 <Row key={data.idx} justify="center" align="bottom" style={{height: "100%"}}>
+				 <Col className={"orderBarColumn"} key={data.idx} style={{height: "100%"}}>
+					 <Row justify="center" align="bottom" style={{height: "95%"}}>
+						 <Col className={"orderColumnDrawing"} style={this.columnStyle(data)} key={data.idx}>
+
+						 </Col>
+					 </Row>
+					 <Row justify="center" align="top" style={{height: "5%"}}>
+						 <Col className={"orderColumnLabel"} key={data.idx}>
+							 {data.value}
+						 </Col>
+					 </Row>
+				 </Col>
+			 </Row>
+		);
+	};
+
+	ReactBarChar = () => {
+		let valuesArray = [];
+		for(let i = 0; i < this.state.orderChartData.length; i++) {
+			valuesArray.push(this.OrderColumn(this.state.orderChartData[i]));
+		}
+		/*
+		for(let i = 0; i < 10; i++) {
+			valuesArray.push(
+				 <Col className={"columnCtn"} key={i}>
+					 {this.OrderColumn({
+						 idx: i,
+						 value: i*5
+					 })}
+				 </Col>
+			);
+		}
+
+		 */
+		return (
+			 <Row className={"orderChartCtn"} justify="space-between" align="bottom" style={{height: "100%"}}>
+				 {valuesArray}
+			 </Row>
+		)
+	};
+
+	addOrderValues = () => {
+		let values = this.state.orderInputModalValue.trim().split(" ");
+		this.setState((prevState) => {
+			let maxValue = -1000000000;
+			let maxHeightPercentage = 90;
+			let newValueHeight;
+			for(let i = 0; i < values.length; i++) {
+				maxValue = Math.max(parseInt(values[i]),maxValue);
+			}
+			for(let i = 0; i < prevState.orderChartData.length; i++) {
+				maxValue = Math.max(parseInt(prevState.orderChartData[i].value),maxValue);
+			}
+			for(let i = 0; i < prevState.orderChartData.length; i++) {
+				prevState.orderChartData[i] = {
+					...prevState.orderChartData[i],
+					height: (prevState.orderChartData[i].height*maxHeightPercentage)/maxValue
+				};
+			};
+
+			for(let i = 0; i < values.length; i++) {
+				prevState.orderChartData.push(
+					 {
+						 idx: prevState.orderChartData.length,
+						 value: values[i],
+						 color: this.state.orderDefaultColumnColor,
+						 height: (parseInt(values[i])*maxHeightPercentage)/maxValue
+					 }
+				)
+			};
+			prevState.isOrderInputModalOpen = false;
+			prevState.orderInputModalValue = "";
+			return prevState;
+		});
+	};
+
+	initOrderAlgorithm = () => {
+		this.setState((prevState) => {
+			//console.log("RECENT DATA: ",prevState.orderChartData);
+			//console.log("OLD DATA: ",prevState.initialOrderChartData);
+			prevState.isOrderAlgorithmPickerModalOpen= true;
+			if(prevState.initialOrderChartData.length === 0) {
+				prevState.initialOrderChartData = [...prevState.orderChartData];
+				//console.log("Saved data: ",prevState.initialOrderChartData);
+			}else{
+				prevState.orderChartData = [...prevState.initialOrderChartData];
+				//console.log("Restoring old data, so new data is: ",prevState.orderChartData);
+			}
+			return prevState;
+		});
 	};
 
 	AddLinkLabelModal = () => {
@@ -1719,6 +1896,13 @@ class Board extends Component {
 		}
 	};
 
+	addOrderValuesOnKeyUp = (e) => {
+		let me = this;
+		if (e.keyCode === 13) {
+			this.addOrderValues();
+		}
+	};
+
 	NodeInputModal = () => {
 		let me = this;
 		const customStyles = {
@@ -1842,6 +2026,108 @@ class Board extends Component {
 		);
 	};
 
+	OrderInputModal = () => {
+		let me = this;
+		const customStyles = {
+			content : {
+				top                   : '50%',
+				left                  : '50%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)',
+				width                 : '500px'
+			}
+		};
+		return (
+			 <Modal
+				  isOpen={this.state.isOrderInputModalOpen}
+				  onRequestClose={this.closeOrderInputModal}
+				  style={customStyles}
+				  contentLabel="MAX or MIN"
+				  ariaHideApp={false}
+			 >
+				 <Row justify="center">
+					 <Col span={18}>
+						 <p className={"modalQuestion"}>Introduzca valores al arreglo (separados por un espacio):</p>
+					 </Col>
+				 </Row>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <Row justify="center">
+							 <input
+								  className={"linkLabelInput"}
+								  type="text"
+								  value={this.state.orderInputModalValue}
+								  onChange={this.handleOrderInputModalValueChange}
+								  placeholder={"Nombre"}
+								  onKeyUp={this.addOrderValuesOnKeyUp}
+								  autoFocus
+							 />
+						 </Row>
+					 </Col>
+				 </Row>
+				 <br/>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <div className={"enterButton"} onClick={this.addOrderValues}>
+							 <p>Guardar Nodo</p>
+						 </div>
+					 </Col>
+				 </Row>
+			 </Modal>
+		);
+	};
+
+	OrderAlgorithmPickerModal = () => {
+		let me = this;
+		const customStyles = {
+			content : {
+				top                   : '50%',
+				left                  : '50%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)',
+				width                 : '500px'
+			}
+		};
+		return (
+			 <Modal
+				  isOpen={this.state.isOrderAlgorithmPickerModalOpen}
+				  onRequestClose={this.closeOrderAlgorithmPickerModal}
+				  style={customStyles}
+				  contentLabel="Order Type"
+				  ariaHideApp={false}
+			 >
+				 <Row justify="center">
+					 <Col span={18} style={{textAlign: "center"}}>
+						 <p className={"modalQuestion"}>¿Qué tipo de ordenamiento desea correr?</p>
+					 </Col>
+				 </Row>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <Row justify="center">
+							 <Radio.Group>
+								 <Radio.Button value="selection" onClick={() => this.setState({orderAlgorithmPicked: 'selection'})}>Selección</Radio.Button>
+								 <Radio.Button value="insertion" onClick={() => this.setState({orderAlgorithmPicked: 'insertion'})}>Inserción</Radio.Button>
+								 <Radio.Button value="shell" onClick={() => this.setState({orderAlgorithmPicked: 'shell'})}>Shell</Radio.Button>
+							 </Radio.Group>
+						 </Row>
+					 </Col>
+				 </Row>
+				 <br/>
+				 <Row justify="center">
+					 <Col span={18}>
+						 <div className={"enterButton"} onClick={this.runAlgorithm}>
+							 <p>Correr Algoritmo</p>
+						 </div>
+					 </Col>
+				 </Row>
+			 </Modal>
+		);
+	};
+
 	setAlgorithmPicked = (e,alg) => {
 		console.log("Algoritmo escogido: ",alg);
 		switch (alg) {
@@ -1925,6 +2211,37 @@ class Board extends Component {
 					 </Row>
 				);
 				break;
+			case "order":
+				return (
+					 <Row type="flex" justify="space-around" align="middle">
+						 <Button type="normal" icon={<DribbbleOutlined/>} size={'large'}
+						         onClick={() => this.setState({isOrderInputModalOpen: true})}
+						 >
+							 AGREGAR
+						 </Button>
+						 <Button type="danger" icon={<ReloadOutlined/>} size={'large'}
+						         onClick={this.undoAction}
+						 >
+							 DESHACER
+						 </Button>
+						 <Button type="danger" icon={<HighlightOutlined/>} size={'large'}
+						         onClick={this.eraseNode}
+						 >
+							 BORRAR
+						 </Button>
+						 <Button type="danger" icon={<DeleteOutlined/>} size={'large'}
+						         onClick={this.eraseAll}
+						 >
+							 LIMPIAR
+						 </Button>
+						 <Button className={"runButton"} type="normal" icon={<PlayCircleOutlined/>} size={'large'}
+						         onClick={this.initOrderAlgorithm}
+						 >
+							 INICIAR
+						 </Button>
+					 </Row>
+				);
+				break;
 			default:
 				return (
 					 <Row type="flex" justify="space-around" align="middle">
@@ -2002,6 +2319,9 @@ class Board extends Component {
 					 />
 				);
 				break;
+			case "order":
+				return this.ReactBarChar();
+				break;
 			default:
 				return (
 					 <Graph
@@ -2048,6 +2368,10 @@ class Board extends Component {
 		                    <HeatMapOutlined />
 		                    <span>Compet</span>
 	                    </Menu.Item>
+	                    <Menu.Item key="6" onClick={e => this.setAlgorithmPicked(e,"order")}>
+		                    <HeatMapOutlined />
+		                    <span>Ordenamiento</span>
+	                    </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout className="site-layout bodyCtn">
@@ -2087,6 +2411,8 @@ class Board extends Component {
 	                        {this.AddTreeNodeModal()}
 	                        {this.OrderTypeModal()}
 	                        {this.CompetInputModal()}
+	                        {this.OrderInputModal()}
+	                        {this.OrderAlgorithmPickerModal()}
                         </div>
                     </Content>
                     <Footer style={{ textAlign: 'center' }}>Investagación de Algoritmos UCB 1-2020</Footer>

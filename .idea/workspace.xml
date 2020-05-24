@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c0ab0c0-61bc-4d75-bdcb-3b662c2e6d1b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Board/Board.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/Board.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/Board/_Board.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/_Board.scss" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -18,8 +21,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="363">
-              <caret line="78" column="24" selection-start-line="78" selection-start-column="24" selection-end-line="78" selection-end-column="24" />
+            <state relative-caret-position="171">
+              <caret line="1535" column="10" selection-start-line="1535" selection-start-column="10" selection-end-line="1535" selection-end-column="10" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -28,10 +31,13 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/components/TreeNode/TreeNode.js">
+        <entry file="file://$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="5" column="10" selection-start-line="5" selection-start-column="10" selection-end-line="5" selection-end-column="10" />
+            <state relative-caret-position="308">
+              <caret line="51" column="10" selection-start-line="51" selection-start-column="10" selection-end-line="51" selection-end-column="10" />
+              <folding>
+                <element signature="e#0#39#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -39,8 +45,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/views/Board/_Board.scss">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="63">
-              <caret line="3" column="14" selection-start-line="3" selection-start-column="8" selection-end-line="3" selection-end-column="14" />
+            <state relative-caret-position="476">
+              <caret line="121" column="10" lean-forward="true" selection-start-line="121" selection-start-column="10" selection-end-line="121" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -87,8 +93,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Node/Node.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret selection-end-line="3" selection-end-column="22" />
+            <state relative-caret-position="252">
+              <caret line="12" column="26" lean-forward="true" selection-end-line="43" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -109,13 +115,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>space-ar</find>
-      <find>onclick</find>
-      <find>boardCº</find>
-      <find>grap</find>
-      <find>dfss</find>
-      <find>class</find>
-      <find>orderType</find>
       <find>addTreeNodeToGraph</find>
       <find>runan</find>
       <find>runanima</find>
@@ -137,8 +136,15 @@
       <find>runal</find>
       <find>10</find>
       <find>runcom</find>
-      <find>callal</find>
       <find>addcom</find>
+      <find>proe</find>
+      <find>prevs</find>
+      <find>order</find>
+      <find>callal</find>
+      <find>runoroder</find>
+      <find>anima</find>
+      <find>column</find>
+      <find>addor</find>
     </findStrings>
     <replaceStrings>
       <replace>right</replace>
@@ -146,6 +152,7 @@
       <replace>prevState.animationState</replace>
       <replace>isMessageModalOpen</replace>
       <replace>br/</replace>
+      <replace>sort</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -167,7 +174,6 @@
         <option value="$PROJECT_DIR$/src/components/Matrix/_Matrix.scss" />
         <option value="$PROJECT_DIR$/src/components/SelfLoopLabel/_SelfLoopLabel.scss" />
         <option value="$PROJECT_DIR$/src/components/SelfLoopLabel/SelfLoopLabel.js" />
-        <option value="$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js" />
         <option value="$PROJECT_DIR$/src/algorithms/example.js" />
         <option value="$PROJECT_DIR$/src/algorithms/johnson.js" />
         <option value="$PROJECT_DIR$/package.json" />
@@ -175,16 +181,17 @@
         <option value="$PROJECT_DIR$/src/components/RawMatrix/RawMatriz.js" />
         <option value="$PROJECT_DIR$/src/components/RawMatrix/RawMatrix.js" />
         <option value="$PROJECT_DIR$/src/components/RawMatrix/_RawMatrix.scss" />
-        <option value="$PROJECT_DIR$/src/views/Board/_Board.scss" />
         <option value="$PROJECT_DIR$/src/components/TreeNode/TreeNode.js" />
+        <option value="$PROJECT_DIR$/src/components/OrderChart/OrderChart.js" />
+        <option value="$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js" />
+        <option value="$PROJECT_DIR$/src/views/Board/_Board.scss" />
         <option value="$PROJECT_DIR$/src/views/Board/Board.js" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-5" />
+  <component name="ProjectFrameBounds">
     <option name="y" value="23" />
-    <option name="width" value="1567" />
+    <option name="width" value="1440" />
     <option name="height" value="812" />
   </component>
   <component name="ProjectView">
@@ -192,6 +199,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -247,7 +255,21 @@
               <item name="graphDrawer" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="OrderChart" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="graphDrawer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="graphDrawer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
               <item name="RawMatrix" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="graphDrawer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="graphDrawer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="SelfLoopLabels" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="graphDrawer" type="b2602c69:ProjectViewProjectNode" />
@@ -273,7 +295,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -357,12 +378,14 @@
       <workItem from="1589750121351" duration="623000" />
       <workItem from="1589756266021" duration="1379000" />
       <workItem from="1589765211776" duration="8467000" />
-      <workItem from="1589808581480" duration="3784000" />
+      <workItem from="1589808581480" duration="3980000" />
+      <workItem from="1589870897448" duration="500000" />
+      <workItem from="1590287084544" duration="9574000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="139090000" />
+    <option name="totallyTimeSpent" value="149360000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="812" extended-state="6" />
@@ -406,16 +429,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="378">
           <caret line="18" selection-start-line="18" selection-end-line="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
-          <caret line="33" column="16" selection-start-line="33" selection-start-column="16" selection-end-line="33" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -502,27 +515,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="363">
-          <caret line="78" column="24" selection-start-line="78" selection-start-column="24" selection-end-line="78" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/components/TreeNode/TreeNode.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="5" column="10" selection-start-line="5" selection-start-column="10" selection-end-line="5" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/views/Board/_Board.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="63">
-          <caret line="3" column="14" selection-start-line="3" selection-start-column="8" selection-end-line="3" selection-end-column="14" />
         </state>
       </provider>
     </entry>
@@ -557,20 +553,64 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/Node/_Node.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/@ant-design/icons/es/icons/HeatMapOutlined.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="231">
+          <caret line="14" column="15" selection-start-line="14" selection-start-column="15" selection-end-line="14" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/components/Node/Node.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="3" selection-end-column="22" />
+        <state relative-caret-position="252">
+          <caret line="12" column="26" lean-forward="true" selection-end-line="43" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/components/Node/_Node.scss">
+    <entry file="file://$PROJECT_DIR$/src/components/OrderChart/OrderChart.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="8" column="25" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+        <state relative-caret-position="903">
+          <caret line="43" selection-start-line="43" selection-end-line="43" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/views/Board/_Board.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="121" column="10" lean-forward="true" selection-start-line="121" selection-start-column="10" selection-end-line="121" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="51" column="10" selection-start-line="51" selection-start-column="10" selection-end-line="51" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="1535" column="10" selection-start-line="1535" selection-start-column="10" selection-end-line="1535" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

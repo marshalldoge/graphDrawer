@@ -2,6 +2,7 @@ $background: #2C313C;
 $board: #F4F4F4;
 $green: #368471;
 $blue: #003152;
+$orderDefaultColor: #baffff;
 .bodyCtn {
   background-color: $background;
 }
@@ -102,4 +103,21 @@ $blue: #003152;
 }
 .boardCtn {
   text-align: center;
+}
+.orderChartCtn {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.columnCtn {
+  height: 100%;
+}
+.orderBarColumn {
+
+}
+.orderColumnDrawing {
+  width: 18px;
+}
+.orderColumnLabel {
+  font-size: 20px;
+  font-weight: 600;
 }
