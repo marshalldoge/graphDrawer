@@ -1535,7 +1535,7 @@ class Board extends Component {
 	OrderColumn = (data) => {
 		//console.log("Rendering: ",data);
 		return (
-			 <Row key={data.idx} justify="center" align="bottom" style={{height: "100%"}}>
+			 <Row key={data.idx} justify="center" align="bottom" style={{height: "100%",paddingLeft: "5px",paddingRight: "5px"}}>
 				 <Col className={"orderBarColumn"} key={data.idx} style={{height: "100%"}}>
 					 <Row justify="center" align="bottom" style={{height: "95%"}}>
 						 <Col className={"orderColumnDrawing"} style={this.columnStyle(data)} key={data.idx}>
@@ -1554,8 +1554,17 @@ class Board extends Component {
 
 	ReactBarChar = () => {
 		let valuesArray = [];
+		let maxValue = -1000000000;
+		let maxHeightPercentage = 90;
 		for(let i = 0; i < this.state.orderChartData.length; i++) {
-			valuesArray.push(this.OrderColumn(this.state.orderChartData[i]));
+			maxValue = Math.max(parseInt(this.state.orderChartData[i].value),maxValue);
+		}
+		console.log("max value for render: ",maxValue);
+		for(let i = 0; i < this.state.orderChartData.length; i++) {
+			valuesArray.push(this.OrderColumn({
+				...this.state.orderChartData[i],
+				height: (parseInt(this.state.orderChartData[i].value)*maxHeightPercentage)/maxValue
+			}));
 		}
 		/*
 		for(let i = 0; i < 10; i++) {
@@ -1571,7 +1580,7 @@ class Board extends Component {
 
 		 */
 		return (
-			 <Row className={"orderChartCtn"} justify="space-between" align="bottom" style={{height: "100%"}}>
+			 <Row className={"orderChartCtn"} justify="center" gutter={[8, 8]} align="bottom" style={{height: "100%"}}>
 				 {valuesArray}
 			 </Row>
 		)
@@ -1580,29 +1589,12 @@ class Board extends Component {
 	addOrderValues = () => {
 		let values = this.state.orderInputModalValue.trim().split(" ");
 		this.setState((prevState) => {
-			let maxValue = -1000000000;
-			let maxHeightPercentage = 90;
-			let newValueHeight;
-			for(let i = 0; i < values.length; i++) {
-				maxValue = Math.max(parseInt(values[i]),maxValue);
-			}
-			for(let i = 0; i < prevState.orderChartData.length; i++) {
-				maxValue = Math.max(parseInt(prevState.orderChartData[i].value),maxValue);
-			}
-			for(let i = 0; i < prevState.orderChartData.length; i++) {
-				prevState.orderChartData[i] = {
-					...prevState.orderChartData[i],
-					height: (prevState.orderChartData[i].height*maxHeightPercentage)/maxValue
-				};
-			};
-
 			for(let i = 0; i < values.length; i++) {
 				prevState.orderChartData.push(
 					 {
 						 idx: prevState.orderChartData.length,
 						 value: values[i],
-						 color: this.state.orderDefaultColumnColor,
-						 height: (parseInt(values[i])*maxHeightPercentage)/maxValue
+						 color: this.state.orderDefaultColumnColor
 					 }
 				)
 			};

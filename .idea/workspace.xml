@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c0ab0c0-61bc-4d75-bdcb-3b662c2e6d1b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Board/Board.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/Board.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views/Board/_Board.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/Board/_Board.scss" afterDir="false" />
     </list>
@@ -21,8 +19,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
-              <caret line="1535" column="10" selection-start-line="1535" selection-start-column="10" selection-end-line="1535" selection-end-column="10" />
+            <state relative-caret-position="221">
+              <caret line="1562" column="67" selection-start-line="1562" selection-start-column="67" selection-end-line="1562" selection-end-column="67" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -45,8 +43,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/views/Board/_Board.scss">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="121" column="10" lean-forward="true" selection-start-line="121" selection-start-column="10" selection-end-line="121" selection-end-column="10" />
+            <state relative-caret-position="392">
+              <caret line="117" column="14" lean-forward="true" selection-start-line="117" selection-start-column="14" selection-end-line="117" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -115,9 +113,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>addTreeNodeToGraph</find>
-      <find>runan</find>
-      <find>runanima</find>
       <find>update</find>
       <find>100</find>
       <find>MAIN</find>
@@ -145,6 +140,9 @@
       <find>anima</find>
       <find>column</find>
       <find>addor</find>
+      <find>orderbarc</find>
+      <find>runanim</find>
+      <find>runor</find>
     </findStrings>
     <replaceStrings>
       <replace>right</replace>
@@ -380,12 +378,12 @@
       <workItem from="1589765211776" duration="8467000" />
       <workItem from="1589808581480" duration="3980000" />
       <workItem from="1589870897448" duration="500000" />
-      <workItem from="1590287084544" duration="9574000" />
+      <workItem from="1590287084544" duration="10514000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="149360000" />
+    <option name="totallyTimeSpent" value="150300000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="812" extended-state="6" />
@@ -587,13 +585,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/views/Board/_Board.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="121" column="10" lean-forward="true" selection-start-line="121" selection-start-column="10" selection-end-line="121" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/components/SelfLoopLabels/SelfLoopLabels.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="308">
@@ -604,10 +595,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/views/Board/_Board.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="392">
+          <caret line="117" column="14" lean-forward="true" selection-start-line="117" selection-start-column="14" selection-end-line="117" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="1535" column="10" selection-start-line="1535" selection-start-column="10" selection-end-line="1535" selection-end-column="10" />
+        <state relative-caret-position="221">
+          <caret line="1562" column="67" selection-start-line="1562" selection-start-column="67" selection-end-line="1562" selection-end-column="67" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
