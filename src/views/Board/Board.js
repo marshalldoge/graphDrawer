@@ -2063,7 +2063,7 @@ class Board extends Component {
 				 <Row justify="center">
 					 <Col span={18}>
 						 <div className={"enterButton"} onClick={this.addOrderValues}>
-							 <p>Guardar Nodo</p>
+							 <p>Agregar valores</p>
 						 </div>
 					 </Col>
 				 </Row>
