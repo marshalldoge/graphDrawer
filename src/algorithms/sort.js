@@ -13,6 +13,9 @@ export function sort(values, algo){
     if(algo=="insertion"){
         sorted = insertion(values,res);
     }
+    if(algo=="merge"){
+        sorted = merge_sort(values,res,0,values.length-1);
+    }
     let aux = [];
     for(let i=0;i<values.length;i++){
         aux.push(i);
@@ -183,4 +186,67 @@ function selection(arr,res) {
         });
     }
     return arr;
+}
+
+function merge_sort(values, res, left, right){
+    console.log("Function for "+left+","+right);
+    if(left == right){
+        return [values[left]];
+    }
+    else{
+        let mid = ((left+right)/2)>>0;
+        let a = merge_sort(values,res,left,mid);
+        let b = merge_sort(values,res,mid+1,right);
+        let r = merge(a,b);
+        //ANIMATION
+        let posi = [];
+        for(let k=left;k<=right;k++){
+            posi.push(k);
+        }
+        res.array.push({
+            type: "color",
+            id: posi,
+            color: "#ffc246"
+        });
+
+        res.array.push({
+            type: "update",
+            values: r,
+            positions: posi
+        });
+        res.array.push({
+            type: "color",
+            id: posi,
+            color: "#afd8e5"
+        });
+        return r;
+    }
+}
+function merge(a,b){
+    let i=0;
+    let j=0;
+    let res= [];
+    while(i<a.length && j<b.length){
+        if(a[i]<=b[j]){
+            res.push(a[i]);
+            i = i+1;
+        }
+        else{
+            res.push(b[j]);
+            j = j+1;
+        }
+    }
+    if(i==a.length){
+        while(j<b.length){
+            res.push(b[j]);
+            j++;
+        }
+    }
+    else{
+        while(i<a.length){
+            res.push(a[i]);
+            i++;
+        }
+    }
+    return res;
 }
