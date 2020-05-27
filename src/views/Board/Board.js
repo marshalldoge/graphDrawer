@@ -806,7 +806,8 @@ class Board extends Component {
 		if(commands.length > 0) {
 			let animation = setInterval(function () {
 				me.setState((prevState) => {
-					console.log("Running command: ",commands[prevState.animationState]);
+					//console.log("Running command: ",commands[prevState.animationState]);
+
 					if (commands[prevState.animationState].type === "color") {
 						let ids = commands[prevState.animationState].id;
 						for(let i = 0; i < ids.length; i++){
@@ -816,7 +817,7 @@ class Board extends Component {
 							};
 							//prevState.orderChartData[ids[i]].color = commands[prevState.animationState].color;
 						}
-					} else {
+					} else if (commands[prevState.animationState].type === "swap") {
 						let aux = prevState.orderChartData[commands[prevState.animationState].id1];
 						prevState.orderChartData[commands[prevState.animationState].id1] = {
 							...prevState.orderChartData[commands[prevState.animationState].id1],
@@ -825,6 +826,16 @@ class Board extends Component {
 						prevState.orderChartData[commands[prevState.animationState].id2] = {
 							...prevState.orderChartData[commands[prevState.animationState].id2],
 							value: aux.value
+						}
+					} else if (commands[prevState.animationState].type === "update") {
+						let values = commands[prevState.animationState].values;
+						let positions = commands[prevState.animationState].positions;
+						for(let i = 0; i < positions.length; i++){
+							prevState.orderChartData[positions[i]] = {
+								...prevState.orderChartData[positions[i]],
+								value: values[i]
+							};
+							//prevState.orderChartData[ids[i]].color = commands[prevState.animationState].color;
 						}
 					}
 					prevState.animationState = prevState.animationState + 1;
@@ -2104,6 +2115,7 @@ class Board extends Component {
 								 <Radio.Button value="selection" onClick={() => this.setState({orderAlgorithmPicked: 'selection'})}>Selección</Radio.Button>
 								 <Radio.Button value="insertion" onClick={() => this.setState({orderAlgorithmPicked: 'insertion'})}>Inserción</Radio.Button>
 								 <Radio.Button value="shell" onClick={() => this.setState({orderAlgorithmPicked: 'shell'})}>Shell</Radio.Button>
+								 <Radio.Button value="merge" onClick={() => this.setState({orderAlgorithmPicked: 'merge'})}>Merge</Radio.Button>
 							 </Radio.Group>
 						 </Row>
 					 </Col>
