@@ -1,14 +1,7 @@
 import React, {Component} from "react";
-import {Row, Col, Button, Typography, message, Menu, Layout, Radio} from 'antd';
+import {Row, Col, InputNumber, Typography, Button, Menu, Layout, Switch} from 'antd';
 import {
-    ArrowsAltOutlined,
-    DeleteOutlined,
-    DribbbleOutlined,
-    HeatMapOutlined,
-    HighlightOutlined,
-    PlayCircleOutlined,
-    RadarChartOutlined,
-    ReloadOutlined,
+	DownloadOutlined,
 } from '@ant-design/icons';
 import { Graph } from "react-d3-graph";
 import Tree from 'react-d3-tree';
@@ -22,6 +15,7 @@ import { noroeste } from '../../algorithms/noroeste';
 import { trees } from '../../algorithms/arboles';
 import { compet } from '../../algorithms/compet';
 import { sort } from '../../algorithms/sort';
+import {getUrlParams} from "../../utils";
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
@@ -50,8 +44,11 @@ class Board extends Component {
 			radius: 20
 		},
 		startEdge: null,
+		edgeWeight: 1,
 		containerRect: null,
-		addingExitNodes: true
+		drawingExitNodes: true,
+		editMode: false,
+		isConfigurationModalOpen: false
 	};
 
 	componentDidMount() {
@@ -69,6 +66,11 @@ class Board extends Component {
 				return prevState;
 			});
 		}, 5000);
+		this.setState({
+			editMode: getUrlParams("editMode"),
+			nodes: JSON.parse(localStorage.getItem("nodes")),
+			edges: JSON.parse(localStorage.getItem("edges"))
+		});
 	}
 
 	Lines = () => {
@@ -104,19 +106,12 @@ class Board extends Component {
 			let rect = e.target.getBoundingClientRect();
 			this.setState(prevState => {
 				let endEdge = node;
-				console.log('edge: ',{
-					start: prevState.startEdge.id,
-					end: endEdge.id,
-					startX: prevState.startEdge.x,
-					startY: prevState.startEdge.y,
-					endX: endEdge.x,
-					endY: endEdge.y
-				});
-				console.log('RECT: ',this.state.containerRect);
 				prevState.edges.push(
 					 {
 						 start: prevState.startEdge.id,
 						 end: endEdge.id,
+						 weight: prevState.edgeWeight,
+						 isOut: prevState.drawingExitNodes,
 						 startX: prevState.startEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
 						 startY: prevState.startEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
 						 endX: endEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
@@ -162,12 +157,63 @@ class Board extends Component {
 					 id: nodeId,
 					 x: x,
 					 y: y,
-					 exitNode: prevState.addingExitNodes
+					 exitNode: prevState.drawingExitNodes
 				 }
 			);
 			console.log("Creating node, new array: ",prevState.nodes);
 			return prevState;
 		});
+	};
+
+	ConfigurationModal = () => {
+		let me = this;
+		const customStyles = {
+			content : {
+				top                   : '50%',
+				left                  : '50%',
+				right                 : 'auto',
+				bottom                : 'auto',
+				marginRight           : '-50%',
+				transform             : 'translate(-50%, -50%)'
+			}
+		};
+
+		function onChange(value) {
+			console.log('changed', value);
+			me.setState({edgeWeight: value})
+		}
+
+		function onSwitchChange(checked) {
+			console.log(`switch to ${checked}`);
+			me.setState({drawingExitNodes: checked})
+		}
+
+		return (
+			 <Modal
+				  isOpen={this.state.isConfigurationModalOpen}
+				  onRequestClose={() => this.setState({isConfigurationModalOpen: false})}
+				  style={customStyles}
+				  contentLabel="Add Edge"
+				  ariaHideApp={false}
+			 >
+				 <Row justify={"center"}>
+					 <Col span={20}>
+						 <Switch className={"switch"} checkedChildren="Sal." unCheckedChildren="Cam." defaultChecked onChange={onSwitchChange}/>
+					 </Col>
+				 </Row>
+				 <br/>
+				 <Row>
+					 <InputNumber min={1} max={10} defaultValue={1} onChange={onChange} />
+				 </Row>
+				 <br />
+				 <Row justify={"center"}>
+					 <Button type="primary" icon={<DownloadOutlined />} size={'middle'} onClick={() => {
+					 	localStorage.setItem("edges",JSON.stringify(this.state.edges));
+					 	localStorage.setItem("nodes",JSON.stringify(this.state.nodes));
+					 }} />
+				 </Row>
+			 </Modal>
+		);
 	};
 
 	render() {
@@ -187,10 +233,19 @@ class Board extends Component {
 					                        {this.SVG()}
 				                        </div>
 			                        </Row>
+			                        <Row justify={"center"} align={"middle"}>
+				                        { this.state.editMode && (
+					                            <div onClick={(e) => this.setState({isConfigurationModalOpen: true})}>
+							                        Abrir Configuración
+						                        </div>
+				                            )
+				                        }
+			                        </Row>
 		                        </Col>
 	                        </Row>
                         </div>
 	                    {this.Nodes()}
+	                    {this.ConfigurationModal()}
                     </Content>
                 </Layout>
             </Layout>
