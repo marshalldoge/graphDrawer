@@ -33,113 +33,36 @@ const { SubMenu } = Menu;
 
 class Board extends Component {
 
+	constructor(props) {
+		super(props);
+		this.containerRef = React.createRef();
+		this.getRectsInterval = null;
+	}
+
 	state = {
-		nodes:[],
 		inputType: "node",
 		nodeRadius: 200,
-		data: {
-			nodes: [{ id: "0",x: window.innerWidth/6 - 40, y: window.innerHeight/4 - 40, left: 0, right: 0 }],
-			links: [],
+		nodes: [],
+		edges: [],
+		lastNodeIndex: -1,
+		collapsed: false,
+		nodeStyle: {
+			radius: 20
 		},
-		collapsed: false
+		startEdge: null,
+		containerRect: null
 	};
 
-	//Hide or Show the sider
-	onCollapse = collapsed => {
-		console.log(collapsed);
-		this.setState({ collapsed });
-	};
-
-	// Function that receives a node and returns a JSX view.
-	viewGenerator = node => {
-		let nodeColor;
-		let nodeCtn, bottomCtn, nodeId, leftBlock, rightBlock;
-		nodeColor = node.color ? node.color : "#f6edcf";
-		nodeCtn = {
-			borderRadius: "40px",
-			width: "60px",
-			height: "60px",
-			backgroundColor: nodeColor,
-			fontSize: "15px"
-		};
-		nodeId = {
-			width: "100%",
-			height: "30px",
-			textAlign: "center",
-			paddingTop: "8px"
-		};
-		return (
-			 <div style={nodeCtn}>
-				 <div style={nodeId}>
-					 {node.id}
-				 </div>
-			 </div>
-		);
-
-	};
-
-	treeNode = (node) => {
-		let nodeColor, nodeCtn, nodeId;
-		nodeColor = node.color ? node.color : "#f6edcf";
-		nodeCtn = {
-			borderRadius: "40px",
-			width: "30px",
-			height: "30px",
-			backgroundColor: nodeColor,
-			fontSize: "15px"
-		};
-		nodeId = {
-			width: "100%",
-			height: "30px",
-			textAlign: "center",
-			paddingTop: "8px"
-		};
-		return (
-			 <div style={nodeCtn}>
-				 <div style={nodeId}>
-					 {node.id}
-				 </div>
-			 </div>
-		);
-	};
-
-	myConfig = {
-		//nodeHighlightBehavior: true,
-		linkHighlightBehavior: true,
-		automaticRearrangeAfterDropNode: true,
-		directed: this.state.directed,
-		staticGraph: true,
-		maxZoom: 8.0,
-		d3: {
-			alphaTarget: 0.05,
-			gravity: -500,
-			linkLength: 200,
-			linkStrength: 2
-		},
-		node: {
-			size: 900,
-			fontSize: 20,
-			fontColor: "#3C4655",
-			highlightStrokeColor: "#2E4052",
-			highlightFontSize: 20,
-			highlightFontWeight: "bolder",
-			renderLabel: false,
-			cx: 200,
-			cy:200,
-			viewGenerator: this.viewGenerator,
-		},
-		link: {
-			highlightColor: "lightblue",
-			renderLabel: true,
-			fontWeight: "normal",
-			fontSize: 13,
-			strokeWidth: 6,
-			highlightStrokeColor: "#3C4655",
-			type: "CURVE_SMOOTH"
-		},
-		height: 800,
-		width: window.innerWidth*0.95
-	};
+	componentDidMount() {
+		this.getRectsInterval = setInterval(() => {
+			this.setState(prevState => {
+				const containerRect = this.containerRef.current.getBoundingClientRect();
+				//console.log('cont rect: ',containerRect);
+				prevState.containerRect = containerRect;
+				return prevState;
+			});
+		}, 5000);
+	}
 
 	dfs = (treeNode) => {
 		console.log("DFS At ",treeNode.attributes.value);
@@ -206,96 +129,103 @@ class Board extends Component {
 		return treeNode;
 	};
 
-	addTreeNodeToGraph = () => {
-		let me = this;
-		console.log("Adding tree node");
-		//treeNodeModalInputValue
-		if(this.state.treeArray.length===0){
-			me.setState((prevState) => {
-				prevState.treeData = [
-					{
-						name: "0",
-						attributes: {
-							value: prevState.treeNodeModalInputValue,
-							position: 'right'
-						},
-						nodeSvgShape: {
-							shape: 'circle',
-							shapeProps: {
-								r: 10,
-								fill: this.state.treeNodeColor,
-							},
-						},
-						children: []
-					}
-				];
-				prevState.isTreeNodeModalOpen = false;
-				prevState.treeArray.push(parseInt(prevState.treeNodeModalInputValue));
-				prevState.treeNodeModalInputValue = "";
-				prevState.treeSize = prevState.treeSize + 1;
-				return prevState;
-			});
-		}else{
-			let found = false;
-			for(let i =0; i < this.state.treeArray.length; i++) {
-				if(this.state.treeArray[i]===parseInt(this.state.treeNodeModalInputValue)){
-					found = true;
-				}
-			}
-			if(!found){
-				let tree = this.dfs(this.state.treeData[0]);
-				console.log("Final tree: ",tree);
-				me.setState((prevState) => {
-					prevState.isTreeNodeModalOpen = false;
-					prevState.treeArray.push(parseInt(prevState.treeNodeModalInputValue));
-					prevState.treeNodeModalInputValue = "";
-					prevState.treeSize = prevState.treeSize + 1;
-					prevState.treeData = [tree];
-					return prevState;
-				});
-			}else{
-				me.setState((prevState) => {
-					prevState.isTreeNodeModalOpen = false;
-					prevState.treeNodeModalInputValue = "";
-					return prevState;
-				});
-			}
-		}
+	Lines = () => {
+		return this.state.edges.map((edge, idx) => {
+			const lineStyle = {
+				stroke: "#003152",
+				strokeWidth: 10
+			};
+			return (
+				 <line key={idx} x1={edge.startX} y1={edge.startY} x2={edge.endX} y2={edge.endY} style={lineStyle} />
+			)
+		});
 	};
 
-	Logo = () => {
-		if(this.state.collapsed) {
-			return (
-				 <div className={"logoCtn"}>
-					 <img className={"logoCollapsed"} src={require("../../assets/logos/logoCollapsed.png")}/>
-				 </div>
-			);
-		} else {
-			return (
-				 <div className={"logoCtn"}>
-					 <img className={"logo"} src={require("../../assets/logos/logo.png")}/>
-				 </div>
-			);
-		}
-	};
+	SVG = () => {
 
-	GraphDrawerBoard = () => {
 		return (
-			 <Graph
-				  ref="graph"
-				  id="graph-id" // id is mandatory, if no id is defined rd3g will throw an error
-				  data={this.state.data}
-				  config={this.myConfig}
-				  onClickNode={this.onClickNode}
-				  onRightClickNode={this.onRightClickNode}
-				  onClickGraph={this.createNode}
-				  onClickLink={this.onClickLink}
-				  onRightClickLink={this.onRightClickLink}
-				  onNodePositionChange={this.onNodePositionChange}
-			 />
+			 <svg className={"svg"}>
+				 {this.Lines()}
+			 </svg>
 		)
 	};
 
+	EdgeCreation = (e,node) => {
+		e.stopPropagation();
+		console.log('Clicked node ',node);
+		if(this.state.startEdge === null) {
+			this.setState(prevState => {
+				prevState.startEdge = node;
+				return prevState;
+			})
+		} else {
+			let rect = e.target.getBoundingClientRect();
+			this.setState(prevState => {
+				let endEdge = node;
+				console.log('edge: ',{
+					start: prevState.startEdge.id,
+					end: endEdge.id,
+					startX: prevState.startEdge.x,
+					startY: prevState.startEdge.y,
+					endX: endEdge.x,
+					endY: endEdge.y
+				});
+				console.log('RECT: ',this.state.containerRect);
+				prevState.edges.push(
+					 {
+						 start: prevState.startEdge.id,
+						 end: endEdge.id,
+						 startX: prevState.startEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
+						 startY: prevState.startEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
+						 endX: endEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
+						 endY: endEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2
+					 }
+				);
+				prevState.startEdge = null;
+				console.log("Edges: ",prevState.edges);
+				return prevState;
+			})
+		}
+	};
+
+	Nodes = () => {
+		return this.state.nodes.map((node,idx) => {
+			let nodeStyle = {
+				position:"absolute",
+				top: node.y.toString() + "px",
+				left: node.x.toString() + "px",
+				width: this.state.nodeStyle.radius.toString() + "px",
+				height: this.state.nodeStyle.radius.toString() + "px",
+				zIndex: 10
+			};
+			return (
+				 <div className={"node"} style={nodeStyle} key={idx} onClick={e => this.EdgeCreation(e,node)}>
+
+				 </div>
+			);
+		})
+	};
+
+	createNode = (e) => {
+		var rect = e.target.getBoundingClientRect();
+		let x = e.clientX - this.state.nodeStyle.radius/2;
+		let y = e.clientY - this.state.nodeStyle.radius/2;
+		let me = this;
+		me.setState((prevState) => {
+			console.log("Crating new node");
+			let nodeId =  (prevState.lastNodeIndex+1);
+			prevState.lastNodeIndex = prevState.lastNodeIndex + 1;
+			prevState.nodes.push(
+				 {
+					 id: nodeId,
+					 x: x,
+					 y: y
+				 }
+			);
+			console.log("Creating node, new array: ",prevState.nodes);
+			return prevState;
+		});
+	};
 
 	render() {
 		//console.log("MAIN RETURN :",this.state.competData);
@@ -306,12 +236,16 @@ class Board extends Component {
                         <div className={"mainCtn"}>
 	                        <Row className={"map-ctn"} type="flex" justify="space-around" align="middle">
 		                        <Col className={"map-sub-ctn"} span={23}>
-			                        <div className={"map-image-ctn"}>
-
+			                        <div
+				                         className={"map-image-ctn"} onClick={this.createNode}
+				                         ref={this.containerRef}
+			                        >
+				                        {this.SVG()}
 			                        </div>
 		                        </Col>
 	                        </Row>
                         </div>
+	                    {this.Nodes()}
                     </Content>
                 </Layout>
             </Layout>

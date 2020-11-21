@@ -29,25 +29,28 @@ $orderDefaultColor: #baffff;
   height: 100%;
 }
 .map-image-ctn {
-  background-image: url("https://fm.hunter.cuny.edu/dept/wp-content/uploads/HN4thFloor.png");
+  background-image: url("../../assets/maps/HN4thFloor.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  width: 90vw;
-  height: 90vh;
+  width: 959px;
+  height: 693px;
+}
+.node {
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background-color: #003152;
+}
+.svg {
+  z-index: 20;
+  top: 10vh;
+  left: 10vw;
+  width: 959px;
+  height: 693px;
 }
 .logoCtn {
   text-align: center;
-}
-.logo {
-  height: 40px;
-  width: 150px;
-  margin: 4px;
-}
-.logoCollapsed {
-  height: 40px;
-  width: 40px;
-  margin: 4px;
 }
 .site-layout .site-layout-background {
   background: #fff;
@@ -55,15 +58,4 @@ $orderDefaultColor: #baffff;
 .ReactModal__Overlay {
   opacity: 1;
   transition: opacity 2000ms ease-in-out;
-}
-.assignation {
-  color: $blue
-}
-.messageModalTitle {
-  color: #2C313C;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: lightgray;
-  font-weight: bolder;
-  text-align: center;
 }
