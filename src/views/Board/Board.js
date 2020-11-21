@@ -50,10 +50,17 @@ class Board extends Component {
 			radius: 20
 		},
 		startEdge: null,
-		containerRect: null
+		containerRect: null,
+		addingExitNodes: true
 	};
 
 	componentDidMount() {
+		this.setState(prevState => {
+			const containerRect = this.containerRef.current.getBoundingClientRect();
+			//console.log('cont rect: ',containerRect);
+			prevState.containerRect = containerRect;
+			return prevState;
+		});
 		this.getRectsInterval = setInterval(() => {
 			this.setState(prevState => {
 				const containerRect = this.containerRef.current.getBoundingClientRect();
@@ -63,71 +70,6 @@ class Board extends Component {
 			});
 		}, 5000);
 	}
-
-	dfs = (treeNode) => {
-		console.log("DFS At ",treeNode.attributes.value);
-		console.log("Verifying: ",this.state.treeNodeModalInputValue,"<",treeNode.attributes.value," ?");
-		let posLeft = null;
-		let posRight = null;
-		for(let i = 0; i<treeNode.children.length;i++) {
-			console.log("Checking: ",treeNode.children[i].attributes.position);
-			if (treeNode.children[i].attributes.position === 'right') {
-				posRight = i;
-			}
-			if (treeNode.children[i].attributes.position === 'left') {
-				posLeft = i;
-			}
-		}
-		console.log(posLeft," -- ",posRight );
-		if(parseInt(this.state.treeNodeModalInputValue) < parseInt(treeNode.attributes.value)){
-			//check if it has two chidlren
-			console.log("Going left!");
-			if(posLeft != null) {
-				treeNode.children[posLeft] = this.dfs(treeNode.children[posLeft]);
-			}else{
-				console.log("Found free space left! at idx",treeNode.attributes.value);
-				treeNode.children.unshift( {
-					name: (this.state.treeSize+1).toString(),
-					attributes: {
-						value: this.state.treeNodeModalInputValue,
-						position: 'left'
-					},
-					nodeSvgShape: {
-						shape: 'circle',
-						shapeProps: {
-							r: 10,
-							fill: this.state.treeNodeColor
-						},
-					},
-					children: []
-				});
-			}
-		}else{
-			console.log("Going right!");
-			if(posRight != null) {
-				console.log("There is a right Child already, goingt to it");
-				treeNode.children[posRight] = this.dfs(treeNode.children[posRight]);
-			}else{
-				console.log("Found free space right! at idx",treeNode.attributes.value);
-				treeNode.children.push( {
-					name: (this.state.treeSize+1).toString(),
-					attributes: {
-						value: this.state.treeNodeModalInputValue,
-						position: 'right',
-					},
-					nodeSvgShape: {
-						shape: 'circle',
-						shapeProps: {
-							r: 10,
-							fill: this.state.treeNodeColor,
-						},
-					},
-					children: []
-				});
-			}
-		}
-		return treeNode;
-	};
 
 	Lines = () => {
 		return this.state.edges.map((edge, idx) => {
@@ -219,7 +161,8 @@ class Board extends Component {
 				 {
 					 id: nodeId,
 					 x: x,
-					 y: y
+					 y: y,
+					 exitNode: prevState.addingExitNodes
 				 }
 			);
 			console.log("Creating node, new array: ",prevState.nodes);
@@ -236,12 +179,14 @@ class Board extends Component {
                         <div className={"mainCtn"}>
 	                        <Row className={"map-ctn"} type="flex" justify="space-around" align="middle">
 		                        <Col className={"map-sub-ctn"} span={23}>
-			                        <div
-				                         className={"map-image-ctn"} onClick={this.createNode}
-				                         ref={this.containerRef}
-			                        >
-				                        {this.SVG()}
-			                        </div>
+			                        <Row justify={"center"} align={"middle"}>
+				                        <div
+					                         className={"map-image-ctn"} onClick={this.createNode}
+					                         ref={this.containerRef}
+				                        >
+					                        {this.SVG()}
+				                        </div>
+			                        </Row>
 		                        </Col>
 	                        </Row>
                         </div>
