@@ -5,6 +5,7 @@ $blue: #003152;
 $orderDefaultColor: #baffff;
 .bodyCtn {
   background-color: $background;
+  text-align: center;
 }
 .mainCtn {
   width: 100%;
@@ -15,49 +16,25 @@ $orderDefaultColor: #baffff;
 .boardTitle {
   color: whitesmoke;
 }
-.board {
+.map-ctn {
   background-color: $board;
   border-radius: 10px;
-  height: 500px;
+  height: 98vh;
   border-style: solid;
   border-width: 3px;
   border-color: grey;
+  margin: 5px;
 }
-.graphCtn {
-  //margin: 10px;
-  width: 100%;
+.map-sub-ctn {
   height: 100%;
 }
-.linkLabelInput {
-  border-width: 0 0 1px 0;
-  border-color: red green gray red;
-  border-style: solid;
-  height: 45px;
-  width: 100%;
-  color: #003152;
-  font-weight: 400;
-  font-size: 20px;
-  text-align: center;
-  padding-bottom: 5px;
-}
-.linkLabelInput:focus {
-  outline: none;
-}
-::-webkit-input-placeholder {
-  color: #003152;
-  font-weight: 200;
-  font-size: 20px;
-  vertical-align: top;
-  text-align: center;
-}
-.enterButton {
-  background-color: #003152;
-  color: whitesmoke;
-  font-weight: 400;
-  font-size: 20px;
-  text-align: center;
-  vertical-align: center;
-  cursor: pointer;
+.map-image-ctn {
+  background-image: url("https://fm.hunter.cuny.edu/dept/wp-content/uploads/HN4thFloor.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 90vw;
+  height: 90vh;
 }
 .logoCtn {
   text-align: center;
@@ -75,17 +52,6 @@ $orderDefaultColor: #baffff;
 .site-layout .site-layout-background {
   background: #fff;
 }
-.runButton {
-  background-color: $green;
-  border-color: $green;
-}
-.modalQuestion {
-  color: $blue;
-  font-weight: bolder;
-  font-size: large;
-  font-weight: 400;
-  font-size: 20px;
-}
 .ReactModal__Overlay {
   opacity: 1;
   transition: opacity 2000ms ease-in-out;
@@ -100,32 +66,4 @@ $orderDefaultColor: #baffff;
   border-bottom-color: lightgray;
   font-weight: bolder;
   text-align: center;
-}
-.boardCtn {
-  text-align: center;
-}
-.orderChartCtn {
-  padding-left: 10px;
-  padding-right: 10px;
-}
-.columnCtn {
-  height: 100%;
-}
-.orderBarColumn {
-
-}
-.orderColumnDrawing {
-  width: 25px;
-  box-shadow:
-          0 2.8px 2.2px rgba(0, 0, 0, 0.034),
-          0 6.7px 5.3px rgba(0, 0, 0, 0.048),
-          0 12.5px 10px rgba(0, 0, 0, 0.06),
-          0 22.3px 17.9px rgba(0, 0, 0, 0.072),
-          0 41.8px 33.4px rgba(0, 0, 0, 0.086),
-          0 100px 80px rgba(0, 0, 0, 0.12)
-;
-}
-.orderColumnLabel {
-  font-size: 20px;
-  font-weight: 600;
 }
