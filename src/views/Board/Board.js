@@ -15,7 +15,7 @@ import { noroeste } from '../../algorithms/noroeste';
 import { trees } from '../../algorithms/arboles';
 import { compet } from '../../algorithms/compet';
 import { sort } from '../../algorithms/sort';
-import { getUrlParams } from "../../utils";
+import { getUrlParams, getRandomArbitrary } from "../../utils";
 import { PriorityQueue } from "../../algorithms/PriorityQueue";
 
 const { Title } = Typography;
@@ -54,7 +54,9 @@ class Board extends Component {
 		editMode: false,
 		isConfigurationModalOpen: false,
 		animationState: 0,
-		animationId: null
+		animationId: null,
+		fireScale: [],
+		fireAnimationIds: []
 	};
 
 	componentDidMount() {
@@ -74,9 +76,11 @@ class Board extends Component {
 		}, 5000);
 
 		this.loadGraphData();
+		this.runFireAnimation();
 	}
 
 	loadGraphData = () => {
+		let me = this;
 		this.setState(prevState => {
 			prevState.editMode = getUrlParams("editMode");
 			prevState.nodes = JSON.parse(localStorage.getItem("nodes")) || [];
@@ -88,6 +92,11 @@ class Board extends Component {
 				graph[prevState.nodes[i].id] = [];
 				edgeMap[prevState.nodes[i].id] = [];
 				nodeMap[prevState.nodes[i].id] = prevState.nodes[i];
+				prevState.fireAnimationIds.push(
+					 setInterval(function () {
+						 me.runFireAnimation(prevState.nodes[i].idx);
+					 }, getRandomArbitrary(500,900))
+				);
 			}
 			prevState.nodeMap = nodeMap;
 			for(let  i = 0; i < prevState.edges.length; i++) {
@@ -150,6 +159,14 @@ class Board extends Component {
 		me.setState({animationId: animationId})
 	}
 
+	runFireAnimation(nodeIdx) {
+		let me = this;
+		me.setState(prevState => {
+			prevState.fireScale[nodeIdx] = getRandomArbitrary(30,90);
+			return prevState;
+		});
+	}
+
 
 	Lines = () => {
 		return this.state.edges.map((edge, idx) => {
@@ -168,6 +185,14 @@ class Board extends Component {
 			let nodeStyle = {
 				filter: "url(#displacementFilter)"
 			};
+			let nodeStyle2 = {
+				filter: "url(#displacementFilter2)"
+			};
+			function getNodeStyle(idx) {
+				return {
+					filter: "url(#"+ idx +")"
+				}
+			}
 			let isExit = node.exitNode ? "exit" : "";
 			if (node.fireLevel === 900) {
 				return (
@@ -192,7 +217,7 @@ class Board extends Component {
 						  fillOpacity={"90%"}
 						  strokeOpacity={"60%"}
 						  //className={"node " + isExit}
-						  style={nodeStyle}
+						  style={getNodeStyle(node.idx)}
 						  key={idx}
 						  onClick={e => this.onClickNode(e,node)}
 					 />
@@ -209,7 +234,7 @@ class Board extends Component {
 						  stroke={"red"}
 						  strokeOpacity={"13%"}
 						  //className={"node " + isExit}
-						  style={nodeStyle}
+						  style={getNodeStyle(node.idx)}
 						  key={idx}
 						  onClick={e => this.onClickNode(e,node)}
 					 />
@@ -226,13 +251,27 @@ class Board extends Component {
 						  //stroke={"red"}
 						  //strokeOpacity={"40%"}
 						  //className={"node " + isExit}
-						  style={nodeStyle}
+						  style={getNodeStyle(node.idx)}
 						  key={idx}
 						  onClick={e => this.onClickNode(e,node)}
 					 />
 				);
 			}
 		})
+	};
+
+	getCircleFilters = () => {
+		return this.state.nodes.map((node,idx) => {
+			return (
+				 <filter id={node.idx} key={idx}>
+					 <feTurbulence type="turbulence" baseFrequency="0.09"
+					               numOctaves="6" result="turbulence"/>
+					 <feDisplacementMap in2="turbulence" in="SourceGraphic"
+					                    scale={this.state.fireScale[node.idx]} xChannelSelector="R" yChannelSelector="G"/>
+					 <feComposite operator="in" in="ripples" in2="SourceGraphic"/>
+				 </filter>
+			);
+		});
 	};
 
 	SVG = () => {
@@ -244,12 +283,20 @@ class Board extends Component {
 						 <stop offset="100%" stopColor="rgba(224,80,80,1)" />
 					 </radialGradient>
 					 <filter id="displacementFilter">
-						 <feTurbulence type="turbulence" baseFrequency="0.05"
-						               numOctaves="2" result="turbulence"/>
+						 <feTurbulence type="turbulence" baseFrequency="0.09"
+						               numOctaves="6" result="turbulence"/>
 						 <feDisplacementMap in2="turbulence" in="SourceGraphic"
-						                    scale="30" xChannelSelector="R" yChannelSelector="G"/>
+						                    scale={this.state.fireScale[0]} xChannelSelector="R" yChannelSelector="G"/>
 						 <feComposite operator="in" in="ripples" in2="SourceGraphic"/>
 					 </filter>
+					 <filter id="displacementFilter2">
+						 <feTurbulence type="turbulence" baseFrequency="0.09"
+						               numOctaves="6" result="turbulence"/>
+						 <feDisplacementMap in2="turbulence" in="SourceGraphic"
+						                    scale={this.state.fireScale[1]} xChannelSelector="R" yChannelSelector="G"/>
+						 <feComposite operator="in" in="ripples" in2="SourceGraphic"/>
+					 </filter>
+					 {this.getCircleFilters()}
 					 <radialGradient id="myGradient2" r={"20%"}>
 						 <stop offset="10%" stopColor="gold" />
 						 <stop offset="95%" stopColor="blue" />
