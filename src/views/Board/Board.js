@@ -100,6 +100,7 @@ class Board extends Component {
 	drawPath(commands) {
 		let me = this;
 		if(commands.length > 0) {
+			console.log('Comans to draw path: ',commands);
 			let drawingPathAnimation = setInterval(function () {
 				me.setState((prevState) => {
 					console.log("Animating command", prevState.animationState, commands[prevState.animationState]);
@@ -120,7 +121,10 @@ class Board extends Component {
 						prevState.edges[commands[prevState.animationState].idx] = aux;
 					}
 					prevState.animationState = prevState.animationState + 1;
-					if (prevState.animationState === commands.length) clearInterval(drawingPathAnimation);
+					if (prevState.animationState === commands.length) {
+						prevState.animationState = 0;
+						clearInterval(drawingPathAnimation);
+					}
 					return prevState;
 				})
 
@@ -132,6 +136,7 @@ class Board extends Component {
 		let me = this;
 		let animation = setInterval(function () {
 			me.cleanStyles(me.drawPath(commands));
+			setTimeout(me.cleanStyles(me.drawPath(commands)), 2000);
 		}, 2000);
 	}
 
@@ -221,7 +226,7 @@ class Board extends Component {
 		return res;
 	};
 
-	cleanStyles = (callback) => {
+	cleanStyles(callback){
 		this.setState(prevState => {
 			prevState.nodes = prevState.nodes.map(node => {
 				node.color = node.exitNode ? "#003152" : "#1B7183";
