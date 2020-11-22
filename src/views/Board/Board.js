@@ -97,52 +97,48 @@ class Board extends Component {
 		});
 	}
 
-	runAnimation(commands) {
+	drawPath(commands) {
 		let me = this;
 		if(commands.length > 0) {
-			let animation = setInterval(function () {
+			let drawingPathAnimation = setInterval(function () {
 				me.setState((prevState) => {
-					console.log("Animating command", prevState.animationState);
-					if (commands[prevState.animationState].type === "node") {
+					console.log("Animating command", prevState.animationState, commands[prevState.animationState]);
+					if (commands[prevState.animationState].weight === undefined) {
 						let aux = {
-							...prevState.data.nodes[commands[prevState.animationState].id],
-							color: commands[prevState.animationState].color,
-							left: commands[prevState.animationState].left ? commands[prevState.animationState].left : prevState.data.nodes[commands[prevState.animationState].id].left,
-							right: commands[prevState.animationState].right ? commands[prevState.animationState].right : prevState.data.nodes[commands[prevState.animationState].id].right,
-							nodes: prevState.data.nodes
+							...prevState.nodes[commands[prevState.animationState].idx],
+							color: commands[prevState.animationState].color
 						};
 
 						//console.log("Node to draw PREV: ", aux);
-						prevState.data.nodes[commands[prevState.animationState].id] = aux;
+						prevState.nodes[commands[prevState.animationState].idx] = aux;
 					} else {
-						for (let j = 0; j < prevState.data.links.length; j++) {
-							if (
-								 prevState.data.links[j].source === commands[prevState.animationState].source.toString() &&
-								 prevState.data.links[j].target === commands[prevState.animationState].target.toString()
-							) {
-								let newRo = commands[prevState.animationState].ro !== undefined ? commands[prevState.animationState].ro : (prevState.data.links[j].ro === "" ? 0 : prevState.data.links[j].ro);
-								let newLabel = commands[prevState.animationState].label !== undefined ? commands[prevState.animationState].label : prevState.data.links[j].label.split("(")[0];
-								prevState.data.links[j] = {
-									...prevState.data.links[j],
-									label: newLabel + "(" + newRo + ")",
-									color: commands[prevState.animationState].color
-								}
-							}
-						}
+						let aux = {
+							...prevState.edges[commands[prevState.animationState].idx],
+							color: commands[prevState.animationState].color
+						};
+						console.log("Edge to draw PREV: ", aux);
+						prevState.edges[commands[prevState.animationState].idx] = aux;
 					}
 					prevState.animationState = prevState.animationState + 1;
-					if (prevState.animationState === commands.length) clearInterval(animation);
+					if (prevState.animationState === commands.length) clearInterval(drawingPathAnimation);
 					return prevState;
 				})
 
-			}, 1000);
+			}, 80);
 		}
 	};
+
+	runAnimation(commands) {
+		let me = this;
+		let animation = setInterval(function () {
+			me.cleanStyles(me.drawPath(commands));
+		}, 2000);
+	}
 
 	Lines = () => {
 		return this.state.edges.map((edge, idx) => {
 			const lineStyle = {
-				stroke: "#003152",
+				stroke: edge.color,
 				strokeWidth: 10
 			};
 			return (
@@ -209,8 +205,15 @@ class Board extends Component {
 			}
 			let node = reachedExitNodes[minPos];
 			while(node !== -1) {
-				res.unshift(this.state.nodeMap[node]);
-				res.unshift(parentEdge[node]);
+				res.unshift({
+					...this.state.nodeMap[node],
+					color: "#3DCAB9"
+				});
+				res.unshift(
+					 {
+						 ...parentEdge[node],
+						 color: "#3DCAB9"
+					 });
 				node = p[node];
 			}
 		}
@@ -218,12 +221,28 @@ class Board extends Component {
 		return res;
 	};
 
+	cleanStyles = (callback) => {
+		this.setState(prevState => {
+			prevState.nodes = prevState.nodes.map(node => {
+				node.color = node.exitNode ? "#003152" : "#1B7183";
+				return node;
+			});
+			prevState.edges = prevState.edges.map(edge => {
+				edge.color = "#618186";
+				return edge;
+			});
+			prevState.animationState = 0;
+			return prevState;
+		},callback);
+	};
+
 	onClickNode = (e,node) => {
 		e.stopPropagation();
 		console.log('Clicked node ',node);
 		if(!this.state.editMode) {
 			console.log('not in edit mode');
-			let path = this.getShortestPath(node.id);
+			let commands = this.getShortestPath(node.id);
+			this.runAnimation(commands);
 		}
 		if(this.state.startEdge === null) {
 			this.setState(prevState => {
@@ -243,7 +262,9 @@ class Board extends Component {
 						 startX: prevState.startEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
 						 startY: prevState.startEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
 						 endX: endEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
-						 endY: endEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2
+						 endY: endEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
+						 color: "#618186",
+						 idx: prevState.edges.length
 					 }
 				);
 				prevState.startEdge = null;
@@ -261,6 +282,7 @@ class Board extends Component {
 				left: node.x.toString() + "px",
 				width: this.state.nodeStyle.radius.toString() + "px",
 				height: this.state.nodeStyle.radius.toString() + "px",
+				backgroundColor: node.color,
 				zIndex: 10
 			};
 			let isExit = node.exitNode ? "exit" : "";
@@ -286,7 +308,9 @@ class Board extends Component {
 					 id: nodeId,
 					 x: x,
 					 y: y,
-					 exitNode: prevState.drawingExitNodes
+					 exitNode: prevState.drawingExitNodes,
+					 idx: prevState.nodes.length,
+					 color: prevState.drawingExitNodes ? "#003152" : "#1B7183"
 				 }
 			);
 			console.log("Creating node, new array: ",prevState.nodes);
