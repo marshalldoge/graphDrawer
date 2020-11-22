@@ -61,3 +61,18 @@ $orderDefaultColor: #baffff;
   opacity: 1;
   transition: opacity 2000ms ease-in-out;
 }
+.shape .gradient-bg {
+  fill: url(#header-shape-gradient) #fff;
+}
+.shape {
+  width:500px;
+  height:200px;
+}
+.shape .gradient-bg {
+  fill: url(#header-shape-gradient) #fff;
+}
+
+#header-shape-gradient {
+  --color-stop: #f12c06;
+  --color-bot: #faed34;
+}

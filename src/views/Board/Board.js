@@ -166,33 +166,90 @@ class Board extends Component {
 	Circles = () => {
 		return this.state.nodes.map((node,idx) => {
 			let nodeStyle = {
-				position:"absolute",
-				top: node.y.toString() + "px",
-				left: node.x.toString() + "px",
-				width: this.state.nodeStyle.radius.toString() + "px",
-				height: this.state.nodeStyle.radius.toString() + "px",
-				backgroundColor: node.color,
-				zIndex: 10
+				//filter: "url(#displacementFilter)"
 			};
 			let isExit = node.exitNode ? "exit" : "";
-			return (
-				 <circle
-					  cx={node.x.toString()}
-					  cy={node.y.toString()}
-					  r={this.state.nodeStyle.radius.toString()}
-					  fill={node.color}
-					  //className={"node " + isExit}
-					  style={nodeStyle}
-					  key={idx}
-					  onClick={e => this.onClickNode(e,node)}
-				 />
-			);
+			if (node.fireLevel === 900) {
+				return (
+					 <circle
+						  cx={node.x.toString()}
+						  cy={node.y.toString()}
+						  r={this.state.nodeStyle.radius.toString()}
+						  fill={node.color}
+						  //className={"node " + isExit}
+						  key={idx}
+						  onClick={e => this.onClickNode(e,node)}
+					 />
+				);
+			}
+			if(node.fireLevel < 300) {
+				return (
+					 <circle
+						  cx={node.x.toString()}
+						  cy={node.y.toString()}
+						  r={this.state.nodeStyle.radius.toString()*6}
+						  fill={"url('#myGradient')"}
+						  fillOpacity={"90%"}
+						  strokeWidth={90}
+						  stroke={"red"}
+						  strokeOpacity={"60%"}
+						  //className={"node " + isExit}
+						  style={nodeStyle}
+						  key={idx}
+						  onClick={e => this.onClickNode(e,node)}
+					 />
+				);
+			} else if(node.fireLevel < 600) {
+				return (
+					 <circle
+						  cx={node.x.toString()}
+						  cy={node.y.toString()}
+						  r={this.state.nodeStyle.radius.toString()*4}
+						  fill={"url('#myGradient')"}
+						  fillOpacity={"90%"}
+						  strokeWidth={40}
+						  stroke={"red"}
+						  strokeOpacity={"50%"}
+						  //className={"node " + isExit}
+						  style={nodeStyle}
+						  key={idx}
+						  onClick={e => this.onClickNode(e,node)}
+					 />
+				);
+			} else if(node.fireLevel < 900) {
+				return (
+					 <circle
+						  cx={node.x.toString()}
+						  cy={node.y.toString()}
+						  r={this.state.nodeStyle.radius.toString()*2}
+						  fill={"url('#myGradient')"}
+						  fillOpacity={"90%"}
+						  strokeWidth={20}
+						  stroke={"red"}
+						  strokeOpacity={"40%"}
+						  //className={"node " + isExit}
+						  style={nodeStyle}
+						  key={idx}
+						  onClick={e => this.onClickNode(e,node)}
+					 />
+				);
+			}
 		})
-	}
+	};
 
 	SVG = () => {
 		return (
 			 <svg className={"svg"}>
+				 <defs>
+					 <radialGradient id="myGradient">
+						 <stop offset="1%" stopColor="rgba(246,240,44,1)" />
+						 <stop offset="100%" stopColor="rgba(224,80,80,1)" />
+					 </radialGradient>
+					 <radialGradient id="myGradient2" r={"20%"}>
+						 <stop offset="10%" stopColor="gold" />
+						 <stop offset="95%" stopColor="blue" />
+					 </radialGradient>
+				 </defs>
 				 {this.Lines()}
 				 {this.Circles()}
 			 </svg>
@@ -223,8 +280,8 @@ class Board extends Component {
 			if(this.state.nodeMap[x[1]].exitNode)reachedExitNodes.push(x[1]);
 			for(let i = 0; i < this.state.graph[x[1]].length; i++) {
 				let addedWeight = this.state.graph[x[1]][i][0];
-				let newWeight = d[x[1]] + addedWeight;
 				let destNode = this.state.graph[x[1]][i][1];
+				let newWeight = d[x[1]] + addedWeight + (900 - this.state.nodeMap[destNode].fireLevel);
 				if(d[destNode] > newWeight) {
 					d[destNode] = newWeight;
 					p[destNode] = x[1];
@@ -233,9 +290,6 @@ class Board extends Component {
 				}
 			}
 		}
-		console.log('Dist: ',d);
-		console.log('Exit nodes reached: ',reachedExitNodes);
-		console.log('Parent edges: ',parentEdge);
 		let res = [];
 		if(reachedExitNodes.length > 0) {
 			let minPos = 0;
@@ -260,7 +314,6 @@ class Board extends Component {
 				node = p[node];
 			}
 		}
-		console.log('Path to exit: ',res);
 		return res;
 	};
 
@@ -281,15 +334,14 @@ class Board extends Component {
 
 	onClickNode = (e,node) => {
 		e.stopPropagation();
-		console.log('Clicked node ',node);
 		if(!this.state.editMode) {
-			console.log('not in edit mode');
 			let commands = this.getShortestPath(node.id);
 			this.runAnimation(commands);
 		} else {
 			if(this.state.startEdge === null) {
 				this.setState(prevState => {
-					prevState.startEdge = node;
+					//prevState.startEdge = node;
+					prevState.nodes[node.idx].fireLevel = prevState.nodes[node.idx].fireLevel - 300;
 					return prevState;
 				})
 			} else {
@@ -311,7 +363,6 @@ class Board extends Component {
 						 }
 					);
 					prevState.startEdge = null;
-					console.log("Edges: ",prevState.edges);
 					return prevState;
 				})
 			}
@@ -345,7 +396,6 @@ class Board extends Component {
 		let me = this;
 		if(this.state.editMode) {
 			me.setState((prevState) => {
-				console.log("Crating new node");
 				let nodeId =  (prevState.lastNodeIndex+1);
 				prevState.lastNodeIndex = prevState.lastNodeIndex + 1;
 				prevState.nodes.push(
@@ -355,10 +405,10 @@ class Board extends Component {
 						 y: y,
 						 exitNode: prevState.drawingExitNodes,
 						 idx: prevState.nodes.length,
-						 color: prevState.drawingExitNodes ? "#003152" : "#1B7183"
+						 color: prevState.drawingExitNodes ? "#003152" : "#1B7183",
+						 fireLevel: 900
 					 }
 				);
-				console.log("Creating node, new array: ",prevState.nodes);
 				return prevState;
 			});
 		}
