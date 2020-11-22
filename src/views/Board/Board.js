@@ -212,10 +212,27 @@ class Board extends Component {
 					 <circle
 						  cx={node.x.toString()}
 						  cy={node.y.toString()}
-						  r={this.state.nodeStyle.radius.toString()*5}
+						  r={this.state.nodeStyle.radius.toString()*6}
 						  fill={"url('#myGradient')"}
 						  fillOpacity={"90%"}
 						  strokeOpacity={"60%"}
+						  //className={"node " + isExit}
+						  style={getNodeStyle(node.idx)}
+						  key={idx}
+						  onClick={e => this.onClickNode(e,node)}
+					 />
+				);
+			}else if(node.fireLevel < 450) {
+				return (
+					 <circle
+						  cx={node.x.toString()}
+						  cy={node.y.toString()}
+						  r={this.state.nodeStyle.radius.toString()*5}
+						  fill={"url('#myGradient')"}
+						  fillOpacity={"90%"}
+						  //strokeWidth={20}
+						  //stroke={"red"}
+						  //strokeOpacity={"40%"}
 						  //className={"node " + isExit}
 						  style={getNodeStyle(node.idx)}
 						  key={idx}
@@ -233,6 +250,23 @@ class Board extends Component {
 						  strokeWidth={5}
 						  stroke={"red"}
 						  strokeOpacity={"13%"}
+						  //className={"node " + isExit}
+						  style={getNodeStyle(node.idx)}
+						  key={idx}
+						  onClick={e => this.onClickNode(e,node)}
+					 />
+				);
+			} else if(node.fireLevel < 750) {
+				return (
+					 <circle
+						  cx={node.x.toString()}
+						  cy={node.y.toString()}
+						  r={this.state.nodeStyle.radius.toString()*3}
+						  fill={"url('#myGradient')"}
+						  fillOpacity={"90%"}
+						  //strokeWidth={20}
+						  //stroke={"red"}
+						  //strokeOpacity={"40%"}
 						  //className={"node " + isExit}
 						  style={getNodeStyle(node.idx)}
 						  key={idx}
