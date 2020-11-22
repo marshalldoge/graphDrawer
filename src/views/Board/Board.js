@@ -135,7 +135,7 @@ class Board extends Component {
 	runAnimation(commands) {
 		let me = this;
 		let animation = setInterval(function () {
-			me.cleanStyles(me.drawPath(commands));
+			//me.cleanStyles(me.drawPath(commands));
 			setTimeout(me.cleanStyles(me.drawPath(commands)), 2000);
 		}, 2000);
 	}
