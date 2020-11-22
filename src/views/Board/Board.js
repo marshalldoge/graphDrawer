@@ -149,6 +149,24 @@ class Board extends Component {
 		}
 		console.log('Dist: ',d);
 		console.log('Exit nodes reached: ',reachedExitNodes);
+		let res = [];
+		if(reachedExitNodes.length > 0) {
+			let minPos = 0;
+			let mini = inf;
+			for(let i = 0; i < reachedExitNodes.length; i++) {
+				if(mini > d[reachedExitNodes[i]]){
+					mini = d[reachedExitNodes[i]];
+					minPos = i;
+				}
+			}
+			let node = reachedExitNodes[minPos];
+			while(node !== -1) {
+				res.unshift(node);
+				node = p[node];
+			}
+		}
+		console.log('Path to exit: ',res);
+		return res;
 	};
 
 	onClickNode = (e,node) => {
