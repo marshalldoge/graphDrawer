@@ -155,7 +155,7 @@ class Board extends Component {
 		return this.state.edges.map((edge, idx) => {
 			const lineStyle = {
 				stroke: edge.color,
-				strokeWidth: 10
+				strokeWidth: 7
 			};
 			return (
 				 <line key={idx} x1={edge.startX} y1={edge.startY} x2={edge.endX} y2={edge.endY} style={lineStyle} />
