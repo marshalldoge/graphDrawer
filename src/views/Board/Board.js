@@ -166,7 +166,7 @@ class Board extends Component {
 	Circles = () => {
 		return this.state.nodes.map((node,idx) => {
 			let nodeStyle = {
-				//filter: "url(#displacementFilter)"
+				filter: "url(#displacementFilter)"
 			};
 			let isExit = node.exitNode ? "exit" : "";
 			if (node.fireLevel === 900) {
@@ -187,11 +187,9 @@ class Board extends Component {
 					 <circle
 						  cx={node.x.toString()}
 						  cy={node.y.toString()}
-						  r={this.state.nodeStyle.radius.toString()*6}
+						  r={this.state.nodeStyle.radius.toString()*5}
 						  fill={"url('#myGradient')"}
 						  fillOpacity={"90%"}
-						  strokeWidth={90}
-						  stroke={"red"}
 						  strokeOpacity={"60%"}
 						  //className={"node " + isExit}
 						  style={nodeStyle}
@@ -207,9 +205,9 @@ class Board extends Component {
 						  r={this.state.nodeStyle.radius.toString()*4}
 						  fill={"url('#myGradient')"}
 						  fillOpacity={"90%"}
-						  strokeWidth={40}
+						  strokeWidth={5}
 						  stroke={"red"}
-						  strokeOpacity={"50%"}
+						  strokeOpacity={"13%"}
 						  //className={"node " + isExit}
 						  style={nodeStyle}
 						  key={idx}
@@ -224,9 +222,9 @@ class Board extends Component {
 						  r={this.state.nodeStyle.radius.toString()*2}
 						  fill={"url('#myGradient')"}
 						  fillOpacity={"90%"}
-						  strokeWidth={20}
-						  stroke={"red"}
-						  strokeOpacity={"40%"}
+						  //strokeWidth={20}
+						  //stroke={"red"}
+						  //strokeOpacity={"40%"}
 						  //className={"node " + isExit}
 						  style={nodeStyle}
 						  key={idx}
@@ -245,6 +243,13 @@ class Board extends Component {
 						 <stop offset="1%" stopColor="rgba(246,240,44,1)" />
 						 <stop offset="100%" stopColor="rgba(224,80,80,1)" />
 					 </radialGradient>
+					 <filter id="displacementFilter">
+						 <feTurbulence type="turbulence" baseFrequency="0.05"
+						               numOctaves="2" result="turbulence"/>
+						 <feDisplacementMap in2="turbulence" in="SourceGraphic"
+						                    scale="30" xChannelSelector="R" yChannelSelector="G"/>
+						 <feComposite operator="in" in="ripples" in2="SourceGraphic"/>
+					 </filter>
 					 <radialGradient id="myGradient2" r={"20%"}>
 						 <stop offset="10%" stopColor="gold" />
 						 <stop offset="95%" stopColor="blue" />
