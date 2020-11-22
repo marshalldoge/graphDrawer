@@ -45,7 +45,7 @@ class Board extends Component {
 		lastNodeIndex: -1,
 		collapsed: false,
 		nodeStyle: {
-			radius: 20
+			radius: 10
 		},
 		startEdge: null,
 		edgeWeight: 1,
@@ -163,11 +163,38 @@ class Board extends Component {
 		});
 	};
 
-	SVG = () => {
+	Circles = () => {
+		return this.state.nodes.map((node,idx) => {
+			let nodeStyle = {
+				position:"absolute",
+				top: node.y.toString() + "px",
+				left: node.x.toString() + "px",
+				width: this.state.nodeStyle.radius.toString() + "px",
+				height: this.state.nodeStyle.radius.toString() + "px",
+				backgroundColor: node.color,
+				zIndex: 10
+			};
+			let isExit = node.exitNode ? "exit" : "";
+			return (
+				 <circle
+					  cx={node.x.toString()}
+					  cy={node.y.toString()}
+					  r={this.state.nodeStyle.radius.toString()}
+					  fill={node.color}
+					  //className={"node " + isExit}
+					  style={nodeStyle}
+					  key={idx}
+					  onClick={e => this.onClickNode(e,node)}
+				 />
+			);
+		})
+	}
 
+	SVG = () => {
 		return (
 			 <svg className={"svg"}>
 				 {this.Lines()}
+				 {this.Circles()}
 			 </svg>
 		)
 	};
@@ -275,10 +302,10 @@ class Board extends Component {
 							 end: endEdge.id,
 							 weight: prevState.edgeWeight,
 							 isOut: prevState.drawingExitNodes,
-							 startX: prevState.startEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
-							 startY: prevState.startEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
-							 endX: endEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
-							 endY: endEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
+							 startX: prevState.startEdge.x,
+							 startY: prevState.startEdge.y,
+							 endX: endEdge.x,
+							 endY: endEdge.y,
 							 color: "#618186",
 							 idx: prevState.edges.length
 						 }
@@ -313,26 +340,28 @@ class Board extends Component {
 
 	createNode = (e) => {
 		var rect = e.target.getBoundingClientRect();
-		let x = e.clientX - this.state.nodeStyle.radius/2;
-		let y = e.clientY - this.state.nodeStyle.radius/2;
+		let x = e.clientX - this.state.containerRect.left;
+		let y = e.clientY - this.state.containerRect.top;
 		let me = this;
-		me.setState((prevState) => {
-			console.log("Crating new node");
-			let nodeId =  (prevState.lastNodeIndex+1);
-			prevState.lastNodeIndex = prevState.lastNodeIndex + 1;
-			prevState.nodes.push(
-				 {
-					 id: nodeId,
-					 x: x,
-					 y: y,
-					 exitNode: prevState.drawingExitNodes,
-					 idx: prevState.nodes.length,
-					 color: prevState.drawingExitNodes ? "#003152" : "#1B7183"
-				 }
-			);
-			console.log("Creating node, new array: ",prevState.nodes);
-			return prevState;
-		});
+		if(this.state.editMode) {
+			me.setState((prevState) => {
+				console.log("Crating new node");
+				let nodeId =  (prevState.lastNodeIndex+1);
+				prevState.lastNodeIndex = prevState.lastNodeIndex + 1;
+				prevState.nodes.push(
+					 {
+						 id: nodeId,
+						 x: x,
+						 y: y,
+						 exitNode: prevState.drawingExitNodes,
+						 idx: prevState.nodes.length,
+						 color: prevState.drawingExitNodes ? "#003152" : "#1B7183"
+					 }
+				);
+				console.log("Creating node, new array: ",prevState.nodes);
+				return prevState;
+			});
+		}
 	};
 
 	ConfigurationModal = () => {
@@ -394,7 +423,7 @@ class Board extends Component {
                     <Content style={{ margin: '0 16px' }}>
                         <div className={"mainCtn"}>
 	                        <Row className={"map-ctn"} type="flex" justify="space-around" align="middle">
-		                        <Col className={"map-sub-ctn"} span={23}>
+		                        <Col className={"map-sub-ctn"} span={24}>
 			                        <Row justify={"center"} align={"middle"}>
 				                        <div
 					                         className={"map-image-ctn"} onClick={this.createNode}
@@ -414,7 +443,9 @@ class Board extends Component {
 		                        </Col>
 	                        </Row>
                         </div>
-	                    {this.Nodes()}
+	                    {
+	                    	//this.Nodes()
+	                    }
 	                    {this.ConfigurationModal()}
                     </Content>
                 </Layout>
