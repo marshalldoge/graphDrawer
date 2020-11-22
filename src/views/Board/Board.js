@@ -180,14 +180,32 @@ class Board extends Component {
 		});
 	};
 
+	WaterLines = () => {
+		return this.state.nodes.map((node,idx) => {
+			const lineStyle = {
+				strokeWidth: "3",
+				stroke: "rgba(123,219,255,0.8)",
+				fill: "#fff",
+				opacity: "1"
+			};
+
+			let rainLines = [];
+			let dif = 10;
+			let cnt = 0;
+			for(let i = 0; i < 4; i++) {
+				let move = "M"+(node.x+(5*i))+","+(node.y-10);
+				let line = "L"+(node.x+(5*i)-15)+","+(node.y+10);
+				rainLines.push(
+					 <path key={cnt} className={"path"} style={lineStyle} id="svg_1" d={move+line}/>
+				);
+				cnt++;
+			}
+			return rainLines;
+		});
+	};
+
 	Circles = () => {
 		return this.state.nodes.map((node,idx) => {
-			let nodeStyle = {
-				filter: "url(#displacementFilter)"
-			};
-			let nodeStyle2 = {
-				filter: "url(#displacementFilter2)"
-			};
 			function getNodeStyle(idx) {
 				return {
 					filter: "url(#"+ idx +")"
@@ -338,6 +356,7 @@ class Board extends Component {
 				 </defs>
 				 {this.Lines()}
 				 {this.Circles()}
+				 {this.WaterLines()}
 			 </svg>
 		)
 	};
@@ -388,14 +407,15 @@ class Board extends Component {
 			}
 			let node = reachedExitNodes[minPos];
 			while(node !== -1) {
-				res.unshift({
-					...this.state.nodeMap[node],
-					color: "#3DCAB9"
-				});
+				res.unshift(
+					 {
+						 ...this.state.nodeMap[node],
+						 color: "rgb(29,188,142)"
+					 });
 				res.unshift(
 					 {
 						 ...parentEdge[node],
-						 color: "#3DCAB9"
+						 color: "rgb(29,188,142)"
 					 });
 				node = p[node];
 			}
