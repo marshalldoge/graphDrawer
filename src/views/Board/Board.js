@@ -40,6 +40,7 @@ class Board extends Component {
 		nodes: [],
 		nodeMap: {},
 		edges: [],
+		edgeMap: [],
 		graph: {},
 		lastNodeIndex: -1,
 		collapsed: false,
@@ -51,7 +52,8 @@ class Board extends Component {
 		containerRect: null,
 		drawingExitNodes: true,
 		editMode: false,
-		isConfigurationModalOpen: false
+		isConfigurationModalOpen: false,
+		animationState: 0
 	};
 
 	componentDidMount() {
@@ -75,20 +77,67 @@ class Board extends Component {
 			prevState.edges = JSON.parse(localStorage.getItem("edges")) || [];
 			let graph = {};
 			let nodeMap = {};
+			let edgeMap = {};
 			for(let  i = 0; i < prevState.nodes.length; i++) {
 				graph[prevState.nodes[i].id] = [];
+				edgeMap[prevState.nodes[i].id] = [];
 				nodeMap[prevState.nodes[i].id] = prevState.nodes[i];
 			}
 			prevState.nodeMap = nodeMap;
 			for(let  i = 0; i < prevState.edges.length; i++) {
 				//if(graph[prevState.edges[i].start] === undefined) graph[prevState.edges[i].start] = [];
 				//if(graph[prevState.edges[i].end] === undefined) graph[prevState.edges[i].start] = [];
+				edgeMap[prevState.edges[i].start].push(prevState.edges[i]);
+				edgeMap[prevState.edges[i].end].push(prevState.edges[i]);
 				graph[prevState.edges[i].start].push([prevState.edges[i].weight,prevState.edges[i].end]);
 				graph[prevState.edges[i].end].push([prevState.edges[i].weight,prevState.edges[i].start]);
 			}
+			prevState.edgeMap = edgeMap;
 			prevState.graph = graph;
 		});
 	}
+
+	runAnimation(commands) {
+		let me = this;
+		if(commands.length > 0) {
+			let animation = setInterval(function () {
+				me.setState((prevState) => {
+					console.log("Animating command", prevState.animationState);
+					if (commands[prevState.animationState].type === "node") {
+						let aux = {
+							...prevState.data.nodes[commands[prevState.animationState].id],
+							color: commands[prevState.animationState].color,
+							left: commands[prevState.animationState].left ? commands[prevState.animationState].left : prevState.data.nodes[commands[prevState.animationState].id].left,
+							right: commands[prevState.animationState].right ? commands[prevState.animationState].right : prevState.data.nodes[commands[prevState.animationState].id].right,
+							nodes: prevState.data.nodes
+						};
+
+						//console.log("Node to draw PREV: ", aux);
+						prevState.data.nodes[commands[prevState.animationState].id] = aux;
+					} else {
+						for (let j = 0; j < prevState.data.links.length; j++) {
+							if (
+								 prevState.data.links[j].source === commands[prevState.animationState].source.toString() &&
+								 prevState.data.links[j].target === commands[prevState.animationState].target.toString()
+							) {
+								let newRo = commands[prevState.animationState].ro !== undefined ? commands[prevState.animationState].ro : (prevState.data.links[j].ro === "" ? 0 : prevState.data.links[j].ro);
+								let newLabel = commands[prevState.animationState].label !== undefined ? commands[prevState.animationState].label : prevState.data.links[j].label.split("(")[0];
+								prevState.data.links[j] = {
+									...prevState.data.links[j],
+									label: newLabel + "(" + newRo + ")",
+									color: commands[prevState.animationState].color
+								}
+							}
+						}
+					}
+					prevState.animationState = prevState.animationState + 1;
+					if (prevState.animationState === commands.length) clearInterval(animation);
+					return prevState;
+				})
+
+			}, 1000);
+		}
+	};
 
 	Lines = () => {
 		return this.state.edges.map((edge, idx) => {
@@ -119,36 +168,35 @@ class Board extends Component {
 					 return a[0] > b[0];
 				 }
 			 };
-		let d = [],p = [];
+		let d = [],p = [], parentEdge = [];
 		let reachedExitNodes = [];
 		let inf = 9999999999;
 		for(let i = 0; i < this.state.nodes.length; i++) {
 			d.push(inf);
 			p.push(-1);
+			parentEdge.push(null);
 		}
 		let pq = new PriorityQueue(comparator);
 		d[initNode] = 0;
 		pq.push([0,initNode]);
-		console.log('Size of pq: ',pq.size());
-		console.log('Graph: ',this.state.graph);
 		while(pq.size() !== 0) {
 			let x = pq.pop();
 			if(this.state.nodeMap[x[1]].exitNode)reachedExitNodes.push(x[1]);
-			console.log('Poped value: ',x);
 			for(let i = 0; i < this.state.graph[x[1]].length; i++) {
 				let addedWeight = this.state.graph[x[1]][i][0];
 				let newWeight = d[x[1]] + addedWeight;
 				let destNode = this.state.graph[x[1]][i][1];
-				console.log('Triying to go to: ',destNode);
 				if(d[destNode] > newWeight) {
 					d[destNode] = newWeight;
 					p[destNode] = x[1];
+					parentEdge[destNode] = this.state.edgeMap[x[1]][i];
 					pq.push([newWeight,destNode]);
 				}
 			}
 		}
 		console.log('Dist: ',d);
 		console.log('Exit nodes reached: ',reachedExitNodes);
+		console.log('Parent edges: ',parentEdge);
 		let res = [];
 		if(reachedExitNodes.length > 0) {
 			let minPos = 0;
@@ -161,7 +209,8 @@ class Board extends Component {
 			}
 			let node = reachedExitNodes[minPos];
 			while(node !== -1) {
-				res.unshift(node);
+				res.unshift(this.state.nodeMap[node]);
+				res.unshift(parentEdge[node]);
 				node = p[node];
 			}
 		}
