@@ -15,7 +15,8 @@ import { noroeste } from '../../algorithms/noroeste';
 import { trees } from '../../algorithms/arboles';
 import { compet } from '../../algorithms/compet';
 import { sort } from '../../algorithms/sort';
-import {getUrlParams} from "../../utils";
+import { getUrlParams } from "../../utils";
+import { PriorityQueue } from "../../algorithms/PriorityQueue";
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
@@ -37,7 +38,9 @@ class Board extends Component {
 		inputType: "node",
 		nodeRadius: 200,
 		nodes: [],
+		nodeMap: {},
 		edges: [],
+		graph: {},
 		lastNodeIndex: -1,
 		collapsed: false,
 		nodeStyle: {
@@ -66,10 +69,24 @@ class Board extends Component {
 				return prevState;
 			});
 		}, 5000);
-		this.setState({
-			editMode: getUrlParams("editMode"),
-			nodes: JSON.parse(localStorage.getItem("nodes")),
-			edges: JSON.parse(localStorage.getItem("edges"))
+		this.setState(prevState => {
+			prevState.editMode = getUrlParams("editMode");
+			prevState.nodes = JSON.parse(localStorage.getItem("nodes")) || [];
+			prevState.edges = JSON.parse(localStorage.getItem("edges")) || [];
+			let graph = {};
+			let nodeMap = {};
+			for(let  i = 0; i < prevState.nodes.length; i++) {
+				graph[prevState.nodes[i].id] = [];
+				nodeMap[prevState.nodes[i].id] = prevState.nodes[i];
+			}
+			prevState.nodeMap = nodeMap;
+			for(let  i = 0; i < prevState.edges.length; i++) {
+				//if(graph[prevState.edges[i].start] === undefined) graph[prevState.edges[i].start] = [];
+				//if(graph[prevState.edges[i].end] === undefined) graph[prevState.edges[i].start] = [];
+				graph[prevState.edges[i].start].push([prevState.edges[i].weight,prevState.edges[i].end]);
+				graph[prevState.edges[i].end].push([prevState.edges[i].weight,prevState.edges[i].start]);
+			}
+			prevState.graph = graph;
 		});
 	}
 
@@ -94,9 +111,53 @@ class Board extends Component {
 		)
 	};
 
-	EdgeCreation = (e,node) => {
+	getShortestPath = (initNode) => {
+		let comparator = (a,b) => {
+				 if (a[0] === b[0]) {
+					 return a[1] > b[1];
+				 } else {
+					 return a[0] > b[0];
+				 }
+			 };
+		let d = [],p = [];
+		let reachedExitNodes = [];
+		let inf = 9999999999;
+		for(let i = 0; i < this.state.nodes.length; i++) {
+			d.push(inf);
+			p.push(-1);
+		}
+		let pq = new PriorityQueue(comparator);
+		d[initNode] = 0;
+		pq.push([0,initNode]);
+		console.log('Size of pq: ',pq.size());
+		console.log('Graph: ',this.state.graph);
+		while(pq.size() !== 0) {
+			let x = pq.pop();
+			if(this.state.nodeMap[x[1]].exitNode)reachedExitNodes.push(x[1]);
+			console.log('Poped value: ',x);
+			for(let i = 0; i < this.state.graph[x[1]].length; i++) {
+				let addedWeight = this.state.graph[x[1]][i][0];
+				let newWeight = d[x[1]] + addedWeight;
+				let destNode = this.state.graph[x[1]][i][1];
+				console.log('Triying to go to: ',destNode);
+				if(d[destNode] > newWeight) {
+					d[destNode] = newWeight;
+					p[destNode] = x[1];
+					pq.push([newWeight,destNode]);
+				}
+			}
+		}
+		console.log('Dist: ',d);
+		console.log('Exit nodes reached: ',reachedExitNodes);
+	};
+
+	onClickNode = (e,node) => {
 		e.stopPropagation();
 		console.log('Clicked node ',node);
+		if(!this.state.editMode) {
+			console.log('not in edit mode');
+			let path = this.getShortestPath(node.id);
+		}
 		if(this.state.startEdge === null) {
 			this.setState(prevState => {
 				prevState.startEdge = node;
@@ -135,8 +196,9 @@ class Board extends Component {
 				height: this.state.nodeStyle.radius.toString() + "px",
 				zIndex: 10
 			};
+			let isExit = node.exitNode ? "exit" : "";
 			return (
-				 <div className={"node"} style={nodeStyle} key={idx} onClick={e => this.EdgeCreation(e,node)}>
+				 <div className={"node " + isExit} style={nodeStyle} key={idx} onClick={e => this.onClickNode(e,node)}>
 
 				 </div>
 			);
@@ -198,7 +260,7 @@ class Board extends Component {
 			 >
 				 <Row justify={"center"}>
 					 <Col span={20}>
-						 <Switch className={"switch"} checkedChildren="Sal." unCheckedChildren="Cam." defaultChecked onChange={onSwitchChange}/>
+						 <Switch className={"switch"} checkedChildren="Sal." unCheckedChildren="Cam." checked={this.state.drawingExitNodes} onChange={onSwitchChange}/>
 					 </Col>
 				 </Row>
 				 <br/>

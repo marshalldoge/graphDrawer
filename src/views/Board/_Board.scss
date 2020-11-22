@@ -40,7 +40,10 @@ $orderDefaultColor: #baffff;
   width: 10px;
   height: 10px;
   border-radius: 10px;
-  background-color: #003152;
+  background-color: #1B7183;
+  &.exit {
+    background-color: #003152;
+  }
 }
 .svg {
   z-index: 20;
