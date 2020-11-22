@@ -18,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="267">
-              <caret line="137" column="14" selection-start-line="137" selection-start-column="14" selection-end-line="137" selection-end-column="14" />
+            <state relative-caret-position="324">
+              <caret line="148" column="17" lean-forward="true" selection-start-line="148" selection-start-column="17" selection-end-line="148" selection-end-column="17" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -266,12 +266,12 @@
       <workItem from="1603758799573" duration="276000" />
       <workItem from="1605905623390" duration="107000" />
       <workItem from="1605959103759" duration="2329000" />
-      <workItem from="1605981755931" duration="13627000" />
+      <workItem from="1605981755931" duration="14875000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="176246000" />
+    <option name="totallyTimeSpent" value="177494000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="803" extended-state="0" />
@@ -292,7 +292,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="GraphQL" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.35539567" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.074820146" />
       <window_info anchor="bottom" id="Messages" order="12" />
       <window_info anchor="bottom" id="TypeScript" order="13" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -513,8 +513,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/views/Board/Board.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="267">
-          <caret line="137" column="14" selection-start-line="137" selection-start-column="14" selection-end-line="137" selection-end-column="14" />
+        <state relative-caret-position="324">
+          <caret line="148" column="17" lean-forward="true" selection-start-line="148" selection-start-column="17" selection-end-line="148" selection-end-column="17" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>

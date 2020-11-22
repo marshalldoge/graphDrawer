@@ -53,7 +53,8 @@ class Board extends Component {
 		drawingExitNodes: true,
 		editMode: false,
 		isConfigurationModalOpen: false,
-		animationState: 0
+		animationState: 0,
+		animationId: null
 	};
 
 	componentDidMount() {
@@ -71,6 +72,11 @@ class Board extends Component {
 				return prevState;
 			});
 		}, 5000);
+
+		this.loadGraphData();
+	}
+
+	loadGraphData = () => {
 		this.setState(prevState => {
 			prevState.editMode = getUrlParams("editMode");
 			prevState.nodes = JSON.parse(localStorage.getItem("nodes")) || [];
@@ -95,15 +101,15 @@ class Board extends Component {
 			prevState.edgeMap = edgeMap;
 			prevState.graph = graph;
 		});
-	}
+	};
 
 	drawPath(commands) {
 		let me = this;
 		if(commands.length > 0) {
-			console.log('Comans to draw path: ',commands);
+			//console.log('Comans to draw path: ',commands);
 			let drawingPathAnimation = setInterval(function () {
 				me.setState((prevState) => {
-					console.log("Animating command", prevState.animationState, commands[prevState.animationState]);
+					//console.log("Animating command", prevState.animationState, commands[prevState.animationState]);
 					if (commands[prevState.animationState].weight === undefined) {
 						let aux = {
 							...prevState.nodes[commands[prevState.animationState].idx],
@@ -117,7 +123,7 @@ class Board extends Component {
 							...prevState.edges[commands[prevState.animationState].idx],
 							color: commands[prevState.animationState].color
 						};
-						console.log("Edge to draw PREV: ", aux);
+						//console.log("Edge to draw PREV: ", aux);
 						prevState.edges[commands[prevState.animationState].idx] = aux;
 					}
 					prevState.animationState = prevState.animationState + 1;
@@ -134,11 +140,16 @@ class Board extends Component {
 
 	runAnimation(commands) {
 		let me = this;
-		let animation = setInterval(function () {
+		if (this.state.animationId) {
+			clearInterval(this.state.animationId);
+		}
+		let animationId = setInterval(function () {
 			//me.cleanStyles(me.drawPath(commands));
 			setTimeout(me.cleanStyles(me.drawPath(commands)), 2000);
 		}, 2000);
+		me.setState({animationId: animationId})
 	}
+
 
 	Lines = () => {
 		return this.state.edges.map((edge, idx) => {
@@ -248,34 +259,35 @@ class Board extends Component {
 			console.log('not in edit mode');
 			let commands = this.getShortestPath(node.id);
 			this.runAnimation(commands);
-		}
-		if(this.state.startEdge === null) {
-			this.setState(prevState => {
-				prevState.startEdge = node;
-				return prevState;
-			})
 		} else {
-			let rect = e.target.getBoundingClientRect();
-			this.setState(prevState => {
-				let endEdge = node;
-				prevState.edges.push(
-					 {
-						 start: prevState.startEdge.id,
-						 end: endEdge.id,
-						 weight: prevState.edgeWeight,
-						 isOut: prevState.drawingExitNodes,
-						 startX: prevState.startEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
-						 startY: prevState.startEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
-						 endX: endEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
-						 endY: endEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
-						 color: "#618186",
-						 idx: prevState.edges.length
-					 }
-				);
-				prevState.startEdge = null;
-				console.log("Edges: ",prevState.edges);
-				return prevState;
-			})
+			if(this.state.startEdge === null) {
+				this.setState(prevState => {
+					prevState.startEdge = node;
+					return prevState;
+				})
+			} else {
+				let rect = e.target.getBoundingClientRect();
+				this.setState(prevState => {
+					let endEdge = node;
+					prevState.edges.push(
+						 {
+							 start: prevState.startEdge.id,
+							 end: endEdge.id,
+							 weight: prevState.edgeWeight,
+							 isOut: prevState.drawingExitNodes,
+							 startX: prevState.startEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
+							 startY: prevState.startEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
+							 endX: endEdge.x - this.state.containerRect.left + this.state.nodeStyle.radius/2,
+							 endY: endEdge.y - this.state.containerRect.top + this.state.nodeStyle.radius/2,
+							 color: "#618186",
+							 idx: prevState.edges.length
+						 }
+					);
+					prevState.startEdge = null;
+					console.log("Edges: ",prevState.edges);
+					return prevState;
+				})
+			}
 		}
 	};
 
