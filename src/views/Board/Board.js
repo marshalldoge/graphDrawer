@@ -45,7 +45,7 @@ class Board extends Component {
 		lastNodeIndex: -1,
 		collapsed: false,
 		nodeStyle: {
-			radius: 10
+			radius: 8
 		},
 		startEdge: null,
 		edgeWeight: 1,
@@ -97,6 +97,7 @@ class Board extends Component {
 						 me.runFireAnimation(prevState.nodes[i].idx);
 					 }, getRandomArbitrary(500,900))
 				);
+				prevState.lastNodeIndex = Math.max(prevState.lastNodeIndex, prevState.nodes[i].id);
 			}
 			prevState.nodeMap = nodeMap;
 			for(let  i = 0; i < prevState.edges.length; i++) {
@@ -172,19 +173,28 @@ class Board extends Component {
 		return this.state.edges.map((edge, idx) => {
 			const lineStyle = {
 				stroke: edge.color,
-				strokeWidth: 7
+				strokeWidth: 7,
+				strokeOpacity: "70%"
 			};
 			return (
-				 <line key={idx} x1={edge.startX} y1={edge.startY} x2={edge.endX} y2={edge.endY} style={lineStyle} />
+				 <line
+					  key={idx}
+					  x1={edge.startX}
+					  y1={edge.startY}
+					  x2={edge.endX}
+					  y2={edge.endY}
+					  style={lineStyle}
+				 />
 			)
 		});
 	};
 
 	WaterLines = () => {
 		return this.state.nodes.map((node,idx) => {
+			if(!node.water) return null;
 			const lineStyle = {
 				strokeWidth: "3",
-				stroke: "rgba(123,219,255,0.8)",
+				stroke: "url(#waterGradient)",
 				fill: "#fff",
 				opacity: "1"
 			};
@@ -196,7 +206,14 @@ class Board extends Component {
 				let move = "M"+(node.x+(5*i))+","+(node.y-10);
 				let line = "L"+(node.x+(5*i)-15)+","+(node.y+10);
 				rainLines.push(
-					 <path key={cnt} className={"path"} style={lineStyle} id="svg_1" d={move+line}/>
+					 <path
+						  key={cnt}
+						  className={"path"}
+						  style={lineStyle}
+						  id="svg_1"
+						  d={move+line}
+						  //filter={"url(#waterFilter)"}
+					 />
 				);
 				cnt++;
 			}
@@ -219,6 +236,7 @@ class Board extends Component {
 						  cy={node.y.toString()}
 						  r={this.state.nodeStyle.radius.toString()}
 						  fill={node.color}
+						  fillOpacity={"80%"}
 						  //className={"node " + isExit}
 						  key={idx}
 						  onClick={e => this.onClickNode(e,node)}
@@ -318,9 +336,14 @@ class Board extends Component {
 				 <filter id={node.idx} key={idx}>
 					 <feTurbulence type="turbulence" baseFrequency="0.09"
 					               numOctaves="6" result="turbulence"/>
-					 <feDisplacementMap in2="turbulence" in="SourceGraphic"
-					                    scale={this.state.fireScale[node.idx]} xChannelSelector="R" yChannelSelector="G"/>
-					 <feComposite operator="in" in="ripples" in2="SourceGraphic"/>
+					 <feDisplacementMap in="SourceGraphic" in2="turbulence"
+					                    scale={this.state.fireScale[node.idx]}
+					                    xChannelSelector="R" yChannelSelector="G"
+					                    result={"map"}
+					 />
+					 <feComposite operator="in" in="map" in2="SourceGraphic" result={"comp"}/>
+					 <feBlend mode="multiply" in="comp" result="blend" />
+
 				 </filter>
 			);
 		});
@@ -334,6 +357,10 @@ class Board extends Component {
 						 <stop offset="1%" stopColor="rgba(246,240,44,1)" />
 						 <stop offset="100%" stopColor="rgba(224,80,80,1)" />
 					 </radialGradient>
+					 <radialGradient id="waterGradient">
+						 <stop offset="1%" stopColor="rgba(117,200,240,1)" />
+						 <stop offset="100%" stopColor="rgba(80,136,224,1)" />
+					 </radialGradient>
 					 <filter id="displacementFilter">
 						 <feTurbulence type="turbulence" baseFrequency="0.09"
 						               numOctaves="6" result="turbulence"/>
@@ -341,7 +368,7 @@ class Board extends Component {
 						                    scale={this.state.fireScale[0]} xChannelSelector="R" yChannelSelector="G"/>
 						 <feComposite operator="in" in="ripples" in2="SourceGraphic"/>
 					 </filter>
-					 <filter id="displacementFilter2">
+					 <filter id="waterFilter">
 						 <feTurbulence type="turbulence" baseFrequency="0.09"
 						               numOctaves="6" result="turbulence"/>
 						 <feDisplacementMap in2="turbulence" in="SourceGraphic"
@@ -356,7 +383,9 @@ class Board extends Component {
 				 </defs>
 				 {this.Lines()}
 				 {this.Circles()}
-				 {this.WaterLines()}
+				 {
+				 	this.WaterLines()
+				 }
 			 </svg>
 		)
 	};
@@ -446,8 +475,9 @@ class Board extends Component {
 		} else {
 			if(this.state.startEdge === null) {
 				this.setState(prevState => {
-					//prevState.startEdge = node;
-					prevState.nodes[node.idx].fireLevel = prevState.nodes[node.idx].fireLevel - 300;
+					prevState.startEdge = node;
+					//prevState.nodes[node.idx].fireLevel = prevState.nodes[node.idx].fireLevel - 100;
+					//prevState.nodes[node.idx].water = true;
 					return prevState;
 				})
 			} else {
@@ -512,7 +542,8 @@ class Board extends Component {
 						 exitNode: prevState.drawingExitNodes,
 						 idx: prevState.nodes.length,
 						 color: prevState.drawingExitNodes ? "#003152" : "#1B7183",
-						 fireLevel: 900
+						 fireLevel: 900,
+						 water: false
 					 }
 				);
 				return prevState;
