@@ -59,7 +59,9 @@ class Board extends Component {
 		animationState: 0,
 		animationId: null,
 		fireScale: [],
-		fireAnimationIds: []
+		fireAnimationIds: [],
+		currentRootNode: null,
+		animationCommands: null
 	};
 
 	componentDidMount() {
@@ -131,16 +133,29 @@ class Board extends Component {
 								prevState.nodes[i] = {
 									...prevState.nodes[i],
 									...sensor,
-									color: "red"
+									//color: "red"
 								};
 								prevState.nodeMap[node.id] = {
 									...prevState.nodeMap[node.id],
 									...sensor,
-									color: "red"
+									//color: "red"
 								};
 							}
 					    }
 				    }
+
+			 		// todo: Update path is fire changes
+			 		/*
+			 		if(prevState.currentRootNode !== null) {
+					    let commands = me.getShortestPath(prevState.currentRootNode);
+					    let newExitNode = commands[commands.length-1].id;
+					    if(prevState.animationCommands[prevState.animationCommands.length-1].id !== newExitNode) {
+					    	console.log('Exit node updated: from',prevState.animationCommands[prevState.animationCommands.length-1].id,' to ',newExitNode);
+						    me.getPathAndRunAnimation(prevState.currentRootNode);
+					    }
+				    }
+
+			 		 */
 			 		return prevState;
 			    });
 			 });
@@ -505,12 +520,20 @@ class Board extends Component {
 		},callback);
 	};
 
+	getPathAndRunAnimation(node) {
+		let commands = this.getShortestPath(node.id);
+		console.log('Commands: ',commands);
+		this.setState({
+			currentRootNode: node.id,
+			animationCommands: commands
+		});
+		this.runAnimation(commands);
+	}
+
 	onClickNode = (e,node) => {
 		e.stopPropagation();
 		if(!this.state.editMode) {
-			let commands = this.getShortestPath(node.id);
-			console.log('Commands: ',commands);
-			this.runAnimation(commands);
+			this.getPathAndRunAnimation(node);
 		} else {
 			if(this.state.startEdge === null) {
 				this.setState(prevState => {
