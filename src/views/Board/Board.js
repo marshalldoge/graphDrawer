@@ -13,6 +13,7 @@ import { getUrlParams, getRandomArbitrary } from "../../utils";
 import { PriorityQueue } from "../../algorithms/PriorityQueue";
 import 'firebase/firestore';
 import firebase from '../../Firebase';
+const { Content } = Layout;
 
 const firestore = firebase.firestore();
 
