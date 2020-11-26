@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Row, Col, InputNumber, Typography, Button, Menu, Layout, Switch} from 'antd';
+import {Row, Col, InputNumber, Typography, Button, Menu, Layout, Switch, message} from 'antd';
 import {
 	DownloadOutlined,
 } from '@ant-design/icons';
@@ -17,6 +17,8 @@ import { compet } from '../../algorithms/compet';
 import { sort } from '../../algorithms/sort';
 import { getUrlParams, getRandomArbitrary } from "../../utils";
 import { PriorityQueue } from "../../algorithms/PriorityQueue";
+import 'firebase/firestore';
+import firebase from '../../Firebase';
 
 const { Title } = Typography;
 const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
@@ -25,6 +27,7 @@ const SelfLoopLabels = React.lazy(() => import("../../components/SelfLoopLabels/
 const TreeNode = React.lazy(() => import("../../components/TreeNode/TreeNode"));
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
+const firestore = firebase.firestore();
 
 class Board extends Component {
 
@@ -110,7 +113,32 @@ class Board extends Component {
 			}
 			prevState.edgeMap = edgeMap;
 			prevState.graph = graph;
-		});
+		},this.setFirestoreWebHook);
+	};
+
+	setFirestoreWebHook = () => {
+		let me = this;
+		firestore.collection("sensors")
+			 .orderBy("id","asc")
+			 .limit(25)
+			 .onSnapshot(function(querySnapshot) {
+			 	me.setState(prevState => {
+			 		for(let i = 0; i < prevState.nodes.length; i++) {
+			 			let node = prevState.nodes[i];
+					    for(let j = 0; j < querySnapshot.docs.length; j++) {
+						    let sensor = querySnapshot.docs[j].data();
+							if(node.id === sensor.id) {
+								prevState.nodes[i] = {
+									...prevState.nodes[i],
+									...sensor,
+									color: "red"
+								};
+							}
+					    }
+				    }
+			 		return prevState;
+			    });
+			 });
 	};
 
 	drawPath(commands) {
@@ -202,9 +230,9 @@ class Board extends Component {
 			let rainLines = [];
 			let dif = 10;
 			let cnt = 0;
-			for(let i = 0; i < 4; i++) {
-				let move = "M"+(node.x+(5*i))+","+(node.y-10);
-				let line = "L"+(node.x+(5*i)-15)+","+(node.y+10);
+			for(let i = 0; i < 6; i++) {
+				let move = "M"+(node.x+(5*i)-5)+","+(node.y-15);
+				let line = "L"+(node.x+(5*i)-20)+","+(node.y+15);
 				rainLines.push(
 					 <path
 						  key={cnt}
@@ -229,7 +257,7 @@ class Board extends Component {
 				}
 			}
 			let isExit = node.exitNode ? "exit" : "";
-			if (node.fireLevel === 900) {
+			if (node.fireLevel >= 900) {
 				return (
 					 <circle
 						  cx={node.x.toString()}
@@ -424,6 +452,8 @@ class Board extends Component {
 				}
 			}
 		}
+
+		console.log('Parent: ',p);
 		let res = [];
 		if(reachedExitNodes.length > 0) {
 			let minPos = 0;
@@ -441,6 +471,7 @@ class Board extends Component {
 						 ...this.state.nodeMap[node],
 						 color: "rgb(29,188,142)"
 					 });
+				console.log('Addint parentEdge: ',parentEdge[node]);
 				res.unshift(
 					 {
 						 ...parentEdge[node],
@@ -448,6 +479,8 @@ class Board extends Component {
 					 });
 				node = p[node];
 			}
+		} else {
+			message.error("No hay caminos seguros. Acércate a una ventana y llama a los bomberos.")
 		}
 		return res;
 	};
@@ -477,7 +510,7 @@ class Board extends Component {
 				this.setState(prevState => {
 					prevState.startEdge = node;
 					//prevState.nodes[node.idx].fireLevel = prevState.nodes[node.idx].fireLevel - 100;
-					//prevState.nodes[node.idx].water = true;
+					//prevState.nodes[node.idx].water = false;
 					return prevState;
 				})
 			} else {
@@ -498,6 +531,7 @@ class Board extends Component {
 							 idx: prevState.edges.length
 						 }
 					);
+					console.log("Edges: ",prevState.edges);
 					prevState.startEdge = null;
 					return prevState;
 				})
@@ -543,9 +577,11 @@ class Board extends Component {
 						 idx: prevState.nodes.length,
 						 color: prevState.drawingExitNodes ? "#003152" : "#1B7183",
 						 fireLevel: 900,
-						 water: false
+						 water: false,
+						 temperature: 0
 					 }
 				);
+				console.log('Nodes: ',prevState.nodes);
 				return prevState;
 			});
 		}
@@ -589,7 +625,7 @@ class Board extends Component {
 				 </Row>
 				 <br/>
 				 <Row>
-					 <InputNumber min={1} max={10} defaultValue={1} onChange={onChange} />
+					 <InputNumber min={1} max={10} value={this.state.edgeWeight} onChange={onChange} />
 				 </Row>
 				 <br />
 				 <Row justify={"center"}>
