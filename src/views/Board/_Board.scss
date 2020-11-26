@@ -18,7 +18,7 @@ $orderDefaultColor: #baffff;
 .map-ctn {
   background-color: $board;
   border-radius: 10px;
-  height: 98vh;
+  height: 96vh;
   border-style: solid;
   border-width: 3px;
   //border-color: grey;
@@ -70,4 +70,7 @@ $orderDefaultColor: #baffff;
   to {
     stroke-dashoffset: -50;
   }
+}
+.conf-button-ctn {
+  padding-bottom: 10px;
 }

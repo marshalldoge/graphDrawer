@@ -684,7 +684,7 @@ class Board extends Component {
 					                        {this.SVG()}
 				                        </div>
 			                        </Row>
-			                        <Row justify={"center"} align={"middle"}>
+			                        <Row justify={"center"} align={"middle"} className={"conf-button-ctn"}>
 				                        { this.state.editMode && (
 					                            <div onClick={(e) => this.setState({isConfigurationModalOpen: true})}>
 							                        Abrir Configuración
