@@ -133,6 +133,11 @@ class Board extends Component {
 									...sensor,
 									color: "red"
 								};
+								prevState.nodeMap[node.id] = {
+									...prevState.nodeMap[node.id],
+									...sensor,
+									color: "red"
+								};
 							}
 					    }
 				    }
@@ -443,7 +448,7 @@ class Board extends Component {
 			for(let i = 0; i < this.state.graph[x[1]].length; i++) {
 				let addedWeight = this.state.graph[x[1]][i][0];
 				let destNode = this.state.graph[x[1]][i][1];
-				let newWeight = d[x[1]] + addedWeight + (900 - this.state.nodeMap[destNode].fireLevel);
+				let newWeight = d[x[1]] + addedWeight + (1024 - this.state.nodeMap[destNode].fireLevel);
 				if(d[destNode] > newWeight) {
 					d[destNode] = newWeight;
 					p[destNode] = x[1];
@@ -453,25 +458,25 @@ class Board extends Component {
 			}
 		}
 
-		console.log('Parent: ',p);
 		let res = [];
 		if(reachedExitNodes.length > 0) {
 			let minPos = 0;
 			let mini = inf;
 			for(let i = 0; i < reachedExitNodes.length; i++) {
+				//console.log('Distance with exit: ',reachedExitNodes[i], ' is ',d[reachedExitNodes[i]]);
 				if(mini > d[reachedExitNodes[i]]){
 					mini = d[reachedExitNodes[i]];
 					minPos = i;
 				}
 			}
 			let node = reachedExitNodes[minPos];
+			//console.log('Closest exit: ',node);
 			while(node !== -1) {
 				res.unshift(
 					 {
 						 ...this.state.nodeMap[node],
 						 color: "rgb(29,188,142)"
 					 });
-				console.log('Addint parentEdge: ',parentEdge[node]);
 				res.unshift(
 					 {
 						 ...parentEdge[node],
@@ -504,6 +509,7 @@ class Board extends Component {
 		e.stopPropagation();
 		if(!this.state.editMode) {
 			let commands = this.getShortestPath(node.id);
+			console.log('Commands: ',commands);
 			this.runAnimation(commands);
 		} else {
 			if(this.state.startEdge === null) {
@@ -576,7 +582,7 @@ class Board extends Component {
 						 exitNode: prevState.drawingExitNodes,
 						 idx: prevState.nodes.length,
 						 color: prevState.drawingExitNodes ? "#003152" : "#1B7183",
-						 fireLevel: 900,
+						 fireLevel: 1024,
 						 water: false,
 						 temperature: 0
 					 }
