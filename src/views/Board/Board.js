@@ -9,24 +9,11 @@ import ReactApexChart from "react-apexcharts";
 import 'antd/dist/antd.css';
 import Modal from 'react-modal';
 import './_Board.scss';
-import { johnson } from '../../algorithms/johnson';
-import { asignacion } from '../../algorithms/asignacion';
-import { noroeste } from '../../algorithms/noroeste';
-import { trees } from '../../algorithms/arboles';
-import { compet } from '../../algorithms/compet';
-import { sort } from '../../algorithms/sort';
 import { getUrlParams, getRandomArbitrary } from "../../utils";
 import { PriorityQueue } from "../../algorithms/PriorityQueue";
 import 'firebase/firestore';
 import firebase from '../../Firebase';
 
-const { Title } = Typography;
-const Matrix = React.lazy(() => import("../../components/Matrix/Matrix"));
-const RawMatrix = React.lazy(() => import("../../components/RawMatrix/RawMatrix"));
-const SelfLoopLabels = React.lazy(() => import("../../components/SelfLoopLabels/SelfLoopLabels"));
-const TreeNode = React.lazy(() => import("../../components/TreeNode/TreeNode"));
-const { Header, Content, Footer, Sider } = Layout;
-const { SubMenu } = Menu;
 const firestore = firebase.firestore();
 
 class Board extends Component {
